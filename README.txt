@@ -2,8 +2,8 @@
  ropemacs, rope in emacs
 =========================
 
-Using rope in emacs.  You should install `rope`_ library before using
-ropemacs.
+For using rope in emacs.  You should install `rope`_ library before
+using ropemacs.
 
 .. _`rope`: http://rope.sf.net/
 

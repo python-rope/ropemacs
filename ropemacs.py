@@ -24,6 +24,7 @@ class RopeInterface(object):
         self.project = None
         self.old_content = None
 
+    @interactive()
     def init(self):
         """Initialize rope mode"""
         lisp.add_hook(lisp.before_save_hook,

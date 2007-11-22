@@ -23,7 +23,7 @@ TODO
 > Public Release 0.2
 
 
-* ropemacs: find file dialog
-
-
 * ropemacs: autocomplete
+
+
+* ropemacs: find file dialog

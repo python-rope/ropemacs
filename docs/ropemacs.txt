@@ -1,0 +1,35 @@
+=========================
+ ropemacs, rope in emacs
+=========================
+
+Ropemacs is a plugin for performing python refactorings in emacs.  It
+uses rope_ library and pymacs_.
+
+You should install `rope`_ library before using ropemacs.  You can
+download ropemacs from `project download page`_.
+
+.. _rope: http://rope.sf.net/
+
+
+Source Repository
+=================
+
+Rope uses Mercurial_ VCS at http://rope.sourceforge.net/hg/ropemacs .
+
+
+Feedback
+========
+
+Send your bug reports, feature requests and patches to `rope-dev (at)
+googlegroups.com`_.
+
+
+License
+=======
+
+rope is under the terms of GNU GPL (GNU General Public License).
+
+.. _project download page: http://sf.net/projects/rope/files
+.. _`rope-dev (at) googlegroups.com`: http://groups.google.com/group/rope-dev
+.. _pymacs: http://www.iro.umontreal.ca/~pinard/pymacs/
+.. _Mercurial: http://selenic.com/mercurial
