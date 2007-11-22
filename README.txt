@@ -55,14 +55,14 @@ C-c i o         rope-organize-imports
 =============   ============================
 
 
-Getting Started
-===============
+Contributing
+============
 
-* List of features: `docs/index.txt`_
-* Contributing: `docs/contributing.txt`_
+Send your bug reports, feature requests and patches to `rope-dev (at)
+googlegroups.com`_.
 
-.. _`docs/index.txt`: docs/index.html
-.. _`docs/contributing.txt`: docs/contributing.html
+.. _`rope-dev (at) googlegroups.com`: http://groups.google.com/group/rope-dev
+
 
 
 License
