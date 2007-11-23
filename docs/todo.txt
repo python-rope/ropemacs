@@ -14,4 +14,5 @@ TODO
 * change pymacs to accept unicode strings
 * specifying refactoring options
 * new file/directory/module/package; C-x p n [fdmp]
+* find file and advanced maching
 * code assists when the buffer is changed causes problems

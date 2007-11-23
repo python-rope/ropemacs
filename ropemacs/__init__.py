@@ -309,7 +309,7 @@ class RopeInterface(object):
 
     def _goto_location(self, location):
         if location[0]:
-            lisp.find_file(location[0].real_path)
+            lisp.find_file(str(location[0].real_path))
         if location[1]:
             lisp.goto_line(location[1])
 
@@ -351,7 +351,7 @@ class RopeInterface(object):
 
     def _reload_buffers(self, changed_resources):
         for resource in changed_resources:
-            buffer = lisp.find_buffer_visiting(resource.real_path)
+            buffer = lisp.find_buffer_visiting(str(resource.real_path))
             if buffer and resource.exists():
                 lisp.set_buffer(buffer)
                 lisp.revert_buffer(None, 1)
