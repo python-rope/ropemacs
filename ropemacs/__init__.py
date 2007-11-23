@@ -142,11 +142,11 @@ class RopeInterface(object):
     def move(self):
         mover = self._create_mover()
         if isinstance(mover, rope.refactor.move.MoveGlobal):
-            lisp.call_interactively(lisp.rope_move_global)
+            self._move_global(mover)
         if isinstance(mover, rope.refactor.move.MoveModule):
-            lisp.call_interactively(lisp.rope_move_module)
+            self._move_module(mover)
         if isinstance(mover, rope.refactor.move.MoveMethod):
-            lisp.call_interactively(lisp.rope_move_method)
+            self._move_method(mover)
 
     def _create_mover(self, module=False):
         self._check_project()
@@ -156,27 +156,25 @@ class RopeInterface(object):
             offset = None
         return rope.refactor.move.create_move(self.project, resource, offset)
 
-    @interactive('sDestination Module Name: ')
-    def move_global(self, dest_module):
-        mover = self._create_mover()
+    def _move_global(self, mover):
+        dest_module = _ask('Destination Module Name: ')
         destination = self.project.pycore.find_module(dest_module)
         self._perform(mover.get_changes(destination))
 
-    @interactive('sDestination Attribute: ')
-    def move_method(self, dest_attr):
-        mover = self._create_mover()
+    def _move_method(self, mover):
+        dest_attr = _ask('Destination Attribute: ')
         self._perform(mover.get_changes(dest_attr,
                                         mover.get_method_name()))
 
-    @interactive('sDestination Package: ')
-    def move_module(self, dest_package):
-        mover = self._create_mover()
+    def _move_module(self, mover):
+        dest_package = _ask('Destination Package: ')
         destination = self.project.pycore.find_module(dest_package)
         self._perform(mover.get_changes(destination))
 
-    @interactive('sDestination Package: ')
-    def move_current_module(self, dest_package):
+    @interactive()
+    def move_current_module(self):
         mover = self._create_mover(module=True)
+        dest_package = _ask('Destination Package: ')
         destination = self.project.pycore.find_module(dest_package)
         self._perform(mover.get_changes(destination))
 
@@ -188,22 +186,25 @@ class RopeInterface(object):
                                                  self._get_resource())
         self._perform(packager.get_changes())
 
-    def _do_extract(self, extractor, newname):
+    def _do_extract(self, extractor, prompt):
         self._check_project()
         lisp.save_buffer()
         resource = self._get_resource()
         start, end = self._get_region()
         extractor = extractor(self.project, resource, start, end)
+        newname = _ask(prompt)
         changes = extractor.get_changes(newname)
         self._perform(changes)
 
-    @interactive('sNew Variable Name: ')
-    def extract_variable(self, newname):
-        self._do_extract(rope.refactor.extract.ExtractVariable, newname)
+    @interactive()
+    def extract_variable(self):
+        self._do_extract(rope.refactor.extract.ExtractVariable,
+                         'New Variable Name: ')
 
-    @interactive('sNew Method Name: ')
-    def extract_method(self, newname):
-        self._do_extract(rope.refactor.extract.ExtractMethod, newname)
+    @interactive()
+    def extract_method(self):
+        self._do_extract(rope.refactor.extract.ExtractMethod,
+                         'New Method Name: ')
 
     @interactive()
     def inline(self):
