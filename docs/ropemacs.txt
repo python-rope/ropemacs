@@ -14,7 +14,8 @@ download ropemacs from `project download page`_.
 Source Repository
 =================
 
-Rope uses Mercurial_ VCS at http://rope.sourceforge.net/hg/ropemacs .
+Ropemacs Mercurial_ repository:
+  http://rope.sourceforge.net/hg/ropemacs
 
 
 Feedback
@@ -27,7 +28,7 @@ googlegroups.com`_.
 License
 =======
 
-rope is under the terms of GNU GPL (GNU General Public License).
+Ropemacs is under the terms of GNU GPL (GNU General Public License).
 
 .. _project download page: http://sf.net/projects/rope/files
 .. _`rope-dev (at) googlegroups.com`: http://groups.google.com/group/rope-dev

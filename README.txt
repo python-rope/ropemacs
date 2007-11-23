@@ -22,7 +22,7 @@ file encoding declarations.  A simple patch is included:
 
 After installing pymacs, add these lines to your ``~/.emacs`` file::
 
-  (load-library "pymacs")
+  (require 'pymacs)
   (pymacs-load "ropemacs" "rope-")
   (rope-init)
 

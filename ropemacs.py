@@ -18,13 +18,18 @@ class interactive(object):
         return func
 
 
+def lispfunction(func):
+    func.lisp = None
+    return func
+
+
 class RopeInterface(object):
 
     def __init__(self):
         self.project = None
         self.old_content = None
 
-    @interactive()
+    @lispfunction
     def init(self):
         """Initialize rope mode"""
         lisp.add_hook(lisp.before_save_hook,
@@ -65,6 +70,7 @@ class RopeInterface(object):
                 result.append(key)
         return ''.join(result)
 
+    @lispfunction
     def before_save_actions(self):
         if self.project is not None:
             resource = self._get_resource()
@@ -73,12 +79,14 @@ class RopeInterface(object):
             else:
                 self.old_content = ''
 
+    @lispfunction
     def after_save_actions(self):
         if self.project is not None:
             libutils.report_change(self.project, lisp.buffer_file_name(),
                                    self.old_content)
             self.old_content = None
 
+    @lispfunction
     def exiting_actions(self):
         if self.project is not None:
             self.close_project()
@@ -276,31 +284,12 @@ class RopeInterface(object):
                 lisp.revert_buffer(None, 1)
 
 
+def register_functions(interface):
+    for attrname in dir(interface):
+        attr = getattr(interface, attrname)
+        if hasattr(attr, 'interaction') or hasattr(attr, 'lisp'):
+            globals()[attrname] = attr
+
+
 interface = RopeInterface()
-
-init = interface.init
-open_project = interface.open_project
-close_project = interface.close_project
-undo_refactoring = interface.undo_refactoring
-redo_refactoring = interface.redo_refactoring
-
-rename = interface.rename
-extract_variable = interface.extract_variable
-extract_method = interface.extract_method
-inline = interface.inline
-rename_current_module = interface.rename_current_module
-module_to_package = interface.module_to_package
-move = interface.move
-move_global = interface.move_global
-move_module = interface.move_module
-move_method = interface.move_method
-move_current_module = interface.move_current_module
-
-organize_imports = interface.organize_imports
-
-before_save_actions = interface.before_save_actions
-after_save_actions = interface.after_save_actions
-exiting_actions = interface.exiting_actions
-
-goto_definition = interface.goto_definition
-show_doc = interface.show_doc
+register_functions(interface)
