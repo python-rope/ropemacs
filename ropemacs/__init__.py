@@ -44,6 +44,7 @@ class RopeInterface(object):
             ('C-x p k', lisp.rope_close_project),
             ('C-x p u', lisp.rope_undo_refactoring),
             ('C-x p r', lisp.rope_redo_refactoring),
+            ('C-x p f', lisp.rope_find_file),
 
             ('C-c r r', lisp.rope_rename),
             ('C-c r l', lisp.rope_extract_variable),
@@ -279,9 +280,20 @@ class RopeInterface(object):
         names = [proposal.name for proposal in proposals]
         starting = source[starting_offset:offset]
         prompt = 'Completion for %s: ' % starting
-        result = lisp.completing_read(prompt, names, None, None, starting)
+        result = _ask_values(prompt, names, starting=starting)
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
+
+    @interactive()
+    def find_file(self):
+        self._check_project()
+        files = self.project.get_files()
+        source = lisp.buffer_string()
+        result = _ask_values('Rope Find File: ',
+                             [file.name for file in files], exact=True)
+        for file in files:
+            if result == file.name:
+                lisp.find_file(file.real_path)
 
     def _get_location(self):
         resource = self._get_resource()
@@ -314,19 +326,12 @@ def _register_functions(interface):
             globals()[attrname] = attr
 
 
-class _LispAskConfig(object):
-
-    def __call__(self, conf):
-        if conf.values:
-            return lisp.completing_read(
-                conf.prompt, conf.values, None, True)
-        else:
-            return lisp.read_from_minibuffer(conf.prompt)
-
-
 def _ask(prompt, default=None):
     return lisp.read_from_minibuffer(prompt, default, None, None,
                                      None, default, None)
+
+def _ask_values(prompt, values, starting=None, exact=None):
+    return lisp.completing_read(prompt, values, None, exact, starting)
 
 interface = RopeInterface()
 _register_functions(interface)

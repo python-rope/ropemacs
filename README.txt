@@ -11,6 +11,8 @@ using ropemacs.
 New Features
 ============
 
+* Auto-completing python names (code-assist)
+
 
 Setting Up
 ==========
@@ -39,6 +41,7 @@ C-x p o         rope-open-project
 C-x p k         rope-close-project
 C-x p u         rope-undo-refactoring
 C-x p r         rope-redo-refactoring
+C-x p f         rope-find-file
 
 C-c r r         rope-rename
 C-c r l         rope-extract-variable
@@ -49,6 +52,7 @@ C-c r 1 r       rope-rename-current-module
 C-c r 1 v       rope-move-current-module
 C-c r 1 p       rope-module-to-package
 
+C-/             rope-code-assist
 C-c g           rope-goto-definition
 C-c C-d         rope-show-doc
 C-c i o         rope-organize-imports
