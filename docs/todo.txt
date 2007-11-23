@@ -8,10 +8,10 @@ TODO
 * previewing changes
 * showing refactoring progress
 * adding a menu
+* change pymacs to accept unicode strings
 
 > Public Release 0.2
 
-* change pymacs to accept unicode strings
 * specifying refactoring options
 * new file/directory/module/package; C-x p n [fdmp]
 * find file and advanced maching
