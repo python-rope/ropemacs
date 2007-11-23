@@ -118,23 +118,25 @@ class RopeInterface(object):
             for changes in self.project.history.redo():
                 self._reload_buffers(changes.get_changed_resources())
 
-    def do_rename(self, newname, module=False):
+    def do_rename(self, module=False):
         self._check_project()
         lisp.save_some_buffers()
         resource, offset = self._get_location()
         if module:
             offset = None
         renamer = rope.refactor.rename.Rename(self.project, resource, offset)
+        oldname = str(renamer.get_old_name())
+        newname = _ask('New name for %s: ' % oldname, default=oldname)
         changes = renamer.get_changes(newname, docs=True)
         self._perform(changes)
 
-    @interactive('sNew Name: ')
-    def rename(self, newname):
-        self.do_rename(newname)
+    @interactive()
+    def rename(self):
+        self.do_rename()
 
-    @interactive('sNew Module Name: ')
-    def rename_current_module(self, newname):
-        self.do_rename(newname, module=True)
+    @interactive()
+    def rename_current_module(self):
+        self.do_rename(module=True)
 
     @interactive()
     def move(self):
@@ -284,12 +286,15 @@ class RopeInterface(object):
                 lisp.revert_buffer(None, 1)
 
 
-def register_functions(interface):
+def _register_functions(interface):
     for attrname in dir(interface):
         attr = getattr(interface, attrname)
         if hasattr(attr, 'interaction') or hasattr(attr, 'lisp'):
             globals()[attrname] = attr
 
+def _ask(prompt, default=None):
+    return lisp.read_from_minibuffer(prompt, None, None, None,
+                                     None, default)
 
 interface = RopeInterface()
-register_functions(interface)
+_register_functions(interface)
