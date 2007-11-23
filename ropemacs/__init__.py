@@ -54,7 +54,7 @@ class RopeInterface(object):
             ('C-c r 1 v', lisp.rope_move_current_module),
             ('C-c r 1 p', lisp.rope_module_to_package),
 
-            ('C-c x', lisp.rope_code_assist),
+            ('M-/', lisp.rope_code_assist),
             ('C-c g', lisp.rope_goto_definition),
             ('C-c C-d', lisp.rope_show_doc),
             ('C-c i o', lisp.rope_organize_imports)]
@@ -64,8 +64,11 @@ class RopeInterface(object):
     def _key_sequence(self, sequence):
         result = []
         for key in sequence.split():
-            if key.lower().startswith('c-'):
+            if key.startswith('C-'):
                 number = ord(key[-1].upper()) - ord('A') + 1
+                result.append(chr(number))
+            elif key.startswith('M-'):
+                number = ord(key[-1].upper()) + 0x80
                 result.append(chr(number))
             else:
                 result.append(key)
