@@ -5,7 +5,7 @@ import rope.refactor.inline
 import rope.refactor.move
 import rope.refactor.rename
 from rope.base import project, libutils
-from rope.contrib import codeassist
+from rope.contrib import codeassist, generate
 
 
 class interactive(object):
@@ -58,7 +58,14 @@ class RopeInterface(object):
             ('M-/', lisp.rope_code_assist),
             ('C-c g', lisp.rope_goto_definition),
             ('C-c C-d', lisp.rope_show_doc),
-            ('C-c i o', lisp.rope_organize_imports)]
+            ('C-c i o', lisp.rope_organize_imports),
+
+            ('C-c n v', lisp.rope_generate_variable),
+            ('C-c n f', lisp.rope_generate_function),
+            ('C-c n c', lisp.rope_generate_class),
+            ('C-c n m', lisp.rope_generate_module),
+            ('C-c n p', lisp.rope_generate_package)]
+
         for key, callback in actions:
             lisp.global_set_key(self._key_sequence(key), callback)
 
@@ -250,10 +257,7 @@ class RopeInterface(object):
         resource, offset = self._get_location()
         definition = codeassist.get_definition_location(
             self.project, lisp.buffer_string(), offset, resource)
-        if definition[0]:
-            lisp.find_file(definition[0].real_path)
-        if definition[1]:
-            lisp.goto_line(definition[1])
+        self._goto_location(definition)
 
     @interactive()
     def show_doc(self):
@@ -294,6 +298,40 @@ class RopeInterface(object):
         for file in files:
             if result == file.name:
                 lisp.find_file(file.real_path)
+
+    def _generate_element(self, kind):
+        self._check_project()
+        resource, offset = self._get_location()
+        generator = generate.create_generate(kind, self.project,
+                                             resource, offset)
+        self._perform(generator.get_changes())
+        self._goto_location(generator.get_location())
+
+    def _goto_location(self, location):
+        if location[0]:
+            lisp.find_file(location[0].real_path)
+        if location[1]:
+            lisp.goto_line(location[1])
+
+    @interactive()
+    def generate_variable(self):
+        self._generate_element('variable')
+
+    @interactive()
+    def generate_function(self):
+        self._generate_element('function')
+
+    @interactive()
+    def generate_class(self):
+        self._generate_element('class')
+
+    @interactive()
+    def generate_module(self):
+        self._generate_element('module')
+
+    @interactive()
+    def generate_package(self):
+        self._generate_element('package')
 
     def _get_location(self):
         resource = self._get_resource()

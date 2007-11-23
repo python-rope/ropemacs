@@ -11,7 +11,9 @@ using ropemacs.
 New Features
 ============
 
-* Auto-completing python names (code-assist)
+* Auto-completing python names (code-assist); ``M-/``
+* Rope find file; ``C-c p f``
+* Generate python element; ``C-c n [vfcmp]``
 
 
 Setting Up
@@ -56,6 +58,12 @@ C-/             rope-code-assist
 C-c g           rope-goto-definition
 C-c C-d         rope-show-doc
 C-c i o         rope-organize-imports
+
+C-c n v         rope-generate-variable
+C-c n f         rope-generate-function
+C-c n c         rope-generate-class
+C-c n m         rope-generate-module
+C-c n p         rope-generate-package
 =============   ============================
 
 
