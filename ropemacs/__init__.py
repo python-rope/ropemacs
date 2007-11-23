@@ -54,6 +54,7 @@ class RopeInterface(object):
             ('C-c r 1 v', lisp.rope_move_current_module),
             ('C-c r 1 p', lisp.rope_module_to_package),
 
+            ('C-c x', lisp.rope_code_assist),
             ('C-c g', lisp.rope_goto_definition),
             ('C-c C-d', lisp.rope_show_doc),
             ('C-c i o', lisp.rope_organize_imports)]
@@ -263,6 +264,22 @@ class RopeInterface(object):
             lisp.insert(docs)
             lisp.display_buffer(pydoc_buffer)
 
+    @interactive()
+    def code_assist(self):
+        self._check_project()
+        resource, offset = self._get_location()
+        source = lisp.buffer_string()
+        proposals = codeassist.code_assist(self.project, source,
+                                           offset, resource)
+        proposals = codeassist.sorted_proposals(proposals)
+        starting_offset = codeassist.starting_offset(source, offset)
+        names = [proposal.name for proposal in proposals]
+        starting = source[starting_offset:offset]
+        prompt = 'Completion for %s: ' % starting
+        result = lisp.completing_read(prompt, names, None, None, starting)
+        lisp.delete_region(starting_offset + 1, offset + 1)
+        lisp.insert(result)
+
     def _get_location(self):
         resource = self._get_resource()
         offset = self._get_offset()
@@ -293,9 +310,20 @@ def _register_functions(interface):
         if hasattr(attr, 'interaction') or hasattr(attr, 'lisp'):
             globals()[attrname] = attr
 
+
+class _LispAskConfig(object):
+
+    def __call__(self, conf):
+        if conf.values:
+            return lisp.completing_read(
+                conf.prompt, conf.values, None, True)
+        else:
+            return lisp.read_from_minibuffer(conf.prompt)
+
+
 def _ask(prompt, default=None):
-    return lisp.read_from_minibuffer(prompt, None, None, None,
-                                     None, default)
+    return lisp.read_from_minibuffer(prompt, default, None, None,
+                                     None, default, None)
 
 interface = RopeInterface()
 _register_functions(interface)

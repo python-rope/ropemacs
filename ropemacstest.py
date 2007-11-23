@@ -12,24 +12,24 @@ class ConfigTest(unittest.TestCase):
         super(ConfigTest, self).tearDown()
 
     def test_trivial_case(self):
-        config.ask([], MiniBuffer())
+        config.ask([], _MockAskConfig())
 
     def test_asking_normal_configs(self):
         confs = [config.Config('name')]
-        minibuffer = MiniBuffer(['value'])
+        minibuffer = _MockAskConfig(['value'])
         result = config.ask(confs, minibuffer)
         self.assertEquals(['name'], minibuffer.asked)
         self.assertEquals({'name': 'value'}, result)
 
 
-class MiniBuffer(object):
+class _MockAskConfig(object):
 
     def __init__(self, responses=[]):
         self.responses = responses
         self.asked = []
 
-    def __call__(self, message):
-        self.asked.append(message)
+    def __call__(self, config):
+        self.asked.append(config.name)
         return self.responses[len(self.asked) - 1]
 
 
