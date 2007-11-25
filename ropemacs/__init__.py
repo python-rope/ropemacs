@@ -132,7 +132,7 @@ class RopeInterface(object):
 
     def do_rename(self, module=False):
         self._check_project()
-        lisp.save_some_buffers()
+        self._save_buffers()
         resource, offset = self._get_location()
         if module:
             offset = None
@@ -162,7 +162,7 @@ class RopeInterface(object):
 
     def _create_mover(self, module=False):
         self._check_project()
-        lisp.save_some_buffers()
+        self._save_buffers()
         resource, offset = self._get_location()
         if module:
             offset = None
@@ -221,7 +221,7 @@ class RopeInterface(object):
     @interactive()
     def inline(self):
         self._check_project()
-        lisp.save_some_buffers()
+        self._save_buffers()
         resource, offset = self._get_location()
         inliner = rope.refactor.inline.create_inline(
             self.project, resource, offset)
@@ -292,15 +292,18 @@ class RopeInterface(object):
     def find_file(self):
         self._check_project()
         files = self.project.get_files()
-        source = lisp.buffer_string()
-        result = _ask_values('Rope Find File: ',
-                             [file.name for file in files], exact=True)
+        names = []
         for file in files:
-            if result == file.name:
-                lisp.find_file(file.real_path)
+            names.append('<'.join(reversed(file.path.split('/'))))
+        source = lisp.buffer_string()
+        result = _ask_values('Rope Find File: ', names, exact=True)
+        path = '/'.join(reversed(result.split('<')))
+        file = self.project.get_file(path)
+        lisp.find_file(file.real_path)
 
     def _generate_element(self, kind):
         self._check_project()
+        self._save_buffers()
         resource, offset = self._get_location()
         generator = generate.create_generate(kind, self.project,
                                              resource, offset)
@@ -338,8 +341,9 @@ class RopeInterface(object):
         offset = self._get_offset()
         return resource, offset
 
-    def _get_resource(self):
-        filename = lisp.buffer_file_name()
+    def _get_resource(self, filename=None):
+        if filename is None:
+            filename = lisp.buffer_file_name()
         resource = libutils.path_to_resource(self.project, filename, 'file')
         return resource
 
@@ -355,6 +359,22 @@ class RopeInterface(object):
             if buffer and resource.exists():
                 lisp.set_buffer(buffer)
                 lisp.revert_buffer(None, 1)
+
+    def _save_buffers(self, ask=True):
+        if ask:
+            lisp.save_some_buffers()
+        else:
+            current_buffer = lisp.current_buffer()
+            buffers = lisp.buffer_list()
+            for buffer in buffers:
+                filename = lisp.buffer_file_name(buffer)
+                if filename:
+                    resource = self._get_resource(filename)
+                    if resource.exists() and \
+                       self.project.pycore.is_python_file(resource):
+                        lisp.set_buffer(buffer)
+                        lisp.save_buffer()
+            lisp.set_buffer(current_buffer)
 
 
 def _register_functions(interface):

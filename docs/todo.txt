@@ -14,5 +14,6 @@ TODO
 
 * specifying refactoring options
 * new file/directory/module/package; C-x p n [fdmp]
-* find file and advanced maching
+* showing proposal type in code-assist
 * code assists when the buffer is changed causes problems
+* only saving python files before refactorings
