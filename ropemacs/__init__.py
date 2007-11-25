@@ -8,15 +8,9 @@ from rope.base import project, libutils
 from rope.contrib import codeassist, generate
 
 
-class interactive(object):
-
-    def __init__(self, mode=''):
-        self.mode = mode
-
-    def __call__(self, func):
-        func.interaction = self.mode
-        return func
-
+def interactive(func):
+    func.interaction = ''
+    return func
 
 def lispfunction(func):
     func.lisp = None
@@ -103,29 +97,32 @@ class RopeInterface(object):
         if self.project is not None:
             self.close_project()
 
-    @interactive('DRope Project Root Folder: ')
-    def open_project(self, root):
+    @interactive
+    def open_project(self):
+        root = lisp.read_directory_name('Rope project root folder: ')
         if self.project is not None:
             self.close_project()
         self.project = project.Project(root)
 
-    @interactive()
+    @interactive
     def close_project(self):
         if project is not None:
             self.project.close()
             self.project = None
             lisp.message('Project closed')
 
-    @interactive('cUndo refactoring might change many files; proceed? (y)')
-    def undo_refactoring(self, confirm):
-        if chr(confirm) in ('\r', '\n', 'y'):
+    @interactive
+    def undo_refactoring(self):
+        if lisp.y_or_n_p('Undo refactoring might change'
+                         ' many files; proceed? (y)'):
             self._check_project()
             for changes in self.project.history.undo():
                 self._reload_buffers(changes.get_changed_resources())
 
-    @interactive('cRedo refactoring might change many files; proceed? (y)')
-    def redo_refactoring(self, confirm):
-        if chr(confirm) in ('\r', '\n', 'y'):
+    @interactive
+    def redo_refactoring(self):
+        if lisp.y_or_n_p('Redo refactoring might change'
+                         ' many files; proceed? (y)'):
             self._check_project()
             for changes in self.project.history.redo():
                 self._reload_buffers(changes.get_changed_resources())
@@ -142,15 +139,15 @@ class RopeInterface(object):
         changes = renamer.get_changes(newname, docs=True)
         self._perform(changes)
 
-    @interactive()
+    @interactive
     def rename(self):
         self.do_rename()
 
-    @interactive()
+    @interactive
     def rename_current_module(self):
         self.do_rename(module=True)
 
-    @interactive()
+    @interactive
     def move(self):
         mover = self._create_mover()
         if isinstance(mover, rope.refactor.move.MoveGlobal):
@@ -183,14 +180,14 @@ class RopeInterface(object):
         destination = self.project.pycore.find_module(dest_package)
         self._perform(mover.get_changes(destination))
 
-    @interactive()
+    @interactive
     def move_current_module(self):
         mover = self._create_mover(module=True)
         dest_package = _ask('Destination Package: ')
         destination = self.project.pycore.find_module(dest_package)
         self._perform(mover.get_changes(destination))
 
-    @interactive()
+    @interactive
     def module_to_package(self):
         self._check_project()
         lisp.save_buffer()
@@ -208,17 +205,17 @@ class RopeInterface(object):
         changes = extractor.get_changes(newname)
         self._perform(changes)
 
-    @interactive()
+    @interactive
     def extract_variable(self):
         self._do_extract(rope.refactor.extract.ExtractVariable,
                          'New Variable Name: ')
 
-    @interactive()
+    @interactive
     def extract_method(self):
         self._do_extract(rope.refactor.extract.ExtractMethod,
                          'New Method Name: ')
 
-    @interactive()
+    @interactive
     def inline(self):
         self._check_project()
         self._save_buffers()
@@ -227,7 +224,7 @@ class RopeInterface(object):
             self.project, resource, offset)
         self._perform(inliner.get_changes())
 
-    @interactive()
+    @interactive
     def organize_imports(self):
         self._check_project()
         lisp.save_buffer()
@@ -251,7 +248,7 @@ class RopeInterface(object):
     def _get_offset(self):
         return lisp.point() - 1
 
-    @interactive()
+    @interactive
     def goto_definition(self):
         self._check_project()
         resource, offset = self._get_location()
@@ -259,7 +256,7 @@ class RopeInterface(object):
             self.project, lisp.buffer_string(), offset, resource)
         self._goto_location(definition)
 
-    @interactive()
+    @interactive
     def show_doc(self):
         self._check_project()
         resource, offset = self._get_location()
@@ -272,7 +269,7 @@ class RopeInterface(object):
             lisp.insert(docs)
             lisp.display_buffer(pydoc_buffer)
 
-    @interactive()
+    @interactive
     def code_assist(self):
         self._check_project()
         resource, offset = self._get_location()
@@ -288,7 +285,7 @@ class RopeInterface(object):
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 
-    @interactive()
+    @interactive
     def find_file(self):
         self._check_project()
         files = self.project.get_files()
@@ -316,23 +313,23 @@ class RopeInterface(object):
         if location[1]:
             lisp.goto_line(location[1])
 
-    @interactive()
+    @interactive
     def generate_variable(self):
         self._generate_element('variable')
 
-    @interactive()
+    @interactive
     def generate_function(self):
         self._generate_element('function')
 
-    @interactive()
+    @interactive
     def generate_class(self):
         self._generate_element('class')
 
-    @interactive()
+    @interactive
     def generate_module(self):
         self._generate_element('module')
 
-    @interactive()
+    @interactive
     def generate_package(self):
         self._generate_element('package')
 
