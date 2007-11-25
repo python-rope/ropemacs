@@ -114,7 +114,7 @@ class RopeInterface(object):
     @interactive
     def undo_refactoring(self):
         if lisp.y_or_n_p('Undo refactoring might change'
-                         ' many files; proceed? (y)'):
+                         ' many files; proceed? '):
             self._check_project()
             for changes in self.project.history.undo():
                 self._reload_buffers(changes.get_changed_resources())
@@ -122,7 +122,7 @@ class RopeInterface(object):
     @interactive
     def redo_refactoring(self):
         if lisp.y_or_n_p('Redo refactoring might change'
-                         ' many files; proceed? (y)'):
+                         ' many files; proceed? '):
             self._check_project()
             for changes in self.project.history.redo():
                 self._reload_buffers(changes.get_changed_resources())
@@ -358,20 +358,24 @@ class RopeInterface(object):
                 lisp.revert_buffer(None, 1)
 
     def _save_buffers(self, ask=True):
-        if ask:
-            lisp.save_some_buffers()
-        else:
-            current_buffer = lisp.current_buffer()
-            buffers = lisp.buffer_list()
-            for buffer in buffers:
-                filename = lisp.buffer_file_name(buffer)
-                if filename:
-                    resource = self._get_resource(filename)
-                    if resource.exists() and \
-                       self.project.pycore.is_python_file(resource):
+        initial = lisp.current_buffer()
+        current_buffer = lisp.current_buffer()
+        buffers = lisp.buffer_list()
+        for buffer in buffers:
+            filename = lisp.buffer_file_name(buffer)
+            if filename:
+                if self._is_a_project_python_file(filename) and \
+                   lisp.buffer_modified_p(buffer):
+                    if not ask or lisp.y_or_n_p('Save %s buffer?' % filename):
                         lisp.set_buffer(buffer)
                         lisp.save_buffer()
-            lisp.set_buffer(current_buffer)
+        lisp.set_buffer(initial)
+
+    def _is_a_project_python_file(self, path):
+        resource = self._get_resource(path)
+        return (resource is not None and resource.exists() and
+                resource.project == self.project and
+                self.project.pycore.is_python_file(resource))
 
 
 def _register_functions(interface):
