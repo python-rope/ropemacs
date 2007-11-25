@@ -15,5 +15,5 @@ TODO
 * specifying refactoring options
 * new file/directory/module/package; C-x p n [fdmp]
 * showing proposal type in code-assist
-* code assists when the buffer is changed causes problems
 * including pymacs in rope?
+* an option for saving files before refactorings without asking

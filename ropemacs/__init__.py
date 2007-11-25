@@ -190,14 +190,14 @@ class RopeInterface(object):
     @interactive
     def module_to_package(self):
         self._check_project()
-        lisp.save_buffer()
+        self._save_buffers(only_current=True)
         packager = rope.refactor.ModuleToPackage(self.project,
                                                  self._get_resource())
         self._perform(packager.get_changes())
 
     def _do_extract(self, extractor, prompt):
         self._check_project()
-        lisp.save_buffer()
+        self._save_buffers(only_current=True)
         resource = self._get_resource()
         start, end = self._get_region()
         extractor = extractor(self.project, resource, start, end)
@@ -227,7 +227,7 @@ class RopeInterface(object):
     @interactive
     def organize_imports(self):
         self._check_project()
-        lisp.save_buffer()
+        self._save_buffers(only_current=True)
         organizer = rope.refactor.ImportOrganizer(self.project)
         self._perform(organizer.organize_imports(self._get_resource()))
 
@@ -357,10 +357,13 @@ class RopeInterface(object):
                 lisp.set_buffer(buffer)
                 lisp.revert_buffer(None, 1)
 
-    def _save_buffers(self, ask=True):
+    def _save_buffers(self, ask=True, only_current=False):
         initial = lisp.current_buffer()
         current_buffer = lisp.current_buffer()
-        buffers = lisp.buffer_list()
+        if only_current:
+            buffers = [current_buffer]
+        else:
+            buffers = lisp.buffer_list()
         for buffer in buffers:
             filename = lisp.buffer_file_name(buffer)
             if filename:
