@@ -3,6 +3,7 @@ import rope.refactor.inline
 import rope.refactor.move
 import rope.refactor.move
 import rope.refactor.rename
+import rope.contrib.generate
 
 import ropemacs
 from ropemacs import config
@@ -31,6 +32,7 @@ class Refactoring(object):
             return
         changes = self._calculate_changes(result)
         self._perform(changes)
+        self._done()
 
     @property
     def project(self):
@@ -52,6 +54,9 @@ class Refactoring(object):
         pass
 
     def _create_refactoring(self):
+        pass
+
+    def _done(self):
         pass
 
     def _perform(self, changes):
@@ -235,3 +240,60 @@ class ExtractMethod(Refactoring):
 
     def _calculate_changes(self, values):
         return self.extractor.get_changes(values['name'])
+
+
+class OrganizeImports(Refactoring):
+
+    name = 'organize_imports'
+    key = 'C-c i o'
+    saveall = False
+
+    def _create_refactoring(self):
+        self.organizer = rope.refactor.ImportOrganizer(self.project)
+
+    def _calculate_changes(self, values):
+        return self.organizer.organize_imports(self.resource)
+
+
+class _GenerateElement(Refactoring):
+
+    def _create_refactoring(self):
+        kind = self.name.split('_')[-1]
+        self.generator = rope.contrib.generate.create_generate(
+            kind, self.project, self.resource, self.offset)
+
+    def _calculate_changes(self, values):
+        return self.generator.get_changes()
+
+    def _done(self):
+        self.interface._goto_location(self.generator.get_location())
+
+
+class GenerateVariable(_GenerateElement):
+
+    name = 'generate_variable'
+    key = 'C-c n v'
+
+
+class GenerateFunction(_GenerateElement):
+
+    name = 'generate_function'
+    key = 'C-c n f'
+
+
+class GenerateClass(_GenerateElement):
+
+    name = 'generate_class'
+    key = 'C-c n c'
+
+
+class GenerateModule(_GenerateElement):
+
+    name = 'generate_module'
+    key = 'C-c n m'
+
+
+class GeneratePackage(_GenerateElement):
+
+    name = 'generate_package'
+    key = 'C-c n p'

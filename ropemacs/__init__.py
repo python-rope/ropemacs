@@ -172,10 +172,7 @@ class RopeInterface(object):
 
     @interactive
     def organize_imports(self):
-        self._check_project()
-        self._save_buffers(only_current=True)
-        organizer = rope.refactor.ImportOrganizer(self.project)
-        self._perform(organizer.organize_imports(self._get_resource()))
+        refactor.OrganizeImports(self).show()
 
     def _perform(self, changes):
         if changes is None:
@@ -244,15 +241,6 @@ class RopeInterface(object):
         file = self.project.get_file(path)
         lisp.find_file(file.real_path)
 
-    def _generate_element(self, kind):
-        self._check_project()
-        self._save_buffers()
-        resource, offset = self._get_location()
-        generator = generate.create_generate(kind, self.project,
-                                             resource, offset)
-        self._perform(generator.get_changes())
-        self._goto_location(generator.get_location())
-
     def _goto_location(self, location, readonly=False):
         if location[0]:
             resource = location[0]
@@ -265,23 +253,23 @@ class RopeInterface(object):
 
     @interactive
     def generate_variable(self):
-        self._generate_element('variable')
+        refactor.GenerateVariable(self).show()
 
     @interactive
     def generate_function(self):
-        self._generate_element('function')
+        refactor.GenerateFunction(self).show()
 
     @interactive
     def generate_class(self):
-        self._generate_element('class')
+        refactor.GenerateClass(self).show()
 
     @interactive
     def generate_module(self):
-        self._generate_element('module')
+        refactor.GenerateModule(self).show()
 
     @interactive
     def generate_package(self):
-        self._generate_element('package')
+        refactor.GeneratePackage(self).show()
 
     def _get_location(self):
         resource = self._get_resource()
