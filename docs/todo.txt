@@ -11,6 +11,5 @@ TODO
 
 > Public Release 0.2
 
-* specifying refactoring options
 * new file/directory/module/package; C-x p n [fdmp]
 * showing proposal type in code-assist

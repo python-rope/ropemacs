@@ -27,7 +27,7 @@ class Refactoring(object):
             ropemacs._lisp_askdata, ['perform', 'cancel'],
             self._get_confs(), self._get_optionals())
         if action != 'perform':
-            lisp.message('Cancelled!')
+            ropemacs._message('Cancelled!')
             return
         changes = self._calculate_changes(result)
         self._perform(changes)
@@ -59,7 +59,11 @@ class Refactoring(object):
         pass
 
     def _perform(self, changes):
-        self.interface._perform(changes)
+        if changes is None:
+            return
+        self.project.do(changes)
+        self.interface._reload_buffers(changes.get_changed_resources())
+        ropemacs._message(str(changes.description) + ' finished')
 
     def _get_confs(self):
         return self.confs

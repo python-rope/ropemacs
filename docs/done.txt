@@ -2,6 +2,7 @@
  Done
 ======
 
+- specifying refactoring options : November 26, 2007
 - restructuring support : November 26, 2007
 - added ``rope-confirm-saving`` variable : November 26, 2007
 - only activating local keys in python mode : November 26, 2007

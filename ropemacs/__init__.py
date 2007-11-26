@@ -127,13 +127,6 @@ class RopeInterface(object):
             for changes in self.project.history.redo():
                 self._reload_buffers(changes.get_changed_resources())
 
-    def _perform(self, changes):
-        if changes is None:
-            return
-        self.project.do(changes)
-        self._reload_buffers(changes.get_changed_resources())
-        lisp.message(str(changes.description) + ' finished')
-
     def _get_region(self):
         offset1 = self._get_offset()
         lisp.exchange_point_and_mark()
@@ -283,6 +276,9 @@ def _lisp_askdata(data):
                            starting=data.starting)
     else:
         return _ask(data.prompt, default=data.default, starting=data.starting)
+
+def _message(self, message):
+    lisp.message(message)
 
 
 DEFVARS = """\
