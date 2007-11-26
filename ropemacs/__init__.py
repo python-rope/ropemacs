@@ -1,9 +1,6 @@
-import rope.refactor.extract
-import rope.refactor.inline
-import rope.refactor.move
 from Pymacs import lisp
 from rope.base import project, libutils
-from rope.contrib import codeassist, generate
+from rope.contrib import codeassist
 
 from ropemacs import refactor
 
@@ -22,6 +19,19 @@ class RopeInterface(object):
     def __init__(self):
         self.project = None
         self.old_content = None
+        self.global_keys = [
+            ('C-x p o', lisp.rope_open_project),
+            ('C-x p k', lisp.rope_close_project),
+            ('C-x p u', lisp.rope_undo_refactoring),
+            ('C-x p r', lisp.rope_redo_refactoring),
+            ('C-x p f', lisp.rope_find_file)]
+
+        self.local_keys = [
+            ('M-/', lisp.rope_code_assist),
+            ('C-c g', lisp.rope_goto_definition),
+            ('C-c C-d', lisp.rope_show_doc)]
+
+        self._register_refactorings()
 
     @lispfunction
     def init(self):
@@ -33,37 +43,20 @@ class RopeInterface(object):
 
         lisp(DEFVARS)
 
-        self.global_keys = [
-            ('C-x p o', lisp.rope_open_project),
-            ('C-x p k', lisp.rope_close_project),
-            ('C-x p u', lisp.rope_undo_refactoring),
-            ('C-x p r', lisp.rope_redo_refactoring),
-            ('C-x p f', lisp.rope_find_file)]
-
-        self.local_keys = [
-            ('C-c r r', lisp.rope_rename),
-            ('C-c r l', lisp.rope_extract_variable),
-            ('C-c r m', lisp.rope_extract_method),
-            ('C-c r i', lisp.rope_inline),
-            ('C-c r v', lisp.rope_move),
-            ('C-c r x', lisp.rope_restructure),
-            ('C-c r 1 r', lisp.rope_rename_current_module),
-            ('C-c r 1 v', lisp.rope_move_current_module),
-            ('C-c r 1 p', lisp.rope_module_to_package),
-
-            ('M-/', lisp.rope_code_assist),
-            ('C-c g', lisp.rope_goto_definition),
-            ('C-c C-d', lisp.rope_show_doc),
-            ('C-c i o', lisp.rope_organize_imports),
-
-            ('C-c n v', lisp.rope_generate_variable),
-            ('C-c n f', lisp.rope_generate_function),
-            ('C-c n c', lisp.rope_generate_class),
-            ('C-c n m', lisp.rope_generate_module),
-            ('C-c n p', lisp.rope_generate_package)]
-
         for key, callback in self.global_keys:
             lisp.global_set_key(self._key_sequence(key), callback)
+
+    def _register_refactorings(self):
+        for name in dir(refactor):
+            if not name.startswith('_') and name != 'Refactoring':
+                attr = getattr(refactor, name)
+                if isinstance(attr, type) and issubclass(attr, refactor.Refactoring):
+                    @interactive
+                    def do_refactor(self=self, refactoring=attr):
+                        refactoring(self).show()
+                    setattr(self, attr.name, do_refactor)
+                    name = 'rope-' + attr.name.replace('_', '-')
+                    self.local_keys.append((attr.key, lisp[name]))
 
     def _key_sequence(self, sequence):
         result = []
@@ -134,46 +127,6 @@ class RopeInterface(object):
             for changes in self.project.history.redo():
                 self._reload_buffers(changes.get_changed_resources())
 
-    @interactive
-    def rename(self):
-        refactor.Rename(self).show()
-
-    @interactive
-    def rename_current_module(self):
-        refactor.RenameCurrentModule(self).show()
-
-    @interactive
-    def move(self):
-        refactor.Move(self).show()
-
-    @interactive
-    def move_current_module(self):
-        refactor.MoveCurrentModule(self).show()
-
-    @interactive
-    def module_to_package(self):
-        refactor.ModuleToPackage(self).show()
-
-    @interactive
-    def extract_variable(self):
-        refactor.ExtractVariable(self).show()
-
-    @interactive
-    def extract_method(self):
-        refactor.ExtractMethod(self).show()
-
-    @interactive
-    def inline(self):
-        refactor.Inline(self).show()
-
-    @interactive
-    def restructure(self):
-        refactor.Restructure(self).show()
-
-    @interactive
-    def organize_imports(self):
-        refactor.OrganizeImports(self).show()
-
     def _perform(self, changes):
         if changes is None:
             return
@@ -224,7 +177,7 @@ class RopeInterface(object):
         names = [proposal.name for proposal in proposals]
         starting = source[starting_offset:offset]
         prompt = 'Completion for %s: ' % starting
-        result = _ask_values(prompt, names, starting=starting, exact=False)
+        result = _ask_values(prompt, names, starting=starting, exact=None)
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 
@@ -250,26 +203,6 @@ class RopeInterface(object):
                 lisp.find_file_read_only(str(location[0].real_path))
         if location[1]:
             lisp.goto_line(location[1])
-
-    @interactive
-    def generate_variable(self):
-        refactor.GenerateVariable(self).show()
-
-    @interactive
-    def generate_function(self):
-        refactor.GenerateFunction(self).show()
-
-    @interactive
-    def generate_class(self):
-        refactor.GenerateClass(self).show()
-
-    @interactive
-    def generate_module(self):
-        refactor.GenerateModule(self).show()
-
-    @interactive
-    def generate_package(self):
-        refactor.GeneratePackage(self).show()
 
     def _get_location(self):
         resource = self._get_resource()

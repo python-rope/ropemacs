@@ -1,9 +1,8 @@
+import rope.contrib.generate
 import rope.refactor.extract
 import rope.refactor.inline
 import rope.refactor.move
-import rope.refactor.move
 import rope.refactor.rename
-import rope.contrib.generate
 
 import ropemacs
 from ropemacs import config
