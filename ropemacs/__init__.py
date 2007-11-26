@@ -6,6 +6,7 @@ import rope.refactor.restructure
 from Pymacs import lisp
 from rope.base import project, libutils
 from rope.contrib import codeassist, generate
+from ropemacs import config
 
 
 def interactive(func):
@@ -142,7 +143,7 @@ class RopeInterface(object):
             offset = None
         renamer = rope.refactor.rename.Rename(self.project, resource, offset)
         oldname = str(renamer.get_old_name())
-        newname = _ask('New name for %s: ' % oldname, default=oldname)
+        newname = _ask('New name for %s: ' % oldname, starting=oldname)
         changes = renamer.get_changes(newname, docs=True)
         self._perform(changes)
 
@@ -234,18 +235,25 @@ class RopeInterface(object):
     @interactive
     def restructure(self):
         self._check_project()
-        pattern = _ask("Restructuring pattern: ")
-        goal = _ask("Restructuring goal: ")
-        restructuring = rope.refactor.restructure.Restructure(self.project,
-                                                              pattern, goal)
-        raw_checks = _ask("Restructuring checks: ")
+        configs = {'pattern': config.Data('Restructuring pattern: '),
+                   'goal': config.Data('Restructuring goal: ')}
+        optionals = {'checks': config.Data('Checks: '),
+                     'imports': config.Data('Imports: ')}
+        action, result = config.show_dialog(
+            _lisp_askdata, ['perform', 'cancel'], configs, optionals)
+        if action != 'perform':
+            lisp.message('Cancelled!')
+            return
+        restructuring = rope.refactor.restructure.Restructure(
+            self.project, result['pattern'], result['goal'])
         check_dict = {}
-        for raw_check in raw_checks.split('\n'):
+        for raw_check in result.get('checks', '').split('\n'):
             if raw_check:
                 key, value = raw_check.split('==')
                 check_dict[key.strip()] = value.strip()
         checks = restructuring.make_checks(check_dict)
-        imports = [line.strip() for line in _ask("Imports: ").split('\n')]
+        imports = [line.strip()
+                   for line in result.get('imports', '').split('\n')]
         changes = restructuring.get_changes(checks=checks, imports=imports)
         self._perform(changes)
 
@@ -306,7 +314,7 @@ class RopeInterface(object):
         names = [proposal.name for proposal in proposals]
         starting = source[starting_offset:offset]
         prompt = 'Completion for %s: ' % starting
-        result = _ask_values(prompt, names, starting=starting)
+        result = _ask_values(prompt, names, starting=starting, exact=False)
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 
@@ -418,12 +426,27 @@ def _register_functions(interface):
             globals()[attrname] = attr
 
 
-def _ask(prompt, default=None):
-    return lisp.read_from_minibuffer(prompt, default, None, None,
-                                     None, default, None)
+def _ask(prompt, default=None, starting=None):
+    if default is not None:
+        prompt = prompt + ('[%s] ' % default)
+    result =  lisp.read_from_minibuffer(prompt, starting, None, None,
+                                        None, default, None)
+    if result == '' and default is not None:
+        return default
 
-def _ask_values(prompt, values, starting=None, exact=None):
-    return lisp.completing_read(prompt, values, None, exact, starting)
+def _ask_values(prompt, values, default=None, starting=None, exact=True):
+    if exact and default is not None:
+        prompt = prompt + ('[%s] ' % default)
+    result = lisp.completing_read(prompt, values, None, exact, starting)
+    if result == '' and exact:
+        return default
+
+def _lisp_askdata(data):
+    if data.values:
+        return _ask_values(data.prompt, data.values, default=data.default)
+    else:
+        return _ask(data.prompt, default=data.default)
+
 
 DEFVARS = """\
 (defvar rope-confirm-saving t

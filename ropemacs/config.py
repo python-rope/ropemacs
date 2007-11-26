@@ -17,6 +17,8 @@ def show_dialog(askdata, actions, confs={}, optionals={}):
                          default=actions[0], values=names)
     while True:
         response = askdata(base_question)
+        if response == '':
+            response = base_question.default
         if response in actions:
             break
         else:
