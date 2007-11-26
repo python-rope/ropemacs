@@ -154,25 +154,13 @@ class RopeInterface(object):
     def module_to_package(self):
         refactor.ModuleToPackage(self).show()
 
-    def _do_extract(self, extractor, prompt):
-        self._check_project()
-        self._save_buffers(only_current=True)
-        resource = self._get_resource()
-        start, end = self._get_region()
-        extractor = extractor(self.project, resource, start, end)
-        newname = _ask(prompt)
-        changes = extractor.get_changes(newname)
-        self._perform(changes)
-
     @interactive
     def extract_variable(self):
-        self._do_extract(rope.refactor.extract.ExtractVariable,
-                         'New Variable Name: ')
+        refactor.ExtractVariable(self).show()
 
     @interactive
     def extract_method(self):
-        self._do_extract(rope.refactor.extract.ExtractMethod,
-                         'New Method Name: ')
+        refactor.ExtractMethod(self).show()
 
     @interactive
     def inline(self):

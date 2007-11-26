@@ -203,3 +203,35 @@ class Inline(Refactoring):
     def _calculate_changes(self, values):
         remove = values.get('remove', 'yes') == 'yes'
         return self.inliner.get_changes(remove=remove)
+
+
+class ExtractVariable(Refactoring):
+
+    name = 'extract_variable'
+    key = 'C-c r l'
+    saveall = False
+    confs = {'name': config.Data('Extracted variable name: ')}
+
+    def _create_refactoring(self):
+        start, end = self.region
+        self.extractor = rope.refactor.extract.ExtractVariable(
+            self.project, self.resource, start, end)
+
+    def _calculate_changes(self, values):
+        return self.extractor.get_changes(values['name'])
+
+
+class ExtractMethod(Refactoring):
+
+    name = 'extract_method'
+    key = 'C-c r m'
+    saveall = False
+    confs = {'name': config.Data('Extracted method name: ')}
+
+    def _create_refactoring(self):
+        start, end = self.region
+        self.extractor = rope.refactor.extract.ExtractMethod(
+            self.project, self.resource, start, end)
+
+    def _calculate_changes(self, values):
+        return self.extractor.get_changes(values['name'])
