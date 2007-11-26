@@ -152,11 +152,7 @@ class RopeInterface(object):
 
     @interactive
     def module_to_package(self):
-        self._check_project()
-        self._save_buffers(only_current=True)
-        packager = rope.refactor.ModuleToPackage(self.project,
-                                                 self._get_resource())
-        self._perform(packager.get_changes())
+        refactor.ModuleToPackage(self).show()
 
     def _do_extract(self, extractor, prompt):
         self._check_project()
@@ -180,17 +176,11 @@ class RopeInterface(object):
 
     @interactive
     def inline(self):
-        self._check_project()
-        self._save_buffers()
-        resource, offset = self._get_location()
-        inliner = rope.refactor.inline.create_inline(
-            self.project, resource, offset)
-        self._perform(inliner.get_changes())
+        refactor.Inline(self).show()
 
     @interactive
     def restructure(self):
-        restruturing = refactor.Restructure(self)
-        return restruturing.show()
+        refactor.Restructure(self).show()
 
     @interactive
     def organize_imports(self):

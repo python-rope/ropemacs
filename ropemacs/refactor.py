@@ -1,3 +1,6 @@
+import rope.refactor.extract
+import rope.refactor.inline
+import rope.refactor.move
 import rope.refactor.move
 import rope.refactor.rename
 
@@ -169,3 +172,34 @@ class MoveCurrentModule(Move):
     key = 'C-c r 1 v'
 
     offset = None
+
+
+class ModuleToPackage(Refactoring):
+
+    name = 'module_to_package'
+    key = 'C-c r 1 p'
+    saveall = False
+
+    def _create_refactoring(self):
+        self.packager = rope.refactor.ModuleToPackage(
+            self.project, self.resource)
+
+    def _calculate_changes(self, values):
+        return self.packager.get_changes()
+
+
+class Inline(Refactoring):
+
+    name = 'inline'
+    key = 'C-c r i'
+    saveall = False
+    optionals = {'remove': config.Data('Remove the definition: ',
+                                       values=['yes', 'no'])}
+
+    def _create_refactoring(self):
+        self.inliner = rope.refactor.inline.create_inline(
+            self.project, self.resource, self.offset)
+
+    def _calculate_changes(self, values):
+        remove = values.get('remove', 'yes') == 'yes'
+        return self.inliner.get_changes(remove=remove)
