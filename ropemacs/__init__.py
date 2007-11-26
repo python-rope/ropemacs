@@ -1,9 +1,8 @@
-from Pymacs import lisp
-
 import rope.refactor.extract
 import rope.refactor.inline
 import rope.refactor.move
 import rope.refactor.rename
+from Pymacs import lisp
 from rope.base import project, libutils
 from rope.contrib import codeassist, generate
 
@@ -30,6 +29,8 @@ class RopeInterface(object):
         lisp.add_hook(lisp.after_save_hook, lisp.rope_after_save_actions)
         lisp.add_hook(lisp.kill_emacs_hook, lisp.rope_exiting_actions)
         lisp.add_hook(lisp.python_mode_hook, lisp.rope_register_local_keys)
+
+        lisp(DEFVARS)
 
         self.global_keys = [
             ('C-x p o', lisp.rope_open_project),
@@ -361,7 +362,8 @@ class RopeInterface(object):
                 lisp.set_buffer(buffer)
                 lisp.revert_buffer(None, 1)
 
-    def _save_buffers(self, ask=True, only_current=False):
+    def _save_buffers(self, only_current=False):
+        ask = lisp['rope-confirm-saving'].value()
         initial = lisp.current_buffer()
         current_buffer = lisp.current_buffer()
         if only_current:
@@ -398,6 +400,13 @@ def _ask(prompt, default=None):
 
 def _ask_values(prompt, values, starting=None, exact=None):
     return lisp.completing_read(prompt, values, None, exact, starting)
+
+DEFVARS = """\
+(defvar rope-confirm-saving t
+  "If non-nil, you have to confirm saving all modified
+python files before refactorings; otherwise they are
+saved automatically.")
+"""
 
 interface = RopeInterface()
 _register_functions(interface)

@@ -14,4 +14,3 @@ TODO
 * specifying refactoring options
 * new file/directory/module/package; C-x p n [fdmp]
 * showing proposal type in code-assist
-* an option for saving files before refactorings without asking
