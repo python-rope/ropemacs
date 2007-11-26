@@ -2,12 +2,15 @@
  Done
 ======
 
+- restructuring support : November 26, 2007
+- added ``rope-confirm-saving`` variable : November 26, 2007
+- only activating local keys in python mode : November 26, 2007
 - find file and advanced maching : November 25, 2007
 - generate python element; ``C-c n [vfcmp]`` : November 23, 2007
 - rope find file; ``C-c p f`` : November 23, 2007
 - code-assist; ``M-/`` : November 23, 2007
 
-> Public Release 0.6.2 : September 9, 2007
+> Public Release 0.1 : September 9, 2007
 
 - moving elements, methods and modules : October 30, 2007
 - undoing refactorings : October 29, 2007

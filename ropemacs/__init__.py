@@ -2,6 +2,7 @@ import rope.refactor.extract
 import rope.refactor.inline
 import rope.refactor.move
 import rope.refactor.rename
+import rope.refactor.restructure
 from Pymacs import lisp
 from rope.base import project, libutils
 from rope.contrib import codeassist, generate
@@ -45,6 +46,7 @@ class RopeInterface(object):
             ('C-c r m', lisp.rope_extract_method),
             ('C-c r i', lisp.rope_inline),
             ('C-c r v', lisp.rope_move),
+            ('C-c r x', lisp.rope_restructure),
             ('C-c r 1 r', lisp.rope_rename_current_module),
             ('C-c r 1 v', lisp.rope_move_current_module),
             ('C-c r 1 p', lisp.rope_module_to_package),
@@ -228,6 +230,24 @@ class RopeInterface(object):
         inliner = rope.refactor.inline.create_inline(
             self.project, resource, offset)
         self._perform(inliner.get_changes())
+
+    @interactive
+    def restructure(self):
+        self._check_project()
+        pattern = _ask("Restructuring pattern: ")
+        goal = _ask("Restructuring goal: ")
+        restructuring = rope.refactor.restructure.Restructure(self.project,
+                                                              pattern, goal)
+        raw_checks = _ask("Restructuring checks: ")
+        check_dict = {}
+        for raw_check in raw_checks.split('\n'):
+            if raw_check:
+                key, value = raw_check.split('==')
+                check_dict[key.strip()] = value.strip()
+        checks = restructuring.make_checks(check_dict)
+        imports = [line.strip() for line in _ask("Imports: ").split('\n')]
+        changes = restructuring.get_changes(checks=checks, imports=imports)
+        self._perform(changes)
 
     @interactive
     def organize_imports(self):

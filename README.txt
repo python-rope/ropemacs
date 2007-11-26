@@ -55,7 +55,7 @@ C-c r 1 r       rope-rename-current-module
 C-c r 1 v       rope-move-current-module
 C-c r 1 p       rope-module-to-package
 
-C-/             rope-code-assist
+M-/             rope-code-assist
 C-c g           rope-goto-definition
 C-c C-d         rope-show-doc
 C-c i o         rope-organize-imports
