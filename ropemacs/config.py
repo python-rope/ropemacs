@@ -1,9 +1,11 @@
 class Data(object):
 
-    def __init__(self, prompt=None, default=None, values=None):
+    def __init__(self, prompt=None, default=None,
+                 values=None, starting=None):
         self.prompt = prompt
         self.default = default
         self.values = values
+        self.starting = starting
 
 
 def show_dialog(askdata, actions, confs={}, optionals={}):
