@@ -3,6 +3,7 @@ import rope.refactor.extract
 import rope.refactor.inline
 import rope.refactor.move
 import rope.refactor.rename
+import rope.refactor.restructure
 
 import ropemacs
 from ropemacs import config
