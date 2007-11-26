@@ -6,7 +6,7 @@ import rope.refactor.restructure
 from Pymacs import lisp
 from rope.base import project, libutils
 from rope.contrib import codeassist, generate
-from ropemacs import config
+from ropemacs import config, refactor
 
 
 def interactive(func):
@@ -136,28 +136,8 @@ class RopeInterface(object):
                 self._reload_buffers(changes.get_changed_resources())
 
     def do_rename(self, module=False):
-        self._check_project()
-        self._save_buffers()
-        resource, offset = self._get_location()
-        if module:
-            offset = None
-        renamer = rope.refactor.rename.Rename(self.project, resource, offset)
-        oldname = str(renamer.get_old_name())
-        confs = {'newname': config.Data('New name for %s: ' % oldname, starting=oldname)}
-        optionals = {
-            'docs': config.Data('Rename occurrences in comments and docs: ', values=['yes', 'no']),
-            'in_hierarchy': config.Data('Rename method occurrences in class hierarchy: ', values=['yes', 'no']),
-            'unsure': config.Data('Unsure occurrences: ', values=['ignore', 'match'])}
-        def get_changes(result):
-            newname = result['newname']
-            unsure = result.get('unsure', 'no') == 'yes'
-            kwds = {
-                'docs': result.get('docs', 'yes') == 'yes',
-                'unsure': (lambda occurrence: unsure)}
-            if renamer.is_method():
-                kwds['in_hierarchy'] = result.get('in_hierarchy', 'no') == 'yes'
-            return renamer.get_changes(newname, **kwds)
-        self._dialog(get_changes, confs, optionals)
+        renamer = refactor.Rename(self)
+        return renamer.show()
 
     @interactive
     def rename(self):
@@ -246,25 +226,8 @@ class RopeInterface(object):
 
     @interactive
     def restructure(self):
-        self._check_project()
-        self._save_buffers()
-        configs = {'pattern': config.Data('Restructuring pattern: '),
-                   'goal': config.Data('Restructuring goal: ')}
-        optionals = {'checks': config.Data('Checks: '),
-                     'imports': config.Data('Imports: ')}
-        def calculate(result):
-            restructuring = rope.refactor.restructure.Restructure(
-                self.project, result['pattern'], result['goal'])
-            check_dict = {}
-            for raw_check in result.get('checks', '').split('\n'):
-                if raw_check:
-                    key, value = raw_check.split('==')
-                    check_dict[key.strip()] = value.strip()
-            checks = restructuring.make_checks(check_dict)
-            imports = [line.strip()
-                       for line in result.get('imports', '').split('\n')]
-            return restructuring.get_changes(checks=checks, imports=imports)
-        self._dialog(calculate, configs, optionals)
+        restruturing = refactor.Restructure(self)
+        return restruturing.show()
 
     @interactive
     def organize_imports(self):
@@ -272,15 +235,6 @@ class RopeInterface(object):
         self._save_buffers(only_current=True)
         organizer = rope.refactor.ImportOrganizer(self.project)
         self._perform(organizer.organize_imports(self._get_resource()))
-
-    def _dialog(self, calculate_changes, configs={}, optionals={}):
-        action, result = config.show_dialog(
-            _lisp_askdata, ['perform', 'cancel'], configs, optionals)
-        if action != 'perform':
-            lisp.message('Cancelled!')
-            return
-        changes = calculate_changes(result)
-        self._perform(changes)
 
     def _perform(self, changes):
         if changes is None:
