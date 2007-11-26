@@ -2,8 +2,9 @@
  ropemacs, rope in emacs
 =========================
 
-For using rope in emacs.  You should install `rope`_ library before
-using ropemacs.
+Ropemacs is an emacs mode that uses rope_ library to provide features
+like refactorings and code-assists.  You should install rope_ library
+and Pymacs before using ropemacs.
 
 .. _`rope`: http://rope.sf.net/
 

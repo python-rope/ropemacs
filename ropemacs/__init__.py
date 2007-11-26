@@ -26,20 +26,19 @@ class RopeInterface(object):
     @lispfunction
     def init(self):
         """Initialize rope mode"""
-        lisp.add_hook(lisp.before_save_hook,
-                      lisp.rope_before_save_actions)
-        lisp.add_hook(lisp.after_save_hook,
-                      lisp.rope_after_save_actions)
-        lisp.add_hook(lisp.kill_emacs_hook,
-                      lisp.rope_exiting_actions)
+        lisp.add_hook(lisp.before_save_hook, lisp.rope_before_save_actions)
+        lisp.add_hook(lisp.after_save_hook, lisp.rope_after_save_actions)
+        lisp.add_hook(lisp.kill_emacs_hook, lisp.rope_exiting_actions)
+        lisp.add_hook(lisp.python_mode_hook, lisp.rope_register_local_keys)
 
-        actions = [
+        self.global_keys = [
             ('C-x p o', lisp.rope_open_project),
             ('C-x p k', lisp.rope_close_project),
             ('C-x p u', lisp.rope_undo_refactoring),
             ('C-x p r', lisp.rope_redo_refactoring),
-            ('C-x p f', lisp.rope_find_file),
+            ('C-x p f', lisp.rope_find_file)]
 
+        self.local_keys = [
             ('C-c r r', lisp.rope_rename),
             ('C-c r l', lisp.rope_extract_variable),
             ('C-c r m', lisp.rope_extract_method),
@@ -60,7 +59,7 @@ class RopeInterface(object):
             ('C-c n m', lisp.rope_generate_module),
             ('C-c n p', lisp.rope_generate_package)]
 
-        for key, callback in actions:
+        for key, callback in self.global_keys:
             lisp.global_set_key(self._key_sequence(key), callback)
 
     def _key_sequence(self, sequence):
@@ -91,6 +90,11 @@ class RopeInterface(object):
             libutils.report_change(self.project, lisp.buffer_file_name(),
                                    self.old_content)
             self.old_content = None
+
+    @lispfunction
+    def register_local_keys(self):
+        for key, callback in self.local_keys:
+            lisp.local_set_key(self._key_sequence(key), callback)
 
     @lispfunction
     def exiting_actions(self):
