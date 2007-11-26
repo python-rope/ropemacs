@@ -332,9 +332,13 @@ class RopeInterface(object):
         self._perform(generator.get_changes())
         self._goto_location(generator.get_location())
 
-    def _goto_location(self, location):
+    def _goto_location(self, location, readonly=False):
         if location[0]:
-            lisp.find_file(str(location[0].real_path))
+            resource = location[0]
+            if resource.project == self.project:
+                lisp.find_file(str(location[0].real_path))
+            else:
+                lisp.find_file_read_only(str(location[0].real_path))
         if location[1]:
             lisp.goto_line(location[1])
 
