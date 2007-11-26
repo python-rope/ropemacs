@@ -1,12 +1,11 @@
 import rope.refactor.extract
 import rope.refactor.inline
 import rope.refactor.move
-import rope.refactor.rename
-import rope.refactor.restructure
 from Pymacs import lisp
 from rope.base import project, libutils
 from rope.contrib import codeassist, generate
-from ropemacs import config, refactor
+
+from ropemacs import refactor
 
 
 def interactive(func):
@@ -135,57 +134,21 @@ class RopeInterface(object):
             for changes in self.project.history.redo():
                 self._reload_buffers(changes.get_changed_resources())
 
-    def do_rename(self, module=False):
-        renamer = refactor.Rename(self)
-        return renamer.show()
-
     @interactive
     def rename(self):
-        self.do_rename()
+        refactor.Rename(self).show()
 
     @interactive
     def rename_current_module(self):
-        self.do_rename(module=True)
+        refactor.RenameCurrentModule(self).show()
 
     @interactive
     def move(self):
-        mover = self._create_mover()
-        if isinstance(mover, rope.refactor.move.MoveGlobal):
-            self._move_global(mover)
-        if isinstance(mover, rope.refactor.move.MoveModule):
-            self._move_module(mover)
-        if isinstance(mover, rope.refactor.move.MoveMethod):
-            self._move_method(mover)
-
-    def _create_mover(self, module=False):
-        self._check_project()
-        self._save_buffers()
-        resource, offset = self._get_location()
-        if module:
-            offset = None
-        return rope.refactor.move.create_move(self.project, resource, offset)
-
-    def _move_global(self, mover):
-        dest_module = _ask('Destination Module Name: ')
-        destination = self.project.pycore.find_module(dest_module)
-        self._perform(mover.get_changes(destination))
-
-    def _move_method(self, mover):
-        dest_attr = _ask('Destination Attribute: ')
-        self._perform(mover.get_changes(dest_attr,
-                                        mover.get_method_name()))
-
-    def _move_module(self, mover):
-        dest_package = _ask('Destination Package: ')
-        destination = self.project.pycore.find_module(dest_package)
-        self._perform(mover.get_changes(destination))
+        refactor.Move(self).show()
 
     @interactive
     def move_current_module(self):
-        mover = self._create_mover(module=True)
-        dest_package = _ask('Destination Package: ')
-        destination = self.project.pycore.find_module(dest_package)
-        self._perform(mover.get_changes(destination))
+        refactor.MoveCurrentModule(self).show()
 
     @interactive
     def module_to_package(self):

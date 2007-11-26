@@ -1,14 +1,16 @@
+import rope.refactor.move
+import rope.refactor.rename
+
 import ropemacs
 from ropemacs import config
-import rope.refactor.rename
 
 
 class Refactoring(object):
 
     name = None
     key = None
-    confs = None
-    optionals = None
+    confs = {}
+    optionals = {}
     saveall = True
 
     def __init__(self, interface):
@@ -93,6 +95,8 @@ class Rename(Refactoring):
 
 class RenameCurrentModule(Rename):
 
+    name = 'rename_current_module'
+    key = 'C-c r 1 r'
     offset = None
 
 
@@ -117,3 +121,51 @@ class Restructure(Refactoring):
         imports = [line.strip()
                    for line in values.get('imports', '').split('\n')]
         return restructuring.get_changes(checks=checks, imports=imports)
+
+
+class Move(Refactoring):
+
+    name = 'move'
+    key = 'C-c r v'
+
+    def _create_refactoring(self):
+        self.mover = rope.refactor.move.create_move(self.project,
+                                                    self.resource,
+                                                    self.offset)
+
+    def _calculate_changes(self, values):
+        destination = values['destination']
+        if isinstance(self.mover, rope.refactor.move.MoveGlobal):
+            return self._move_global(destination)
+        if isinstance(self.mover, rope.refactor.move.MoveModule):
+            return self._move_module(destination)
+        if isinstance(self.mover, rope.refactor.move.MoveMethod):
+            return self._move_method(destination)
+
+    def _move_global(self, dest):
+        destination = self.project.pycore.find_module(dest)
+        return self.mover.get_changes(destination)
+
+    def _move_method(self, dest):
+        return self.mover.get_changes(dest, self.mover.get_method_name())
+
+    def _move_module(self, dest):
+        destination = self.project.pycore.find_module(dest)
+        return self.mover.get_changes(destination)
+
+    def _get_confs(self):
+        if isinstance(self.mover, rope.refactor.move.MoveGlobal):
+            prompt = 'Destination module: '
+        if isinstance(self.mover, rope.refactor.move.MoveModule):
+            prompt = 'Destination package: '
+        if isinstance(self.mover, rope.refactor.move.MoveMethod):
+            prompt = 'Destination attribute: '
+        return {'destination': config.Data(prompt)}
+
+
+class MoveCurrentModule(Move):
+
+    name = 'move_current_module'
+    key = 'C-c r 1 v'
+
+    offset = None
