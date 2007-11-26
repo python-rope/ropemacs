@@ -1,13 +1,28 @@
-class Config(object):
+class Data(object):
 
-    def __init__(self, name, prompt=None, values=None):
-        self.name = name
+    def __init__(self, prompt=None, default=None, values=None):
         self.prompt = prompt
+        self.default = default
         self.values = values
 
 
-def ask(confs, askconfig):
+def show_dialog(askdata, actions, confs={}, optionals={}):
     result = {}
-    for conf in confs:
-        result[conf.name] = askconfig(conf)
-    return result
+    for name, conf in confs.items():
+        result[name] = askdata(conf)
+    names = list(confs.keys())
+    names.extend(optionals.keys())
+    names.extend(actions)
+    base_question = Data('Choose what to do? ',
+                         default=actions[0], values=names)
+    while True:
+        response = askdata(base_question)
+        if response in actions:
+            break
+        else:
+            if response in confs:
+                conf = confs[response]
+            else:
+                conf = optionals[response]
+            result[response] = askdata(conf)
+    return response, result

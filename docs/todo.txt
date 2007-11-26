@@ -3,11 +3,11 @@ TODO
 
 > Public Release 1.0
 
-* previewing changes
-* showing refactoring progress
 * adding a menu
 * including pymacs in ropemacs?
 * change pymacs to accept unicode strings
+* previewing changes
+* showing refactoring progress
 
 > Public Release 0.2
 
