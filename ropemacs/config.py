@@ -15,7 +15,7 @@ def show_dialog(askdata, actions, confs={}, optionals={}):
     names = list(confs.keys())
     names.extend(optionals.keys())
     names.extend(actions)
-    base_question = Data('Choose what to do? ',
+    base_question = Data('Choose what to do: ',
                          default=actions[0], values=names)
     while True:
         response = askdata(base_question)

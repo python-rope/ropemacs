@@ -31,15 +31,59 @@ After installing pymacs, add these lines to your ``~/.emacs`` file::
   (pymacs-load "ropemacs" "rope-")
   (rope-init)
 
+If you want to only ropemacs only when you really need it, you can use
+a function like this instead of that::
+
+  (defun load-ropemacs ()
+    "Load pymacs and ropemacs"
+    (interactive)
+    (require 'pymacs)
+    (pymacs-load "ropemacs" "rope-")
+    (rope-init)
+    (setq rope-confirm-saving 'nil)
+  )
+
+And execute ``load-ropemacs`` whenever you want to use ropemacs.  Also
+if you don't want to install rope library and ropemacs you can put it
+somewhere and add them to the ``PYTHONPATH`` before loading ropemacs
+in your ``.emacs``::
+
+  (setenv "PYTHONPATH" (concat (getenv "PYTHONPATH")
+                               ":/path/to/extracted/rope/package"
+                               ":/path/to/extracted/ropemacs/package"))
+
+
+
+Getting Started
+===============
+
+Rope refactorings use a special kind of dialog.  When you start a
+refactoring, you'll be asked to confirm saving modified python
+buffers; you can change it by using ``rope-confirm-saving`` variable.
+Adding ``(setq rope-confirm-saving 'nil)`` to your ``.emacs`` file,
+will make emacs save them without asking.
+
+After that depending on the refactoring, you'll be asked about the
+essential information a refactoring needs to know (like the new name
+in rename refactoring).
+
+Next you'll see the base prompt of a refactoring dialog that shows
+something like "Choose what to do".  You can choose to set other
+optional refactoring options; after setting each option you'll be
+returned back to the base prompt.  Finally, you can ask rope to
+perform, preview or cancel the refactoring.
+
+See keybinding_ section and try the refactorings yourself.
+
 
 Keybinding
 ==========
 
-Uses almost the same keybinding as rope.
+Uses almost the same keybinding as ropeide.
 
-=============   ============================
+==============  ============================
 Key             Action
-=============   ============================
+==============  ============================
 C-x p o         rope-open-project
 C-x p k         rope-close-project
 C-x p u         rope-undo-refactoring
@@ -65,7 +109,17 @@ C-c n f         rope-generate-function
 C-c n c         rope-generate-class
 C-c n m         rope-generate-module
 C-c n p         rope-generate-package
-=============   ============================
+==============  ============================
+
+
+
+Variables
+=========
+
+* ``rope-confirm-saving``: If non-nil, you have to confirm saving all
+  modified python files before refactorings; otherwise they are saved
+  automatically. Defaults to ``t``.
+
 
 
 Contributing
