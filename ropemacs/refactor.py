@@ -1,3 +1,4 @@
+import rope.base.taskhandle
 import rope.contrib.generate
 import rope.refactor.extract
 import rope.refactor.inline
@@ -25,14 +26,19 @@ class Refactoring(object):
         self.interface._save_buffers(only_current=not self.saveall)
         self._create_refactoring()
         action, result = config.show_dialog(
-            ropemacs._lisp_askdata, ['perform', 'cancel'],
+            ropemacs._lisp_askdata, ['perform', 'preview', 'cancel'],
             self._get_confs(), self._get_optionals())
-        if action != 'perform':
+        if action == 'cancel':
             ropemacs._message('Cancelled!')
             return
-        changes = self._calculate_changes(result)
-        self._perform(changes)
-        self._done()
+        def calculate(handle):
+            return self._calculate_changes(result, handle)
+        name = 'Performing %s' % self.name
+        changes = ropemacs._RunTask(calculate, name=name)()
+        if action == 'perform':
+            self._perform(changes)
+        if action == 'preview':
+            ropemacs._message('We\'ll preview it!')
 
     @property
     def project(self):
@@ -50,7 +56,7 @@ class Refactoring(object):
     def region(self):
         return self.interface._get_region()
 
-    def _calculate_changes(self, option_values):
+    def _calculate_changes(self, option_values, task_handle):
         pass
 
     def _create_refactoring(self):
@@ -62,8 +68,12 @@ class Refactoring(object):
     def _perform(self, changes):
         if changes is None:
             return
-        self.project.do(changes)
-        self.interface._reload_buffers(changes.get_changed_resources())
+        def perform(handle, self=self, changes=changes):
+            self.project.do(changes, task_handle=handle)
+            self.interface._reload_buffers(changes.get_changed_resources())
+            self._done()
+        ropemacs._RunTask(perform, 'Making %s changes' % self.name,
+                          interrupts=False)()
         ropemacs._message(str(changes.description) + ' finished')
 
     def _get_confs(self):
@@ -90,7 +100,7 @@ class Rename(Refactoring):
         self.renamer = rope.refactor.rename.Rename(
             self.project, self.resource, self.offset)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         newname = values['newname']
         unsure = values.get('unsure', 'no') == 'yes'
         kwds = {
@@ -98,7 +108,8 @@ class Rename(Refactoring):
             'unsure': (lambda occurrence: unsure)}
         if self.renamer.is_method():
             kwds['in_hierarchy'] = values.get('in_hierarchy', 'no') == 'yes'
-        return self.renamer.get_changes(newname, **kwds)
+        return self.renamer.get_changes(newname,
+                                        task_handle=task_handle, **kwds)
 
     def _get_confs(self):
         oldname = str(self.renamer.get_old_name())
@@ -121,7 +132,7 @@ class Restructure(Refactoring):
     optionals = {'checks': config.Data('Checks: '),
                      'imports': config.Data('Imports: ')}
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         restructuring = rope.refactor.restructure.Restructure(
             self.project, values['pattern'], values['goal'])
         check_dict = {}
@@ -132,7 +143,8 @@ class Restructure(Refactoring):
         checks = restructuring.make_checks(check_dict)
         imports = [line.strip()
                    for line in values.get('imports', '').split('\n')]
-        return restructuring.get_changes(checks=checks, imports=imports)
+        return restructuring.get_changes(checks=checks, imports=imports,
+                                         task_handle=task_handle)
 
 
 class Move(Refactoring):
@@ -145,25 +157,26 @@ class Move(Refactoring):
                                                     self.resource,
                                                     self.offset)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         destination = values['destination']
         if isinstance(self.mover, rope.refactor.move.MoveGlobal):
-            return self._move_global(destination)
+            return self._move_global(destination, task_handle)
         if isinstance(self.mover, rope.refactor.move.MoveModule):
-            return self._move_module(destination)
+            return self._move_module(destination, task_handle)
         if isinstance(self.mover, rope.refactor.move.MoveMethod):
-            return self._move_method(destination)
+            return self._move_method(destination, task_handle)
 
-    def _move_global(self, dest):
+    def _move_global(self, dest, handle):
         destination = self.project.pycore.find_module(dest)
-        return self.mover.get_changes(destination)
+        return self.mover.get_changes(destination, task_handle=handle)
 
-    def _move_method(self, dest):
-        return self.mover.get_changes(dest, self.mover.get_method_name())
+    def _move_method(self, dest, handle):
+        return self.mover.get_changes(
+            dest, self.mover.get_method_name(), task_handle=handle)
 
-    def _move_module(self, dest):
+    def _move_module(self, dest, handle):
         destination = self.project.pycore.find_module(dest)
-        return self.mover.get_changes(destination)
+        return self.mover.get_changes(destination, task_handle=handle)
 
     def _get_confs(self):
         if isinstance(self.mover, rope.refactor.move.MoveGlobal):
@@ -193,7 +206,7 @@ class ModuleToPackage(Refactoring):
         self.packager = rope.refactor.ModuleToPackage(
             self.project, self.resource)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         return self.packager.get_changes()
 
 
@@ -201,7 +214,6 @@ class Inline(Refactoring):
 
     name = 'inline'
     key = 'C-c r i'
-    saveall = False
     optionals = {'remove': config.Data('Remove the definition: ',
                                        values=['yes', 'no'])}
 
@@ -209,9 +221,10 @@ class Inline(Refactoring):
         self.inliner = rope.refactor.inline.create_inline(
             self.project, self.resource, self.offset)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         remove = values.get('remove', 'yes') == 'yes'
-        return self.inliner.get_changes(remove=remove)
+        return self.inliner.get_changes(remove=remove,
+                                        task_handle=task_handle)
 
 
 class ExtractVariable(Refactoring):
@@ -226,7 +239,7 @@ class ExtractVariable(Refactoring):
         self.extractor = rope.refactor.extract.ExtractVariable(
             self.project, self.resource, start, end)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         return self.extractor.get_changes(values['name'])
 
 
@@ -242,7 +255,7 @@ class ExtractMethod(Refactoring):
         self.extractor = rope.refactor.extract.ExtractMethod(
             self.project, self.resource, start, end)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         return self.extractor.get_changes(values['name'])
 
 
@@ -255,7 +268,7 @@ class OrganizeImports(Refactoring):
     def _create_refactoring(self):
         self.organizer = rope.refactor.ImportOrganizer(self.project)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         return self.organizer.organize_imports(self.resource)
 
 
@@ -266,7 +279,7 @@ class _GenerateElement(Refactoring):
         self.generator = rope.contrib.generate.create_generate(
             kind, self.project, self.resource, self.offset)
 
-    def _calculate_changes(self, values):
+    def _calculate_changes(self, values, task_handle):
         return self.generator.get_changes()
 
     def _done(self):

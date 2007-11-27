@@ -6,10 +6,10 @@ TODO
 * adding a menu
 * including pymacs in ropemacs?
 * change pymacs to accept unicode strings
-* previewing changes
-* showing refactoring progress
 
 > Public Release 0.2
 
 * new file/directory/module/package; C-x p n [fdmp]
 * showing proposal type in code-assist
+* previewing changes
+* showing refactoring progress

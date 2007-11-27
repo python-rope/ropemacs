@@ -1,5 +1,7 @@
+import threading
+
 from Pymacs import lisp
-from rope.base import project, libutils
+from rope.base import project, libutils, taskhandle
 from rope.contrib import codeassist
 
 from ropemacs import refactor
@@ -277,8 +279,60 @@ def _lisp_askdata(data):
     else:
         return _ask(data.prompt, default=data.default, starting=data.starting)
 
-def _message(self, message):
+def _message(message):
     lisp.message(message)
+
+
+class _RunTask(object):
+
+    def __init__(self, task, name, interrupts=True):
+        self.task = task
+        self.name = name
+        self.interrupts = interrupts
+
+    def __call__(self):
+        handle = taskhandle.TaskHandle(name=self.name)
+        _message('')
+        progress = lisp.make_progress_reporter(
+            '%s ... ' % self.name, 0, 100)
+        def update_progress():
+            jobset = handle.current_jobset()
+            if jobset:
+                percent = jobset.get_percent_done()
+                if percent is not None:
+                    lisp.progress_reporter_update(progress, percent)
+        handle.add_observer(update_progress)
+        class Calculate(object):
+
+            def __init__(self, task):
+                self.task = task
+                self.result = None
+                self.exception = None
+
+            def __call__(self):
+                try:
+                    self.result = self.task(handle)
+                except Exception, e:
+                    self.exception = e
+
+        calculate = Calculate(self.task)
+        thread = threading.Thread(target=calculate)
+        try:
+            thread.start()
+            thread.join()
+            lisp.progress_reporter_done(progress)
+            if calculate.exception is not None:
+                description = type(calculate.exception).__name__ + ': ' + \
+                                   str(calculate.exception)
+                _message('Task <%s> was interrupted.\nReason: <%s>' %
+                         (self.name, description))
+        except:
+            handle.stop()
+            _message('%s interrupted!' % self.name)
+            raise
+        return calculate.result
+
+
 
 
 DEFVARS = """\
