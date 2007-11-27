@@ -37,11 +37,15 @@ class Refactoring(object):
         if action == 'perform':
             self._perform(changes)
         if action == 'preview':
-            lisputils.make_buffer('*rope-preview*',
-                                   str(changes.get_description()),
-                                   mode='diff')
-            if lisputils.yes_or_no('Do the changes? '):
-                self._perform(changes)
+            if changes is not None:
+                diffs = str(changes.get_description())
+                lisputils.make_buffer('*rope-preview*', diffs, mode='diff')
+                if lisputils.yes_or_no('Do the changes? '):
+                    self._perform(changes)
+                else:
+                    lisputils.message('Thrown away!')
+            else:
+                lisputils.message('No changes!')
 
     @property
     def project(self):
@@ -70,6 +74,7 @@ class Refactoring(object):
 
     def _perform(self, changes):
         if changes is None:
+            lisputils.message('No changes!')
             return
         def perform(handle, self=self, changes=changes):
             self.project.do(changes, task_handle=handle)

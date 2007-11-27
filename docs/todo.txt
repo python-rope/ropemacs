@@ -8,8 +8,7 @@ TODO
 * change pymacs to accept unicode strings
 * saving the old values of refacturing config
 * find occurrences
-
-> Public Release 0.2
-
 * new file/directory/module/package; C-x p n [fdmp]
 * showing proposal type in code-assist
+
+> Public Release 0.2
