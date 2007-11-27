@@ -1,7 +1,7 @@
 import threading
 
 from Pymacs import lisp
-from rope.base import project, libutils, taskhandle
+from rope.base import project, libutils, taskhandle, exceptions
 from rope.contrib import codeassist
 
 from ropemacs import refactor
@@ -319,8 +319,9 @@ class _RunTask(object):
             if calculate.exception is not None:
                 description = type(calculate.exception).__name__ + ': ' + \
                                    str(calculate.exception)
-                _message('Task <%s> was interrupted.\nReason: <%s>' %
-                         (self.name, description))
+                raise exceptions.InterruptedTaskError(
+                    'Task <%s> was interrupted.\nReason: <%s>' %
+                    (self.name, description))
         except:
             handle.stop()
             _message('%s interrupted!' % self.name)
