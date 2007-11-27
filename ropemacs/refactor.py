@@ -7,7 +7,7 @@ import rope.refactor.rename
 import rope.refactor.restructure
 
 import ropemacs
-from ropemacs import config
+from ropemacs import dialog
 
 
 class Refactoring(object):
@@ -25,7 +25,7 @@ class Refactoring(object):
         self.interface._check_project()
         self.interface._save_buffers(only_current=not self.saveall)
         self._create_refactoring()
-        action, result = config.show_dialog(
+        action, result = dialog.show_dialog(
             ropemacs._lisp_askdata, ['perform', 'preview', 'cancel'],
             self._get_confs(), self._get_optionals())
         if action == 'cancel':
@@ -92,9 +92,9 @@ class Rename(Refactoring):
     name = 'rename'
     key = 'C-c r r'
     optionals = {
-        'docs': config.Data('Rename occurrences in comments and docs: ', values=['yes', 'no']),
-        'in_hierarchy': config.Data('Method in class hierarchy: ', values=['yes', 'no']),
-        'unsure': config.Data('Unsure occurrences: ', values=['ignore', 'match'])}
+        'docs': dialog.Data('Rename occurrences in comments and docs: ', values=['yes', 'no']),
+        'in_hierarchy': dialog.Data('Method in class hierarchy: ', values=['yes', 'no']),
+        'unsure': dialog.Data('Unsure occurrences: ', values=['ignore', 'match'])}
     saveall = True
 
     def __init__(self, interface):
@@ -117,7 +117,7 @@ class Rename(Refactoring):
 
     def _get_confs(self):
         oldname = str(self.renamer.get_old_name())
-        return {'newname': config.Data('New name: ', starting=oldname)}
+        return {'newname': dialog.Data('New name: ', starting=oldname)}
 
 
 class RenameCurrentModule(Rename):
@@ -131,10 +131,10 @@ class Restructure(Refactoring):
 
     name = 'restructure'
     key = 'C-c r x'
-    confs = {'pattern': config.Data('Restructuring pattern: '),
-             'goal': config.Data('Restructuring goal: ')}
-    optionals = {'checks': config.Data('Checks: '),
-                     'imports': config.Data('Imports: ')}
+    confs = {'pattern': dialog.Data('Restructuring pattern: '),
+             'goal': dialog.Data('Restructuring goal: ')}
+    optionals = {'checks': dialog.Data('Checks: '),
+                     'imports': dialog.Data('Imports: ')}
 
     def _calculate_changes(self, values, task_handle):
         restructuring = rope.refactor.restructure.Restructure(
@@ -189,7 +189,7 @@ class Move(Refactoring):
             prompt = 'Destination package: '
         if isinstance(self.mover, rope.refactor.move.MoveMethod):
             prompt = 'Destination attribute: '
-        return {'destination': config.Data(prompt)}
+        return {'destination': dialog.Data(prompt)}
 
 
 class MoveCurrentModule(Move):
@@ -218,7 +218,7 @@ class Inline(Refactoring):
 
     name = 'inline'
     key = 'C-c r i'
-    optionals = {'remove': config.Data('Remove the definition: ',
+    optionals = {'remove': dialog.Data('Remove the definition: ',
                                        values=['yes', 'no'])}
 
     def _create_refactoring(self):
@@ -236,7 +236,7 @@ class ExtractVariable(Refactoring):
     name = 'extract_variable'
     key = 'C-c r l'
     saveall = False
-    confs = {'name': config.Data('Extracted variable name: ')}
+    confs = {'name': dialog.Data('Extracted variable name: ')}
 
     def _create_refactoring(self):
         start, end = self.region
@@ -252,7 +252,7 @@ class ExtractMethod(Refactoring):
     name = 'extract_method'
     key = 'C-c r m'
     saveall = False
-    confs = {'name': config.Data('Extracted method name: ')}
+    confs = {'name': dialog.Data('Extracted method name: ')}
 
     def _create_refactoring(self):
         start, end = self.region
