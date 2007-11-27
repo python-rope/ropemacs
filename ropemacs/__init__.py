@@ -145,8 +145,9 @@ class RopeInterface(object):
         resource, offset = self._get_location()
         definition = codeassist.get_definition_location(
             self.project, lisp.buffer_string(), offset, resource)
-        lisp.push_mark()
-        self._goto_location(definition)
+        if tuple(definition) != (None, None):
+            lisp.push_mark()
+            self._goto_location(definition)
 
     @interactive
     def show_doc(self):
