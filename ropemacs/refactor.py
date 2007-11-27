@@ -6,8 +6,7 @@ import rope.refactor.move
 import rope.refactor.rename
 import rope.refactor.restructure
 
-import ropemacs
-from ropemacs import dialog
+from ropemacs import dialog, lisputils
 
 
 class Refactoring(object):
@@ -26,22 +25,22 @@ class Refactoring(object):
         self.interface._save_buffers(only_current=not self.saveall)
         self._create_refactoring()
         action, result = dialog.show_dialog(
-            ropemacs._lisp_askdata, ['perform', 'preview', 'cancel'],
+            lisputils.askdata, ['perform', 'preview', 'cancel'],
             self._get_confs(), self._get_optionals())
         if action == 'cancel':
-            ropemacs._message('Cancelled!')
+            lisputils.message('Cancelled!')
             return
         def calculate(handle):
             return self._calculate_changes(result, handle)
         name = 'Calculating %s changes' % self.name
-        changes = ropemacs._RunTask(calculate, name=name)()
+        changes = lisputils.RunTask(calculate, name=name)()
         if action == 'perform':
             self._perform(changes)
         if action == 'preview':
-            ropemacs._make_buffer('*rope-preview*',
-                                  str(changes.get_description()),
-                                  mode='diff')
-            if ropemacs._yes_or_no('Do the changes? '):
+            lisputils.make_buffer('*rope-preview*',
+                                   str(changes.get_description()),
+                                   mode='diff')
+            if lisputils.yes_or_no('Do the changes? '):
                 self._perform(changes)
 
     @property
@@ -76,9 +75,9 @@ class Refactoring(object):
             self.project.do(changes, task_handle=handle)
             self.interface._reload_buffers(changes.get_changed_resources())
             self._done()
-        ropemacs._RunTask(perform, 'Making %s changes' % self.name,
-                          interrupts=False)()
-        ropemacs._message(str(changes.description) + ' finished')
+        lisputils.RunTask(perform, 'Making %s changes' % self.name,
+                           interrupts=False)()
+        lisputils.message(str(changes.description) + ' finished')
 
     def _get_confs(self):
         return self.confs

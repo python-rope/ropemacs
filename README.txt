@@ -31,7 +31,7 @@ After installing pymacs, add these lines to your ``~/.emacs`` file::
   (pymacs-load "ropemacs" "rope-")
   (rope-init)
 
-If you want to only ropemacs only when you really need it, you can use
+If you want to load ropemacs only when you really need it, you can use
 a function like this instead of that::
 
   (defun load-ropemacs ()
@@ -53,7 +53,6 @@ in your ``.emacs``::
                                ":/path/to/extracted/ropemacs/package"))
 
 
-
 Getting Started
 ===============
 
@@ -73,7 +72,6 @@ optional refactoring options; after setting each option you'll be
 returned back to the base prompt.  Finally, you can ask rope to
 perform, preview or cancel the refactoring.
 
-
 See keybinding_ section and try the refactorings yourself.
 
 
@@ -88,9 +86,8 @@ For instance ``projectroot/docs/todo.txt`` is shown like
 project.
 
 
-
 Keybinding
-==========
+----------
 
 Uses almost the same keybinding as ropeide.
 
@@ -99,9 +96,9 @@ Key             Action
 ==============  ============================
 C-x p o         rope-open-project
 C-x p k         rope-close-project
+C-x p f         rope-find-file
 C-x p u         rope-undo-refactoring
 C-x p r         rope-redo-refactoring
-C-x p f         rope-find-file
 
 C-c r r         rope-rename
 C-c r l         rope-extract-variable
@@ -125,14 +122,12 @@ C-c n p         rope-generate-package
 ==============  ============================
 
 
-
 Variables
-=========
+---------
 
 * ``rope-confirm-saving``: If non-nil, you have to confirm saving all
   modified python files before refactorings; otherwise they are saved
   automatically. Defaults to ``t``.
-
 
 
 Contributing
@@ -142,7 +137,6 @@ Send your bug reports, feature requests and patches to `rope-dev (at)
 googlegroups.com`_.
 
 .. _`rope-dev (at) googlegroups.com`: http://groups.google.com/group/rope-dev
-
 
 
 License

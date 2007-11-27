@@ -12,6 +12,7 @@ classifiers=[
     'License :: OSI Approved :: GNU General Public License (GPL)',
     'Natural Language :: English',
     'Programming Language :: Python',
+    'Topic :: Text Editors :: Emacs',
     'Topic :: Software Development']
 
 def get_long_description():
