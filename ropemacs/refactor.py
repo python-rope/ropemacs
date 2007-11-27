@@ -33,12 +33,13 @@ class Refactoring(object):
             return
         def calculate(handle):
             return self._calculate_changes(result, handle)
-        name = 'Performing %s' % self.name
+        name = 'Calculating %s changes' % self.name
         changes = ropemacs._RunTask(calculate, name=name)()
         if action == 'perform':
             self._perform(changes)
         if action == 'preview':
-            ropemacs._message('We\'ll preview it!')
+            ropemacs._make_buffer('*rope-preview*',
+                                  str(changes.get_description()))
 
     @property
     def project(self):

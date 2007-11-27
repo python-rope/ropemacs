@@ -154,12 +154,7 @@ class RopeInterface(object):
         resource, offset = self._get_location()
         docs = codeassist.get_doc(
             self.project, lisp.buffer_string(), offset, resource)
-        pydoc_buffer = lisp.get_buffer_create('*rope-pydoc*')
-        lisp.set_buffer(pydoc_buffer)
-        lisp.erase_buffer()
-        if docs:
-            lisp.insert(docs)
-            lisp.display_buffer(pydoc_buffer)
+        _make_buffer('*rope-pydoc*', docs, empty_goto=False)
 
     @interactive
     def code_assist(self):
@@ -293,7 +288,6 @@ class _RunTask(object):
 
     def __call__(self):
         handle = taskhandle.TaskHandle(name=self.name)
-        _message('')
         progress = lisp.make_progress_reporter(
             '%s ... ' % self.name, 0, 100)
         def update_progress():
@@ -334,6 +328,14 @@ class _RunTask(object):
         return calculate.result
 
 
+def _make_buffer(name, contents, empty_goto=True):
+    new_buffer = lisp.get_buffer_create(name)
+    lisp.set_buffer(new_buffer)
+    lisp.erase_buffer()
+    if contents or empty_goto:
+        lisp.insert(contents)
+        lisp.display_buffer(new_buffer)
+        lisp.goto_line(1)
 
 
 DEFVARS = """\
