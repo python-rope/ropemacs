@@ -7,6 +7,7 @@ TODO
 * including pymacs in ropemacs?
 * change pymacs to accept unicode strings
 * saving the old values of refacturing config
+* find occurrences
 
 > Public Release 0.2
 

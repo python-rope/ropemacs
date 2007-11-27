@@ -73,7 +73,20 @@ optional refactoring options; after setting each option you'll be
 returned back to the base prompt.  Finally, you can ask rope to
 perform, preview or cancel the refactoring.
 
+
 See keybinding_ section and try the refactorings yourself.
+
+
+Finding Files
+-------------
+
+By using ``rope-find-file`` (``C-x p f`` by default), you can search
+for files in your project.  When you complete the minibuffer you'll
+see all files in the project; files are shown as their reversed paths.
+For instance ``projectroot/docs/todo.txt`` is shown like
+``todo.txt<docs``.  This way you can find files faster in your
+project.
+
 
 
 Keybinding

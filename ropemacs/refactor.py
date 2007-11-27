@@ -41,7 +41,7 @@ class Refactoring(object):
             ropemacs._make_buffer('*rope-preview*',
                                   str(changes.get_description()),
                                   mode='diff')
-            if ropemacs._y_or_n_p('Do the changes? '):
+            if ropemacs._yes_or_no('Do the changes? '):
                 self._perform(changes)
 
     @property

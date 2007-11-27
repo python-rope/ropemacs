@@ -339,8 +339,8 @@ def _make_buffer(name, contents, empty_goto=True, mode=None):
         lisp.display_buffer(new_buffer)
         lisp.goto_line(1)
 
-def _y_or_n_p(prompt):
-    return lisp.y_or_n_p(prompt)
+def _yes_or_no(prompt):
+    return lisp.yes_or_no_p(prompt)
 
 
 DEFVARS = """\
