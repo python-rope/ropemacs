@@ -12,4 +12,3 @@ TODO
 
 * new file/directory/module/package; C-x p n [fdmp]
 * showing proposal type in code-assist
-* previewing changes

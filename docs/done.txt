@@ -2,6 +2,7 @@
  Done
 ======
 
+- previewing changes : November 27, 2007
 - specifying refactoring options : November 26, 2007
 - restructuring support : November 26, 2007
 - added ``rope-confirm-saving`` variable : November 26, 2007

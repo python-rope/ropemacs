@@ -328,14 +328,19 @@ class _RunTask(object):
         return calculate.result
 
 
-def _make_buffer(name, contents, empty_goto=True):
+def _make_buffer(name, contents, empty_goto=True, mode=None):
     new_buffer = lisp.get_buffer_create(name)
     lisp.set_buffer(new_buffer)
     lisp.erase_buffer()
     if contents or empty_goto:
         lisp.insert(contents)
+        if mode is not None:
+            lisp[mode + '-mode']()
         lisp.display_buffer(new_buffer)
         lisp.goto_line(1)
+
+def _y_or_n_p(prompt):
+    return lisp.y_or_n_p(prompt)
 
 
 DEFVARS = """\

@@ -39,7 +39,10 @@ class Refactoring(object):
             self._perform(changes)
         if action == 'preview':
             ropemacs._make_buffer('*rope-preview*',
-                                  str(changes.get_description()))
+                                  str(changes.get_description()),
+                                  mode='diff')
+            if ropemacs._y_or_n_p('Do the changes? '):
+                self._perform(changes)
 
     @property
     def project(self):
