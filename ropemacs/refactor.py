@@ -39,11 +39,12 @@ class Refactoring(object):
         if action == 'preview':
             if changes is not None:
                 diffs = str(changes.get_description())
-                lisputils.make_buffer('*rope-preview*', diffs, mode='diff')
+                lisputils.make_buffer('*rope-preview*', diffs, modes=['diff'])
                 if lisputils.yes_or_no('Do the changes? '):
                     self._perform(changes)
                 else:
                     lisputils.message('Thrown away!')
+                lisputils.hide_buffer('*rope-preview*')
             else:
                 lisputils.message('No changes!')
 

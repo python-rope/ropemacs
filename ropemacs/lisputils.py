@@ -8,16 +8,27 @@ def yes_or_no(prompt):
     return lisp.yes_or_no_p(prompt)
 
 
-def make_buffer(name, contents, empty_goto=True, mode=None):
+def make_buffer(name, contents, empty_goto=True, modes=[]):
     new_buffer = lisp.get_buffer_create(name)
     lisp.set_buffer(new_buffer)
+    lisp.toggle_read_only(-1)
     lisp.erase_buffer()
     if contents or empty_goto:
         lisp.insert(contents)
-        if mode is not None:
+        for mode in modes:
             lisp[mode + '-mode']()
         lisp.display_buffer(new_buffer)
+        lisp.buffer_disable_undo(new_buffer)
+        lisp.toggle_read_only(1)
         lisp.goto_line(1)
+
+
+def hide_buffer(name):
+    buffer = lisp.get_buffer(name)
+    if buffer is not None:
+        window = lisp.get_buffer_window(buffer)
+        if window is not None:
+            lisp.delete_window(window)
 
 
 class RunTask(object):
