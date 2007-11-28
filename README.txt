@@ -15,6 +15,12 @@ New Features
 * Auto-completing python names (code-assist); ``M-/``
 * Rope find file; ``C-c p f``
 * Generate python element; ``C-c n [vfcmp]``
+* Previewing changes
+* Specifying refactoring options
+* Restructuring support
+* Added ``rope-confirm-saving`` variable
+* Only activating local keys in python mode
+* Find file and advanced matching
 
 
 Setting Up
