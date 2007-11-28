@@ -2,6 +2,8 @@
  Done
 ======
 
+> Public Release 0.2
+
 - previewing changes : November 27, 2007
 - specifying refactoring options : November 26, 2007
 - restructuring support : November 26, 2007

@@ -1,9 +1,14 @@
+"""ropemacs, an emacs mode for using rope refactoring library"""
+
 from Pymacs import lisp
 from rope.base import project, libutils
 from rope.contrib import codeassist
 
 from ropemacs import refactor, lisputils
 from ropemacs.lisputils import lispfunction, interactive
+
+
+VERSION = '0.3'
 
 
 class RopeInterface(object):
