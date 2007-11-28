@@ -31,6 +31,10 @@ After installing pymacs, add these lines to your ``~/.emacs`` file::
   (pymacs-load "ropemacs" "rope-")
   (rope-init)
 
+Rope registers its local keys using ``python-mode`` hook.  If you
+don't want to use rope with ``python-mode`` you can add
+``rope-register-local-keys`` lisp function to some other hook.
+
 If you want to load ropemacs only when you really need it, you can use
 a function like this instead of that::
 
@@ -44,9 +48,9 @@ a function like this instead of that::
   )
 
 And execute ``load-ropemacs`` whenever you want to use ropemacs.  Also
-if you don't want to install rope library and ropemacs you can put it
-somewhere and add them to the ``PYTHONPATH`` before loading ropemacs
-in your ``.emacs``::
+if you don't want to install rope library and ropemacs you can put
+them somewhere and add them to the ``PYTHONPATH`` before loading
+ropemacs in your ``.emacs``::
 
   (setenv "PYTHONPATH" (concat (getenv "PYTHONPATH")
                                ":/path/to/extracted/rope/package"
