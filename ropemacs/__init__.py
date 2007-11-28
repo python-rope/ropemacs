@@ -21,7 +21,8 @@ class RopeInterface(object):
             ('C-x p k', lisp.rope_close_project),
             ('C-x p u', lisp.rope_undo_refactoring),
             ('C-x p r', lisp.rope_redo_refactoring),
-            ('C-x p f', lisp.rope_find_file)]
+            ('C-x p f', lisp.rope_find_file),
+            ('C-x p c', lisp.rope_project_config)]
 
         self.local_keys = [
             ('M-/', lisp.rope_code_assist),
@@ -181,6 +182,15 @@ class RopeInterface(object):
         path = '/'.join(reversed(result.split('<')))
         file = self.project.get_file(path)
         lisp.find_file(file.real_path)
+
+    @interactive
+    def project_config(self):
+        self._check_project()
+        if self.project.ropefolder is not None:
+            config = self.project.ropefolder.get_child('config.py')
+            lisp.find_file(config.real_path)
+        else:
+            lisputils.message('No rope project folder found')
 
     def _goto_location(self, location, readonly=False):
         if location[0]:

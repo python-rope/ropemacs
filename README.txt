@@ -12,15 +12,6 @@ and Pymacs before using ropemacs.
 New Features
 ============
 
-* Auto-completing python names (code-assist); ``M-/``
-* Rope find file; ``C-c p f``
-* Generate python element; ``C-c n [vfcmp]``
-* Previewing changes
-* Specifying refactoring options
-* Restructuring support
-* Added ``rope-confirm-saving`` variable
-* Only activating local keys in python mode
-* Find file and advanced matching
 
 
 Setting Up
@@ -109,6 +100,7 @@ C-x p k         rope-close-project
 C-x p f         rope-find-file
 C-x p u         rope-undo-refactoring
 C-x p r         rope-redo-refactoring
+C-x p c         rope-project-config
 
 C-c r r         rope-rename
 C-c r l         rope-extract-variable

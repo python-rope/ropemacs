@@ -7,6 +7,9 @@ TODO
 * including pymacs in ropemacs?
 * change pymacs to accept unicode strings
 * saving the old values of refacturing config
+
+> Public Release 0.3
+
 * find occurrences
 * new file/directory/module/package; C-x p n [fdmp]
 * showing proposal type in code-assist

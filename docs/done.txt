@@ -2,7 +2,9 @@
  Done
 ======
 
-> Public Release 0.2
+- edit project config; ``C-x p c`` : November 28, 2007
+
+> Public Release 0.2 : November 28, 2007
 
 - previewing changes : November 27, 2007
 - specifying refactoring options : November 26, 2007
