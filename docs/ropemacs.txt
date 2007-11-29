@@ -35,6 +35,7 @@ Features
   * Code-completion
   * Goto definition
   * Show pydoc
+  * Find occurrences
   * Organize imports (remove unused and duplicate imports and sort them)
   * Generating python elements
 

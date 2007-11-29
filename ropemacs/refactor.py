@@ -97,9 +97,14 @@ class Rename(Refactoring):
     name = 'rename'
     key = 'C-c r r'
     optionals = {
-        'docs': dialog.Data('Rename occurrences in comments and docs: ', values=['yes', 'no']),
-        'in_hierarchy': dialog.Data('Method in class hierarchy: ', values=['yes', 'no']),
-        'unsure': dialog.Data('Unsure occurrences: ', values=['ignore', 'match'])}
+        'docs': dialog.Data('Rename occurrences in comments and docs: ',
+                            values=['yes', 'no'], default='yes'),
+        'in_hierarchy': dialog.Data('Method in class hierarchy: ',
+                                    values=['yes', 'no'], default='no'),
+        'in_file': dialog.Data('Only rename occurrences in the same file: ',
+                               values=['yes', 'no'], default='no'),
+        'unsure': dialog.Data('Unsure occurrences: ',
+                              values=['ignore', 'match'], default='ignore')}
     saveall = True
 
     def __init__(self, interface):
@@ -111,9 +116,10 @@ class Rename(Refactoring):
 
     def _calculate_changes(self, values, task_handle):
         newname = values['newname']
-        unsure = values.get('unsure', 'no') == 'yes'
+        unsure = values.get('unsure', 'ignore') == 'match'
         kwds = {
             'docs': values.get('docs', 'yes') == 'yes',
+            'in_file': values.get('in_file', 'no') == 'yes',
             'unsure': (lambda occurrence: unsure)}
         if self.renamer.is_method():
             kwds['in_hierarchy'] = values.get('in_hierarchy', 'no') == 'yes'
