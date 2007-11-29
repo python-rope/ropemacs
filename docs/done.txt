@@ -2,6 +2,7 @@
  Done
 ======
 
+- find occurrences; ``C-c f`` : November 29, 2007
 - edit project config; ``C-x p c`` : November 28, 2007
 
 > Public Release 0.2 : November 28, 2007

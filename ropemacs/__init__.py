@@ -27,7 +27,8 @@ class RopeInterface(object):
         self.local_keys = [
             ('M-/', lisp.rope_code_assist),
             ('C-c g', lisp.rope_goto_definition),
-            ('C-c C-d', lisp.rope_show_doc)]
+            ('C-c C-d', lisp.rope_show_doc),
+            ('C-c f', lisp.rope_find_occurrences)]
 
         self._register_refactorings()
 
@@ -154,6 +155,42 @@ class RopeInterface(object):
         lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
 
     @interactive
+    def find_occurrences(self):
+        self._check_project()
+        self._save_buffers()
+        resource, offset = self._get_location()
+        def calculate(handle):
+            return codeassist.find_occurrences(
+                self.project, resource, offset,
+                unsure=True, task_handle=handle)
+        result = lisputils.RunTask(calculate, 'Find Occurrences')()
+        text = []
+        for occurrence in result:
+            line = '%s : %s' % (occurrence.resource.path, occurrence.offset)
+            if occurrence.unsure:
+                line += ' ?'
+            text.append(line)
+        text = '\n'.join(text) + '\n'
+        buffer = lisputils.make_buffer('*rope-occurrences*',
+                                       text, switch=True)
+        lisp.set_buffer(buffer)
+        lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
+
+    @interactive
+    def occurrences_goto_occurrence(self):
+        self._check_project()
+        start = lisp.line_beginning_position()
+        end = lisp.line_end_position()
+        line = lisp.buffer_substring_no_properties(start, end)
+        tokens = line.split()
+        if tokens:
+            resource = self.project.get_resource(tokens[0])
+            offset = int(tokens[2])
+            lisp.find_file_other_window(resource.real_path)
+            lisp.goto_char(offset)
+            lisp.switch_to_buffer_other_window('*rope-occurrences*')
+
+    @interactive
     def code_assist(self):
         self._check_project()
         resource, offset = self._get_location()
@@ -166,7 +203,7 @@ class RopeInterface(object):
         starting = source[starting_offset:offset]
         prompt = 'Completion for %s: ' % starting
         result = lisputils.ask_values(prompt, names,
-                                       starting=starting, exact=None)
+                                      starting=starting, exact=None)
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 

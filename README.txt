@@ -115,6 +115,7 @@ M-/             rope-code-assist
 C-c g           rope-goto-definition
 C-c C-d         rope-show-doc
 C-c i o         rope-organize-imports
+C-c f           rope-find-occurrences
 
 C-c n v         rope-generate-variable
 C-c n f         rope-generate-function
