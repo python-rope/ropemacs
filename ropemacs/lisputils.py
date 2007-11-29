@@ -130,3 +130,7 @@ def interactive(func):
 def prefixed(func):
     func.interaction = 'p'
     return func
+
+def rawprefixed(func):
+    func.interaction = 'P'
+    return func

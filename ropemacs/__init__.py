@@ -5,7 +5,7 @@ from rope.base import project, libutils
 from rope.contrib import codeassist
 
 from ropemacs import refactor, lisputils
-from ropemacs.lisputils import lispfunction, interactive, prefixed
+from ropemacs.lisputils import lispfunction, interactive, prefixed, rawprefixed
 
 
 VERSION = '0.3'
@@ -26,6 +26,7 @@ class RopeInterface(object):
 
         self.local_keys = [
             ('M-/', lisp.rope_code_assist),
+            ('M-?', lisp.rope_lucky_assist),
             ('C-c g', lisp.rope_goto_definition),
             ('C-c C-d', lisp.rope_show_doc),
             ('C-c f', lisp.rope_find_occurrences)]
@@ -195,8 +196,18 @@ class RopeInterface(object):
     def occurrences_quit(self):
         lisputils.hide_buffer('*rope-occurrences*')
 
+    @rawprefixed
+    def code_assist(self, prefix):
+        arg = None
+        if prefix is not None:
+            arg = lisp.prefix_numeric_value(prefix)
+        self._code_assist(arg)
+
     @interactive
-    def code_assist(self):
+    def lucky_assist(self):
+        self.code_assist(0)
+
+    def _code_assist(self, index):
         self._check_project()
         resource, offset = self._get_location()
         source = lisp.buffer_string()
@@ -206,9 +217,16 @@ class RopeInterface(object):
         starting_offset = codeassist.starting_offset(source, offset)
         names = [proposal.name for proposal in proposals]
         starting = source[starting_offset:offset]
-        prompt = 'Completion for %s: ' % starting
-        result = lisputils.ask_values(prompt, names,
-                                      starting=starting, exact=None)
+        if index is not None:
+            if 0 <= index < len(names):
+                result = names[index]
+            else:
+                lisputils.message('Not enough proposals!')
+                return
+        else:
+            prompt = 'Completion for %s: ' % starting
+            result = lisputils.ask_values(prompt, names,
+                                          starting=starting, exact=None)
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 

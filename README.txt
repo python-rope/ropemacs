@@ -87,6 +87,19 @@ For instance ``projectroot/docs/todo.txt`` is shown like
 project.
 
 
+Code-Assist
+-----------
+
+``rope-code-assist`` (``M-/`` by default) function will let you select
+from a list of completions.  By giving this function an argument, you
+can select which proposal to use without prompting; ``C-u 1 M-/`` uses
+the second, for instance.
+
+The ``rope-lucky-assist`` (``M-?``) is exactly like ``C-u 0 M-/``.  It
+applies the first completion without asking.
+
+
+
 Keybinding
 ----------
 
@@ -116,6 +129,7 @@ C-c g           rope-goto-definition
 C-c C-d         rope-show-doc
 C-c i o         rope-organize-imports
 C-c f           rope-find-occurrences
+M-?             rope-lucky-assist
 
 C-c n v         rope-generate-variable
 C-c n f         rope-generate-function
