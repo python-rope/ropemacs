@@ -32,6 +32,7 @@ def hide_buffer(name):
         window = lisp.get_buffer_window(buffer)
         if window is not None:
             lisp.delete_window(window)
+            lisp.bury_buffer(buffer)
 
 
 class RunTask(object):

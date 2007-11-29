@@ -175,6 +175,7 @@ class RopeInterface(object):
                                        text, switch=True)
         lisp.set_buffer(buffer)
         lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
+        lisp.local_set_key('q', lisp.rope_occurrences_quit)
 
     @interactive
     def occurrences_goto_occurrence(self):
@@ -189,6 +190,10 @@ class RopeInterface(object):
             lisp.find_file_other_window(resource.real_path)
             lisp.goto_char(offset)
             lisp.switch_to_buffer_other_window('*rope-occurrences*')
+
+    @interactive
+    def occurrences_quit(self):
+        lisputils.hide_buffer('*rope-occurrences*')
 
     @interactive
     def code_assist(self):
