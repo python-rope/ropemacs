@@ -5,7 +5,7 @@ from rope.base import project, libutils
 from rope.contrib import codeassist
 
 from ropemacs import refactor, lisputils
-from ropemacs.lisputils import lispfunction, interactive
+from ropemacs.lisputils import lispfunction, interactive, prefixed
 
 
 VERSION = '0.3'
@@ -154,15 +154,15 @@ class RopeInterface(object):
             self.project, lisp.buffer_string(), offset, resource)
         lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
 
-    @interactive
-    def find_occurrences(self, *args):
+    @prefixed
+    def find_occurrences(self, prefix):
         self._check_project()
         self._save_buffers()
         resource, offset = self._get_location()
         def calculate(handle):
             return codeassist.find_occurrences(
                 self.project, resource, offset,
-                unsure=False, task_handle=handle)
+                unsure=(prefix != 1), task_handle=handle)
         result = lisputils.RunTask(calculate, 'Find Occurrences')()
         text = []
         for occurrence in result:
@@ -176,7 +176,6 @@ class RopeInterface(object):
         lisp.set_buffer(buffer)
         lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
         lisp.local_set_key('q', lisp.rope_occurrences_quit)
-        lisputils.message(str(args))
 
     @interactive
     def occurrences_goto_occurrence(self):

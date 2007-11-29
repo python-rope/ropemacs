@@ -125,3 +125,8 @@ def lispfunction(func):
 def interactive(func):
     func.interaction = ''
     return func
+
+
+def prefixed(func):
+    func.interaction = 'p'
+    return func
