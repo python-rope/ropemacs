@@ -245,9 +245,9 @@ class Inline(Refactoring):
 class _Extract(Refactoring):
 
     saveall = False
-    kind = None
     optionals = {'similar': dialog.Data('Extract similar pieces: ',
                                         values=['yes', 'no'], default='yes')}
+    kind = None
     constructor = None
 
     def _create_refactoring(self):

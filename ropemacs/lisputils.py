@@ -72,9 +72,9 @@ class RunTask(object):
             thread.start()
             thread.join()
             lisp.progress_reporter_done(progress)
-            if calculate.exception is not None:
-                description = type(calculate.exception).__name__ + ': ' + \
-                                   str(calculate.exception)
+            raised = calculate.exception
+            if raised is not None:
+                description = type(raised).__name__ + ': ' + str(raised)
                 raise exceptions.InterruptedTaskError(
                     'Task <%s> was interrupted.\nReason: <%s>' %
                     (self.name, description))

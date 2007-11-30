@@ -196,7 +196,7 @@ class RopeInterface(object):
             resource = self.project.get_resource(tokens[0])
             offset = int(tokens[2])
             lisp.find_file_other_window(resource.real_path)
-            lisp.goto_char(offset)
+            lisp.goto_char(offset + 1)
             lisp.switch_to_buffer_other_window('*rope-occurrences*')
 
     @interactive
