@@ -89,10 +89,10 @@ def message(message):
     lisp.message(message)
 
 
-def askdata(data):
+def askdata(data, starting=None):
     """`data` is a `ropemacs.dialog.Data` object"""
     ask_func = ask
-    ask_args = {'prompt': data.prompt, 'starting': data.starting,
+    ask_args = {'prompt': data.prompt, 'starting': starting,
                 'default': data.default}
     if data.values:
         ask_func = ask_values

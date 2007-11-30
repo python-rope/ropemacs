@@ -1,11 +1,9 @@
 class Data(object):
 
-    def __init__(self, prompt=None, default=None,
-                 values=None, starting=None, kind=None):
+    def __init__(self, prompt=None, default=None, values=None, kind=None):
         self.prompt = prompt
         self.default = default
         self.values = values
-        self.starting = starting
         self.kind = kind
 
 
@@ -29,5 +27,6 @@ def show_dialog(askdata, actions, confs={}, optionals={}):
                 conf = confs[response]
             else:
                 conf = optionals[response]
-            result[response] = askdata(conf)
+            oldvalue = result.get(response, None)
+            result[response] = askdata(conf, starting=oldvalue)
     return response, result

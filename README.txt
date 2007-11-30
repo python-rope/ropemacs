@@ -106,7 +106,7 @@ Keybinding
 Uses almost the same keybinding as ropeide.
 
 ==============  ============================
-Key             Action
+Key             Command
 ==============  ============================
 C-x p o         rope-open-project
 C-x p k         rope-close-project

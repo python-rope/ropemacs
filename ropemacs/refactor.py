@@ -128,7 +128,7 @@ class Rename(Refactoring):
 
     def _get_confs(self):
         oldname = str(self.renamer.get_old_name())
-        return {'newname': dialog.Data('New name: ', starting=oldname)}
+        return {'newname': dialog.Data('New name: ', default=oldname)}
 
 
 class RenameCurrentModule(Rename):
