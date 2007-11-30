@@ -2,7 +2,7 @@
 
 from Pymacs import lisp
 from rope.base import project, libutils
-from rope.contrib import codeassist
+from rope.contrib import codeassist, generate
 
 from ropemacs import refactor, lisputils, dialog
 from ropemacs.lisputils import lispfunction, interactive, prefixed, rawprefixed
@@ -263,13 +263,13 @@ class RopeInterface(object):
     @interactive
     def create_module(self):
         def callback(sourcefolder, name):
-            return self.project.pycore.create_module(sourcefolder, name)
+            return generate.create_module(self.project, name, sourcefolder)
         self._create('module', callback)
 
     @interactive
     def create_package(self):
         def callback(sourcefolder, name):
-            folder = self.project.pycore.create_package(sourcefolder, name)
+            folder = generate.create_package(self.project, name, sourcefolder)
             return folder.get_child('__init__.py')
         self._create('package', callback)
 
