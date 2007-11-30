@@ -242,36 +242,41 @@ class Inline(Refactoring):
                                         task_handle=task_handle)
 
 
-class ExtractVariable(Refactoring):
+class _Extract(Refactoring):
+
+    saveall = False
+    kind = None
+    optionals = {'similar': dialog.Data('Extract similar pieces: ',
+                                        values=['yes', 'no'], default='yes')}
+    constructor = None
+
+    def _create_refactoring(self):
+        start, end = self.region
+        self.extractor = self.constructor(self.project,
+                                          self.resource, start, end)
+
+    def _calculate_changes(self, values, task_handle):
+        similar = values.get('similar', 'yes') == 'yes'
+        return self.extractor.get_changes(values['name'], similar=similar)
+
+    def _get_confs(self):
+        return {'name': dialog.Data('Extracted %s name: ' % self.kind)}
+
+
+class ExtractVariable(_Extract):
 
     name = 'extract_variable'
     key = 'C-c r l'
-    saveall = False
-    confs = {'name': dialog.Data('Extracted variable name: ')}
-
-    def _create_refactoring(self):
-        start, end = self.region
-        self.extractor = rope.refactor.extract.ExtractVariable(
-            self.project, self.resource, start, end)
-
-    def _calculate_changes(self, values, task_handle):
-        return self.extractor.get_changes(values['name'])
+    kind = 'variable'
+    constructor = rope.refactor.extract.ExtractVariable
 
 
-class ExtractMethod(Refactoring):
+class ExtractMethod(_Extract):
 
     name = 'extract_method'
     key = 'C-c r m'
-    saveall = False
-    confs = {'name': dialog.Data('Extracted method name: ')}
-
-    def _create_refactoring(self):
-        start, end = self.region
-        self.extractor = rope.refactor.extract.ExtractMethod(
-            self.project, self.resource, start, end)
-
-    def _calculate_changes(self, values, task_handle):
-        return self.extractor.get_changes(values['name'])
+    kind = 'method'
+    constructor = rope.refactor.extract.ExtractMethod
 
 
 class OrganizeImports(Refactoring):
