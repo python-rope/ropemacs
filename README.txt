@@ -114,6 +114,7 @@ C-x p f         rope-find-file
 C-x p u         rope-undo-refactoring
 C-x p r         rope-redo-refactoring
 C-x p c         rope-project-config
+C-x p n [mpfd]  rope-create-(module|package|file|directory)
 
 C-c r r         rope-rename
 C-c r l         rope-extract-variable
@@ -130,12 +131,7 @@ C-c C-d         rope-show-doc
 C-c i o         rope-organize-imports
 C-c f           rope-find-occurrences
 M-?             rope-lucky-assist
-
-C-c n v         rope-generate-variable
-C-c n f         rope-generate-function
-C-c n c         rope-generate-class
-C-c n m         rope-generate-module
-C-c n p         rope-generate-package
+C-c n [vfcmp]   rope-generate-(variable|function|class|module|package)
 ==============  ============================
 
 

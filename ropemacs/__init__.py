@@ -4,7 +4,7 @@ from Pymacs import lisp
 from rope.base import project, libutils
 from rope.contrib import codeassist
 
-from ropemacs import refactor, lisputils
+from ropemacs import refactor, lisputils, dialog
 from ropemacs.lisputils import lispfunction, interactive, prefixed, rawprefixed
 
 
@@ -22,7 +22,11 @@ class RopeInterface(object):
             ('C-x p u', lisp.rope_undo_refactoring),
             ('C-x p r', lisp.rope_redo_refactoring),
             ('C-x p f', lisp.rope_find_file),
-            ('C-x p c', lisp.rope_project_config)]
+            ('C-x p c', lisp.rope_project_config),
+            ('C-x p n m', lisp.rope_create_module),
+            ('C-x p n p', lisp.rope_create_package),
+            ('C-x p n f', lisp.rope_create_file),
+            ('C-x p n d', lisp.rope_create_directory)]
 
         self.local_keys = [
             ('M-/', lisp.rope_code_assist),
@@ -56,7 +60,10 @@ class RopeInterface(object):
                         refactoring(self).show()
                     setattr(self, attr.name, do_refactor)
                     name = 'rope-' + attr.name.replace('_', '-')
-                    self.local_keys.append((attr.key, lisp[name]))
+                    if attr.key.startswith('C-x'):
+                        self.global_keys.append((attr.key, lisp[name]))
+                    else:
+                        self.local_keys.append((attr.key, lisp[name]))
 
     def _key_sequence(self, sequence):
         result = []
@@ -99,7 +106,7 @@ class RopeInterface(object):
 
     @interactive
     def open_project(self):
-        root = lisp.read_directory_name('Rope project root folder: ')
+        root = lisputils.ask_directory('Rope project root folder: ')
         if self.project is not None:
             self.close_project()
         self.project = project.Project(root)
@@ -251,6 +258,48 @@ class RopeInterface(object):
             lisp.find_file(config.real_path)
         else:
             lisputils.message('No rope project folder found')
+
+
+    @interactive
+    def create_module(self):
+        def callback(sourcefolder, name):
+            return self.project.pycore.create_module(sourcefolder, name)
+        self._create('module', callback)
+
+    @interactive
+    def create_package(self):
+        def callback(sourcefolder, name):
+            folder = self.project.pycore.create_package(sourcefolder, name)
+            return folder.get_child('__init__.py')
+        self._create('package', callback)
+
+    @interactive
+    def create_file(self):
+        def callback(parent, name):
+            return parent.create_file(name)
+        self._create('file', callback, 'parent')
+
+    @interactive
+    def create_directory(self):
+        def callback(parent, name):
+            parent.create_folder(name)
+        self._create('directory', callback, 'parent')
+
+    def _create(self, name, callback, parentname='source'):
+        self._check_project()
+        confs = {'name': dialog.Data(name.title() + ' name: ')}
+        parentname = parentname + 'folder'
+        optionals = {parentname: dialog.Data(
+                parentname.title() + ' Folder: ',
+                default=self.project.address, kind='directory')}
+        action, values = dialog.show_dialog(
+            lisputils.askdata, ['perform', 'cancel'], confs, optionals)
+        if action == 'perform':
+            parent = libutils.path_to_resource(
+                self.project, values.get(parentname, self.project.address))
+            resource = callback(parent, values['name'])
+            if resource:
+                lisp.find_file(resource.real_path)
 
     def _goto_location(self, location, readonly=False):
         if location[0]:

@@ -2,6 +2,7 @@
  Done
 ======
 
+- new file/directory/module/package; ``C-x p n [fdmp]`` : November 30, 2007
 - lucky-assist; ``M-?`` : November 29, 2007
 - find occurrences; ``C-c f`` : November 29, 2007
 - edit project config; ``C-x p c`` : November 28, 2007

@@ -91,11 +91,15 @@ def message(message):
 
 def askdata(data):
     """`data` is a `ropemacs.dialog.Data` object"""
+    ask_func = ask
+    ask_args = {'prompt': data.prompt, 'starting': data.starting,
+                'default': data.default}
     if data.values:
-        return ask_values(data.prompt, data.values, default=data.default,
-                          starting=data.starting)
-    else:
-        return ask(data.prompt, default=data.default, starting=data.starting)
+        ask_func = ask_values
+        ask_args['values'] = data.values
+    elif data.kind == 'directory':
+        ask_func = ask_directory
+    return ask_func(**ask_args)
 
 
 def ask_values(prompt, values, default=None, starting=None, exact=True):
@@ -110,8 +114,16 @@ def ask_values(prompt, values, default=None, starting=None, exact=True):
 def ask(prompt, default=None, starting=None):
     if default is not None:
         prompt = prompt + ('[%s] ' % default)
-    result =  lisp.read_from_minibuffer(prompt, starting, None, None,
+    result = lisp.read_from_minibuffer(prompt, starting, None, None,
                                         None, default, None)
+    if result == '' and default is not None:
+        return default
+    return result
+
+def ask_directory(prompt, default=None, starting=None):
+    if default is not None:
+        prompt = prompt + ('[%s] ' % default)
+    result = lisp.read_directory_name(prompt, starting, default)
     if result == '' and default is not None:
         return default
     return result

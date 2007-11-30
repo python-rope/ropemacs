@@ -145,7 +145,7 @@ class Restructure(Refactoring):
     confs = {'pattern': dialog.Data('Restructuring pattern: '),
              'goal': dialog.Data('Restructuring goal: ')}
     optionals = {'checks': dialog.Data('Checks: '),
-                     'imports': dialog.Data('Imports: ')}
+                 'imports': dialog.Data('Imports: ')}
 
     def _calculate_changes(self, values, task_handle):
         restructuring = rope.refactor.restructure.Restructure(
