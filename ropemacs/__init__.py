@@ -328,12 +328,17 @@ class RopeInterface(object):
         else:
             self.project.validate(self.project.root)
 
-    def _reload_buffers(self, changed_resources):
+    def _reload_buffers(self, changed_resources, moved={}):
         for resource in changed_resources:
             buffer = lisp.find_buffer_visiting(str(resource.real_path))
-            if buffer and resource.exists():
-                lisp.set_buffer(buffer)
-                lisp.revert_buffer(None, 1)
+            if buffer:
+                if resource.exists():
+                    lisp.set_buffer(buffer)
+                    lisp.revert_buffer(None, 1)
+                elif resource in moved:
+                    new_resource = moved[resource]
+                    lisp.kill_buffer(buffer)
+                    lisp.find_file(new_resource.real_path)
 
     def _save_buffers(self, only_current=False):
         ask = lisp['rope-confirm-saving'].value()

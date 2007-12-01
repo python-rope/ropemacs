@@ -40,6 +40,31 @@ class ConfigTest(unittest.TestCase):
         self.assertEquals({'name': 'value'}, result)
         self.assertEquals('done', action)
 
+    def test_trivial_batchset(self):
+        optionals = {'name': dialog.Data()}
+        minibuffer = _MockAskConfig(['batchset', 'name value', 'done'])
+        action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
+                                            optionals=optionals)
+        self.assertEquals({'name': 'value'}, result)
+        self.assertEquals('done', action)
+
+    def test_batchset_multiple_sets(self):
+        optionals = {'name1': dialog.Data(), 'name2': dialog.Data()}
+        minibuffer = _MockAskConfig(['batchset',
+                                     'name1 value1\nname2 value2', 'done'])
+        action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
+                                            optionals=optionals)
+        self.assertEquals({'name1': 'value1', 'name2': 'value2'}, result)
+        self.assertEquals('done', action)
+
+    def test_trivial_batchset(self):
+        optionals = {'name': dialog.Data()}
+        minibuffer = _MockAskConfig(['batchset', 'name value', 'done'])
+        action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
+                                            optionals=optionals)
+        self.assertEquals({'name': 'value'}, result)
+        self.assertEquals('done', action)
+
 
 class _MockAskConfig(object):
 
@@ -47,7 +72,7 @@ class _MockAskConfig(object):
         self.responses = responses
         self.asked = []
 
-    def __call__(self, config):
+    def __call__(self, config, starting=None):
         self.asked.append(config)
         return self.responses[len(self.asked) - 1]
 
