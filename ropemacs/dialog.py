@@ -39,8 +39,20 @@ def show_dialog(askdata, actions, confs={}, optionals={}):
 
 
 def _parse_batchset(sets):
-    result = {}
-    for line in sets.splitlines():
-        tokens = line.split(None, 1)
-        result[tokens[0]] = tokens[1]
-    return result
+    result = []
+    multiline = False
+    for line in sets.splitlines(True):
+        if line[0].isspace() and multiline:
+            result[-1][1] += line[1:]
+        else:
+            if not line:
+                continue
+            multiline= False
+            tokens = line.split(None, 1)
+            value = ''
+            if len(tokens) > 1:
+                result.append([tokens[0], tokens[1].rstrip('\r\n')])
+            else:
+                multiline = True
+                result.append([tokens[0], ''])
+    return dict(result)

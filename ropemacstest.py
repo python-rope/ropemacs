@@ -57,12 +57,25 @@ class ConfigTest(unittest.TestCase):
         self.assertEquals({'name1': 'value1', 'name2': 'value2'}, result)
         self.assertEquals('done', action)
 
-    def test_trivial_batchset(self):
+    def test_multiline_sets(self):
         optionals = {'name': dialog.Data()}
-        minibuffer = _MockAskConfig(['batchset', 'name value', 'done'])
+        minibuffer = _MockAskConfig(
+            ['batchset', 'name\n line1\n  line2\n', 'done'])
         action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
                                             optionals=optionals)
-        self.assertEquals({'name': 'value'}, result)
+        self.assertEquals({'name': 'line1\n line2\n'}, result)
+        self.assertEquals('done', action)
+
+    def test_complex_batchset(self):
+        optionals = {'name1': dialog.Data(), 'name2': dialog.Data(),
+                     'name3': dialog.Data()}
+        minibuffer = _MockAskConfig(
+            ['batchset', 'name3\n value3\nname1\n line1\n  line2\n\nname2 value2\n', 'done'])
+        action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
+                                            optionals=optionals)
+        self.assertEquals(
+            {'name1': 'line1\n line2\n', 'name2': 'value2',
+             'name3': 'value3\n'}, result)
         self.assertEquals('done', action)
 
 

@@ -2,6 +2,7 @@
  Done
 ======
 
+- setting many configs using batchset in dialogs : December 1, 2007
 - updating buffers with moved files : December 1, 2007
 - showing the old value of a field in dialogs : November 30, 2007
 - new file/directory/module/package; ``C-x p n [fdmp]`` : November 30, 2007
