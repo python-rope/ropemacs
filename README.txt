@@ -99,9 +99,52 @@ The ``rope-lucky-assist`` (``M-?``) is exactly like ``C-u 0 M-/``.  It
 applies the first completion without asking.
 
 
+Dialog batchset command
+-----------------------
 
-Keybinding
-----------
+When you use rope dialogs there is a command called ``batchset``.  It
+can be used to set many configs at the same time.  After selecting
+this command from dialog base prompt, you are asked to enter a string.
+
+Batch-set strings can give value to configs in two ways.  The single
+line form is like this::
+
+  name1 value1
+  name2 value2
+
+That is the name of config is followed its value.  For multi-line
+values you can use::
+
+  name1
+   line1
+   line2
+
+  name2
+   line3
+
+Each line of the definition should start with a space or a tab.  Note
+that blank lines before the name of config definitions are ignored.
+
+``batchset`` command is useful when performing refactorings with long
+configs, like restructurings::
+
+  pattern ${?pycore}.create_module(${?project}.root, ${?name})
+
+  goal generate.create_module(${?project}, ${?name})
+
+  imports
+   from rope.contrib import generate
+
+  checks
+   ?pycore.type == rope.base.pycore.PyCore
+   ?project.type == rope.base.project.Project
+
+Now this string can be used for ``batchset`` string in restructuring
+dialog.
+
+
+Key-binding
+-----------
 
 Uses almost the same keybinding as ropeide.
 
