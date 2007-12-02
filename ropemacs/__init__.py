@@ -54,10 +54,12 @@ class RopeInterface(object):
         for name in dir(refactor):
             if not name.startswith('_') and name != 'Refactoring':
                 attr = getattr(refactor, name)
-                if isinstance(attr, type) and issubclass(attr, refactor.Refactoring):
-                    @interactive
-                    def do_refactor(self=self, refactoring=attr):
-                        refactoring(self).show()
+                if isinstance(attr, type) and \
+                   issubclass(attr, refactor.Refactoring):
+                    @rawprefixed
+                    def do_refactor(prefix, self=self, refactoring=attr):
+                        initial_asking = prefix is None
+                        refactoring(self).show(initial_asking=initial_asking)
                     setattr(self, attr.name, do_refactor)
                     name = 'rope-' + attr.name.replace('_', '-')
                     if attr.key.startswith('C-x'):

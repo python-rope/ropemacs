@@ -1,5 +1,5 @@
-import rope.base.taskhandle
 import rope.base.change
+import rope.base.taskhandle
 import rope.contrib.generate
 import rope.refactor.extract
 import rope.refactor.inline
@@ -21,13 +21,14 @@ class Refactoring(object):
     def __init__(self, interface):
         self.interface = interface
 
-    def show(self):
+    def show(self, initial_asking=True):
         self.interface._check_project()
         self.interface._save_buffers(only_current=not self.saveall)
         self._create_refactoring()
         action, result = dialog.show_dialog(
             lisputils.askdata, ['perform', 'preview', 'cancel'],
-            self._get_confs(), self._get_optionals())
+            self._get_confs(), self._get_optionals(),
+            initial_asking=initial_asking)
         if action == 'cancel':
             lisputils.message('Cancelled!')
             return

@@ -7,10 +7,11 @@ class Data(object):
         self.kind = kind
 
 
-def show_dialog(askdata, actions, confs={}, optionals={}):
+def show_dialog(askdata, actions, confs={}, optionals={}, initial_asking=True):
     result = {}
-    for name, conf in confs.items():
-        result[name] = askdata(conf)
+    if initial_asking:
+        for name, conf in confs.items():
+            result[name] = askdata(conf)
     actions.append('batchset')
     names = list(confs.keys())
     names.extend(optionals.keys())
