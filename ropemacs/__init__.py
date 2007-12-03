@@ -207,16 +207,40 @@ class RopeInterface(object):
 
     @rawprefixed
     def code_assist(self, prefix):
-        arg = None
+        starting_offset, names = self._calculate_proposals()
         if prefix is not None:
             arg = lisp.prefix_numeric_value(prefix)
-        self._code_assist(arg)
+            if arg == 0:
+                arg = len(names)
+            common_start = self._calculate_prefix(names[:arg])
+            lisp.insert(common_start[self._get_offset() - starting_offset:])
+        source = lisp.buffer_string()
+        offset = self._get_offset()
+        starting = source[starting_offset:offset]
+        prompt = 'Completion for %s: ' % starting
+        result = lisputils.ask_values(prompt, names,
+                                      starting=starting, exact=None)
+        lisp.delete_region(starting_offset + 1, offset + 1)
+        lisp.insert(result)
 
-    @interactive
-    def lucky_assist(self):
-        self.code_assist(0)
+    @rawprefixed
+    def lucky_assist(self, prefix):
+        starting_offset, names = self._calculate_proposals()
+        source = lisp.buffer_string()
+        offset = self._get_offset()
+        starting = source[starting_offset:offset]
+        selected = 0
+        if prefix is not None:
+            selected = lisp.prefix_numeric_value(prefix)
+        if 0 <= selected < len(names):
+            result = names[selected]
+        else:
+            lisputils.message('Not enough proposals!')
+            pass
+        lisp.delete_region(starting_offset + 1, offset + 1)
+        lisp.insert(result)
 
-    def _code_assist(self, index):
+    def _calculate_proposals(self):
         self._check_project()
         resource, offset = self._get_location()
         source = lisp.buffer_string()
@@ -225,19 +249,21 @@ class RopeInterface(object):
         proposals = codeassist.sorted_proposals(proposals)
         starting_offset = codeassist.starting_offset(source, offset)
         names = [proposal.name for proposal in proposals]
-        starting = source[starting_offset:offset]
-        if index is not None:
-            if 0 <= index < len(names):
-                result = names[index]
-            else:
-                lisputils.message('Not enough proposals!')
-                return
-        else:
-            prompt = 'Completion for %s: ' % starting
-            result = lisputils.ask_values(prompt, names,
-                                          starting=starting, exact=None)
-        lisp.delete_region(starting_offset + 1, offset + 1)
-        lisp.insert(result)
+        return starting_offset, names
+
+    def _calculate_prefix(self, names):
+        if not names:
+            return ''
+        prefix = names[0]
+        for name in names:
+            common = 0
+            for c1, c2 in zip(prefix, name):
+                if c1 == c2:
+                    common += 1
+                else:
+                    break
+            prefix = prefix[:common]
+        return prefix
 
     @interactive
     def find_file(self):

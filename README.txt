@@ -41,7 +41,6 @@ a function like this instead of that::
     (require 'pymacs)
     (pymacs-load "ropemacs" "rope-")
     (rope-init)
-    (setq rope-confirm-saving 'nil)
   )
 
 And execute ``load-ropemacs`` whenever you want to use ropemacs.  Also
@@ -91,12 +90,37 @@ Code-Assist
 -----------
 
 ``rope-code-assist`` (``M-/`` by default) function will let you select
-from a list of completions.  By giving this function an argument, you
-can select which proposal to use without prompting; ``C-u 1 M-/`` uses
-the second, for instance.
+from a list of completions.  If prefixed (``C-u M-/``), ropemacs
+inserts the common prefix, automatically.  If a numeric argument is
+given, rope will insert the common prefix for that many of the first
+proposals.
 
-The ``rope-lucky-assist`` (``M-?``) is exactly like ``C-u 0 M-/``.  It
-applies the first completion without asking.
+The ``rope-lucky-assist`` (``M-?``) does not ask, anything; instead,
+it inserts the first proposal.  By prefixing it, you can select which
+proposal to use.  ``C-u 1 M-?`` uses the second propsal, for instance.
+
+Here::
+
+  xxaa = None
+  xxab = None
+  xxba = None
+  xxbb = None
+
+  x^
+
+consider cursor is at ``^`` position.  This table shows what happens
+when code-assist commands are used:
+
+============  ==========  =======================
+Key           Inserts     Minibuffer Completions
+============  ==========  =======================
+M-/                       xxaa, xxab, xxba, xxbb
+C-u M-/       x           xxaa, xxab, xxba, xxbb
+C-u 2 M-/     xa          xxaa, xxab
+M-?           xxaa
+C-u 1 M-/     xxab
+C-u 3 M-/     xxbb
+============  ==========  =======================
 
 
 Dialog batchset command
@@ -164,6 +188,7 @@ C-c r l         rope-extract-variable
 C-c r m         rope-extract-method
 C-c r i         rope-inline
 C-c r v         rope-move
+C-c r x         rope-restructure
 C-c r 1 r       rope-rename-current-module
 C-c r 1 v       rope-move-current-module
 C-c r 1 p       rope-module-to-package
