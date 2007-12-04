@@ -171,9 +171,22 @@ configs, like restructurings::
    ?pycore.type == rope.base.pycore.PyCore
    ?project.type == rope.base.project.Project
 
+.. ignore the two-space indents
+
 This is a valid ``batchset`` string for restructurings.  When using
 batchset, you usually want to skip initial questions.  That can be
 done by prefixing refactorings.
+
+Just for the sake of completeness, the reverse of the above
+restructuring can be::
+
+  pattern ${?create_module}(${?project}, ${?name})
+
+  goal ${?project}.pycore.create_module(${?project}.root, ${?name})
+
+  checks
+   ?create_module == rope.contrib.generate.create_module
+   ?project.type == rope.base.project.Project
 
 
 Key-binding
