@@ -85,8 +85,7 @@ class ConfigTest(unittest.TestCase):
             ['batchset', '\nname1\n value1\n\nname2 value2\n\n', 'done'])
         action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
                                             optionals=optionals)
-        self.assertEquals(
-            {'name1': 'value1\n', 'name2': 'value2'}, result)
+        self.assertEquals({'name1': 'value1\n', 'name2': 'value2'}, result)
         self.assertEquals('done', action)
 
     def test_skip_initial_asking(self):

@@ -43,17 +43,18 @@ def _parse_batchset(sets):
     result = []
     multiline = False
     for line in sets.splitlines(True):
-        if line[0].isspace() and multiline:
-            result[-1][1] += line[1:]
+        if line[0].isspace():
+            if multiline:
+                result[-1][1] += line[1:]
         else:
-            if not line:
+            if not line.strip():
                 continue
             multiline= False
             tokens = line.split(None, 1)
             value = ''
             if len(tokens) > 1:
                 result.append([tokens[0], tokens[1].rstrip('\r\n')])
-            elif len(tokens) > 0:
+            else:
                 multiline = True
                 result.append([tokens[0], ''])
     return dict(result)
