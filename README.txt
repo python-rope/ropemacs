@@ -12,6 +12,13 @@ and Pymacs before using ropemacs.
 New Features
 ============
 
+* Find occurrences; ``C-c f``
+* Lucky-assist; ``M-?``
+* Setting many configs using batchset in dialogs
+* Showing the old value of a field in dialogs
+* New file/directory/module/package; ``C-x p n [fdmp]``
+* Edit project config; ``C-x p c``
+* Updating buffers with moved files after refactorings
 
 
 Setting Up
@@ -89,15 +96,16 @@ project.
 Code-Assist
 -----------
 
-``rope-code-assist`` (``M-/`` by default) function will let you select
+``rope-code-assist`` command (``M-/`` by default) will let you select
 from a list of completions.  If prefixed (``C-u M-/``), ropemacs
 inserts the common prefix, automatically.  If a numeric argument is
 given, rope will insert the common prefix for that many of the first
 proposals.
 
-The ``rope-lucky-assist`` (``M-?``) does not ask, anything; instead,
-it inserts the first proposal.  By prefixing it, you can select which
-proposal to use.  ``C-u 1 M-?`` uses the second propsal, for instance.
+``rope-lucky-assist`` command (``M-?``) does not ask, anything;
+instead, it inserts the first proposal.  By prefixing it, you can
+choose which proposal to insert.  ``C-u 1 M-?`` uses the second
+propsal, for instance.
 
 Here::
 
@@ -123,15 +131,15 @@ C-u 3 M-/     xxbb
 ============  ==========  =======================
 
 
-Dialog batchset command
------------------------
+Dialog ``batchset`` Command
+---------------------------
 
 When you use rope dialogs there is a command called ``batchset``.  It
 can be used to set many configs at the same time.  After selecting
 this command from dialog base prompt, you are asked to enter a string.
 
-Batch-set strings can give value to configs in two ways.  The single
-line form is like this::
+``batchset`` strings can give value to configs in two ways.  The
+single line form is like this::
 
   name1 value1
   name2 value2
@@ -163,8 +171,9 @@ configs, like restructurings::
    ?pycore.type == rope.base.pycore.PyCore
    ?project.type == rope.base.project.Project
 
-Now this string can be used for ``batchset`` string in restructuring
-dialog.
+This is a valid ``batchset`` string for restructurings.  When using
+batchset, you usually want to skip initial questions.  That can be
+done by prefixing refactorings.
 
 
 Key-binding

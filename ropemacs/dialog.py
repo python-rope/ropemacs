@@ -53,7 +53,7 @@ def _parse_batchset(sets):
             value = ''
             if len(tokens) > 1:
                 result.append([tokens[0], tokens[1].rstrip('\r\n')])
-            else:
+            elif len(tokens) > 0:
                 multiline = True
                 result.append([tokens[0], ''])
     return dict(result)

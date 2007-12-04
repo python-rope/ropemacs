@@ -79,6 +79,16 @@ class ConfigTest(unittest.TestCase):
              'name3': 'value3\n'}, result)
         self.assertEquals('done', action)
 
+    def test_skipping_blanks(self):
+        optionals = {'name1': dialog.Data(), 'name2': dialog.Data()}
+        minibuffer = _MockAskConfig(
+            ['batchset', '\nname1\n value1\n\nname2 value2\n\n', 'done'])
+        action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
+                                            optionals=optionals)
+        self.assertEquals(
+            {'name1': 'value1\n', 'name2': 'value2'}, result)
+        self.assertEquals('done', action)
+
     def test_skip_initial_asking(self):
         confs = {'name': dialog.Data()}
         minibuffer = _MockAskConfig(
