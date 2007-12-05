@@ -2,6 +2,8 @@
  Done
 ======
 
+> Public Release 0.3 : December 5, 2007
+
 - setting many configs using batchset in dialogs : December 1, 2007
 - updating buffers with moved files : December 1, 2007
 - showing the old value of a field in dialogs : November 30, 2007

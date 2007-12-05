@@ -4,9 +4,10 @@
 
 Ropemacs is an emacs mode that uses rope_ library to provide features
 like refactorings and code-assists.  You should install rope_ library
-and Pymacs before using ropemacs.
+and pymacs_ before using ropemacs.
 
 .. _`rope`: http://rope.sf.net/
+.. _pymacs: http://www.iro.umontreal.ca/~pinard/pymacs/
 
 
 New Features
@@ -19,12 +20,13 @@ New Features
 * New file/directory/module/package; ``C-x p n [fdmp]``
 * Edit project config; ``C-x p c``
 * Updating buffers with moved files after refactorings
+* Extracting similar pieces defaults to yes in extract refactorings
 
 
 Setting Up
 ==========
 
-You can get Pymacs from http://www.iro.umontreal.ca/~pinard/pymacs/.
+You can get pymacs_ from http://www.iro.umontreal.ca/~pinard/pymacs/.
 But version 0.22 does not work with Python 2.5 because of the lack of
 file encoding declarations.  A simple patch is included:
 ``docs/pymacs_python25.patch``.
@@ -48,16 +50,17 @@ a function like this instead of that::
     (require 'pymacs)
     (pymacs-load "ropemacs" "rope-")
     (rope-init)
+    ;; Automatically save project python buffers before refactorings
+    (setq rope-confirm-saving 'nil)
   )
 
 And execute ``load-ropemacs`` whenever you want to use ropemacs.  Also
-if you don't want to install rope library and ropemacs you can put
-them somewhere and add them to the ``PYTHONPATH`` before loading
-ropemacs in your ``.emacs``::
+if you don't want to install rope library and ropemacs you can extract
+them somewhere and add these lines to your ``.emacs``::
 
-  (setenv "PYTHONPATH" (concat (getenv "PYTHONPATH")
-                               ":/path/to/extracted/rope/package"
-                               ":/path/to/extracted/ropemacs/package"))
+  ;; Add this before loading pymacs if you haven't installed rope and ropemacs
+  (setq pymacs-load-path '("/home/ali/projects/rope"
+			   "/home/ali/projects/ropemacs"))
 
 
 Getting Started
@@ -71,13 +74,14 @@ will make emacs save them without asking.
 
 After that depending on the refactoring, you'll be asked about the
 essential information a refactoring needs to know (like the new name
-in rename refactoring).
+in rename refactoring).  You can skip it by prefixing the refactoring;
+this can be useful when using batchset command (described later).
 
 Next you'll see the base prompt of a refactoring dialog that shows
-something like "Choose what to do".  You can choose to set other
-optional refactoring options; after setting each option you'll be
-returned back to the base prompt.  Finally, you can ask rope to
-perform, preview or cancel the refactoring.
+something like "Choose what to do".  By entering the name of a
+refactoring option you can set its value.  After setting each option
+you'll be returned back to the base prompt.  Finally, you can ask rope
+to perform, preview or cancel the refactoring.
 
 See keybinding_ section and try the refactorings yourself.
 

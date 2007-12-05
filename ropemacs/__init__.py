@@ -8,9 +8,6 @@ from ropemacs import refactor, lisputils, dialog
 from ropemacs.lisputils import lispfunction, interactive, prefixed, rawprefixed
 
 
-VERSION = '0.3'
-
-
 class RopeInterface(object):
 
     def __init__(self):

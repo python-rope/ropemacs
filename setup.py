@@ -1,4 +1,3 @@
-import ropemacs
 from distutils.core import setup
 
 
@@ -22,7 +21,7 @@ def get_long_description():
     return '\n' + '\n'.join(lines[:end]) + '\n'
 
 setup(name='ropemacs',
-      version=ropemacs.VERSION,
+      version="0.3",
       description='An emacs mode for using rope refactoring library',
       long_description=get_long_description(),
       packages=['ropemacs'],
