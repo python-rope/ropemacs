@@ -2,6 +2,8 @@
  Done
 ======
 
+- not raising exceptions in hooks : December 5, 2007
+
 > Public Release 0.3 : December 5, 2007
 
 - setting many configs using batchset in dialogs : December 1, 2007

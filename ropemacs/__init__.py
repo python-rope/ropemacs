@@ -5,7 +5,8 @@ from rope.base import project, libutils
 from rope.contrib import codeassist, generate
 
 from ropemacs import refactor, lisputils, dialog
-from ropemacs.lisputils import lispfunction, interactive, prefixed, rawprefixed
+from ropemacs.lisputils import (lispfunction, interactive, prefixed,
+                                rawprefixed, lisphook)
 
 
 class RopeInterface(object):
@@ -77,7 +78,7 @@ class RopeInterface(object):
                 result.append(key)
         return ''.join(result)
 
-    @lispfunction
+    @lisphook
     def before_save_actions(self):
         if self.project is not None:
             resource = self._get_resource()
@@ -86,19 +87,19 @@ class RopeInterface(object):
             else:
                 self.old_content = ''
 
-    @lispfunction
+    @lisphook
     def after_save_actions(self):
         if self.project is not None:
             libutils.report_change(self.project, lisp.buffer_file_name(),
                                    self.old_content)
             self.old_content = None
 
-    @lispfunction
+    @lisphook
     def register_local_keys(self):
         for key, callback in self.local_keys:
             lisp.local_set_key(self._key_sequence(key), callback)
 
-    @lispfunction
+    @lisphook
     def exiting_actions(self):
         if self.project is not None:
             self.close_project()

@@ -138,7 +138,6 @@ def interactive(func):
     func.interaction = ''
     return func
 
-
 def prefixed(func):
     func.interaction = 'p'
     return func
@@ -146,3 +145,13 @@ def prefixed(func):
 def rawprefixed(func):
     func.interaction = 'P'
     return func
+
+def lisphook(func):
+    def newfunc(*args, **kwds):
+        try:
+            func(*args, **kwds)
+        except Exception, e:
+            message('Exception in ropemacs hook: %s' %
+                    (type(e).__name__ + str(e)))
+    newfunc.interaction = ''
+    return newfunc
