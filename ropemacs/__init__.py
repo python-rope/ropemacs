@@ -234,7 +234,7 @@ class RopeInterface(object):
             result = names[selected]
         else:
             lisputils.message('Not enough proposals!')
-            pass
+            return
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 

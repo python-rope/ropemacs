@@ -13,14 +13,6 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
-* Find occurrences; ``C-c f``
-* Lucky-assist; ``M-?``
-* Setting many configs using batchset in dialogs
-* Showing the old value of a field in dialogs
-* New file/directory/module/package; ``C-x p n [fdmp]``
-* Edit project config; ``C-x p c``
-* Updating buffers with moved files after refactorings
-* Extracting similar pieces defaults to yes in extract refactorings
 
 
 Setting Up

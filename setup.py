@@ -17,11 +17,11 @@ classifiers=[
 
 def get_long_description():
     lines = open('README.txt').read().splitlines(False)
-    end = lines.index('Getting Started')
+    end = lines.index('Setting Up')
     return '\n' + '\n'.join(lines[:end]) + '\n'
 
 setup(name='ropemacs',
-      version="0.3",
+      version="0.4",
       description='An emacs mode for using rope refactoring library',
       long_description=get_long_description(),
       packages=['ropemacs'],
