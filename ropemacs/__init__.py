@@ -160,7 +160,8 @@ class RopeInterface(object):
         resource, offset = self._get_location()
         docs = codeassist.get_doc(
             self.project, lisp.buffer_string(), offset, resource)
-        lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
+        buffer = lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
+        lisp.local_set_key('q', lisp.bury_buffer)
 
     @prefixed
     def find_occurrences(self, prefix):
