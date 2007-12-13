@@ -242,7 +242,10 @@ class Inline(Refactoring):
     name = 'inline'
     key = 'C-c r i'
     optionals = {'remove': dialog.Data('Remove the definition: ',
-                                       values=['yes', 'no'])}
+                                       values=['yes', 'no'], default='yes'),
+                 'only_current':
+                     dialog.Data('Inline this occurrence only: ',
+                                 values=['yes', 'no'], default='no')}
 
     def _create_refactoring(self):
         self.inliner = rope.refactor.inline.create_inline(
@@ -250,8 +253,9 @@ class Inline(Refactoring):
 
     def _calculate_changes(self, values, task_handle):
         remove = values.get('remove', 'yes') == 'yes'
-        return self.inliner.get_changes(remove=remove,
-                                        task_handle=task_handle)
+        only_current = values.get('only_current', 'no') == 'yes'
+        return self.inliner.get_changes(
+            remove=remove, only_current=only_current, task_handle=task_handle)
 
 
 class _Extract(Refactoring):
