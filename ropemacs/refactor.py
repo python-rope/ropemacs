@@ -258,7 +258,9 @@ class _Extract(Refactoring):
 
     saveall = False
     optionals = {'similar': dialog.Data('Extract similar pieces: ',
-                                        values=['yes', 'no'], default='yes')}
+                                        values=['yes', 'no'], default='yes'),
+                 'global_': dialog.Data('Make global: ',
+                                        values=['yes', 'no'], default='no')}
     kind = None
     constructor = None
 
@@ -269,7 +271,9 @@ class _Extract(Refactoring):
 
     def _calculate_changes(self, values, task_handle):
         similar = values.get('similar', 'yes') == 'yes'
-        return self.extractor.get_changes(values['name'], similar=similar)
+        global_ = values.get('global_', 'no') == 'yes'
+        return self.extractor.get_changes(values['name'], similar=similar,
+                                          global_=global_)
 
     def _get_confs(self):
         return {'name': dialog.Data('Extracted %s name: ' % self.kind)}
