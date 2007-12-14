@@ -1,3 +1,5 @@
+import sys
+import traceback
 import threading
 
 from Pymacs import lisp
@@ -59,12 +61,14 @@ class RunTask(object):
                 self.task = task
                 self.result = None
                 self.exception = None
+                self.traceback = None
 
             def __call__(self):
                 try:
                     self.result = self.task(handle)
                 except Exception, e:
                     self.exception = e
+                    self.traceback = str(traceback.format_exc())
 
         calculate = Calculate(self.task)
         thread = threading.Thread(target=calculate)
@@ -76,8 +80,8 @@ class RunTask(object):
             if raised is not None:
                 description = type(raised).__name__ + ': ' + str(raised)
                 raise exceptions.InterruptedTaskError(
-                    'Task <%s> was interrupted.\nReason: <%s>' %
-                    (self.name, description))
+                    'Task <%s> was interrupted.\nReason: <%s>\nTraceback: %s' %
+                    (self.name, description, calculate.traceback))
         except:
             handle.stop()
             message('%s interrupted!' % self.name)
