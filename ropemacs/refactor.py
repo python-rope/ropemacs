@@ -1,5 +1,4 @@
 import rope.base.change
-import rope.base.taskhandle
 import rope.contrib.generate
 import rope.refactor.extract
 import rope.refactor.inline

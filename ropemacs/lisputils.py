@@ -1,6 +1,5 @@
-import sys
-import traceback
 import threading
+import traceback
 
 from Pymacs import lisp
 from rope.base import taskhandle, exceptions
@@ -80,8 +79,8 @@ class RunTask(object):
             if raised is not None:
                 description = type(raised).__name__ + ': ' + str(raised)
                 raise exceptions.InterruptedTaskError(
-                    'Task <%s> was interrupted.\nReason: <%s>\nTraceback: %s' %
-                    (self.name, description, calculate.traceback))
+                    '%s\nTask <%s> was interrupted.\nReason: <%s>\n' %
+                    (calculate.traceback, self.name, description))
         except:
             handle.stop()
             message('%s interrupted!' % self.name)
