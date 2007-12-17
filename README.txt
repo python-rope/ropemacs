@@ -227,6 +227,8 @@ Variables
 * ``rope-confirm-saving``: If non-nil, you have to confirm saving all
   modified python files before refactorings; otherwise they are saved
   automatically. Defaults to ``t``.
+* ``rope-code-assist-max-fixes``: The maximum number of syntax errors
+  to fix for code assists.  The default value is ``1``.
 
 
 Contributing

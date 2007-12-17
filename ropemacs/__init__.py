@@ -243,8 +243,9 @@ class RopeInterface(object):
         self._check_project()
         resource, offset = self._get_location()
         source = lisp.buffer_string()
-        proposals = codeassist.code_assist(self.project, source,
-                                           offset, resource)
+        maxfixes = lisp['rope-code-assist-max-fixes'].value()
+        proposals = codeassist.code_assist(self.project, source, offset,
+                                           resource, maxfixes=maxfixes)
         proposals = codeassist.sorted_proposals(proposals)
         starting_offset = codeassist.starting_offset(source, offset)
         names = [proposal.name for proposal in proposals]
@@ -404,6 +405,9 @@ DEFVARS = """\
   "If non-nil, you have to confirm saving all modified
 python files before refactorings; otherwise they are
 saved automatically.")
+(defvar rope-code-assist-max-fixes 1
+  "How many errors to fix, at most, when proposing code
+completions.")
 """
 
 interface = RopeInterface()
