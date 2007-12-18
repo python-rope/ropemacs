@@ -89,7 +89,8 @@ class RopeInterface(object):
 
     @lisphook
     def after_save_actions(self):
-        if self.project is not None:
+        raise Exception('sldjf')
+        if self.project is not None and self.old_content is not None:
             libutils.report_change(self.project, lisp.buffer_file_name(),
                                    self.old_content)
             self.old_content = None

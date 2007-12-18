@@ -188,7 +188,8 @@ def lisphook(func):
         try:
             func(*args, **kwds)
         except Exception, e:
-            message('Exception in ropemacs hook: %s' %
-                    (type(e).__name__ + str(e)))
+            trace = str(traceback.format_exc())
+            message('%s\nIgnored an exception in ropemacs hook: %s: %s' %
+                    (trace, type(e).__name__, str(e)))
     newfunc.interaction = ''
     return newfunc
