@@ -45,14 +45,16 @@ class RunTask(object):
 
     def __call__(self):
         handle = taskhandle.TaskHandle(name=self.name)
-        progress = lisp.make_progress_reporter(
-            '%s ... ' % self.name, 0, 100)
+        if _emacs_version() < 22:
+            progress = _OldProgress(self.name)
+        else:
+            progress = _LispProgress(self.name)
         def update_progress():
             jobset = handle.current_jobset()
             if jobset:
                 percent = jobset.get_percent_done()
                 if percent is not None:
-                    lisp.progress_reporter_update(progress, percent)
+                    progress.update(percent)
         handle.add_observer(update_progress)
         class Calculate(object):
 
@@ -74,7 +76,7 @@ class RunTask(object):
         try:
             thread.start()
             thread.join()
-            lisp.progress_reporter_done(progress)
+            progress.done()
             raised = calculate.exception
             if raised is not None:
                 description = type(raised).__name__ + ': ' + str(raised)
@@ -86,6 +88,30 @@ class RunTask(object):
             message('%s interrupted!' % self.name)
             raise
         return calculate.result
+
+
+class _LispProgress(object):
+
+    def __init__(self, name):
+        self.progress = lisp.make_progress_reporter('%s ... ' % name, 0, 100)
+
+    def update(self, percent):
+        lisp.progress_reporter_update(self.progress, percent)
+
+    def done(self):
+        lisp.progress_reporter_done(self.progress)
+
+class _OldProgress(object):
+
+    def __init__(self, name):
+        self.name = name
+        self.update(0)
+
+    def update(self, percent):
+        message('%s ... %s%%%%' % (self.name, percent))
+
+    def done(self):
+        message('%s ... done' % self.name)
 
 
 def message(message):
@@ -106,6 +132,8 @@ def askdata(data, starting=None):
 
 
 def ask_values(prompt, values, default=None, starting=None, exact=True):
+    if _emacs_version() < 22:
+        values = [[value, value] for value in values]
     if exact and default is not None:
         prompt = prompt + ('[%s] ' % default)
     result = lisp.completing_read(prompt, values, None, exact, starting)
@@ -126,10 +154,16 @@ def ask(prompt, default=None, starting=None):
 def ask_directory(prompt, default=None, starting=None):
     if default is not None:
         prompt = prompt + ('[%s] ' % default)
-    result = lisp.read_directory_name(prompt, starting, default)
+    if _emacs_version() < 22:
+        result = lisp.read_file_name(prompt, starting, default)
+    else:
+        result = lisp.read_directory_name(prompt, starting, default)
     if result == '' and default is not None:
         return default
     return result
+
+def _emacs_version():
+    return int(lisp['emacs-version'].value().split('.')[0])
 
 
 def lispfunction(func):
