@@ -2,6 +2,7 @@
  Done
 ======
 
+- supporting emacs 21 : December 18, 2007
 - added ``rope-code-assist-max-fixes`` variable : December 17, 2007
 - printing traceback when task runner gets interrupted : December 14, 2007
 - supporting ``only_current`` option for inline refactoring : December 13, 2007
