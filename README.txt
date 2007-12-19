@@ -13,6 +13,12 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
+* Supporting ``only_current`` option for inline refactoring
+* Supporting ``global_`` option for extract refactorings
+* Added ``rope-code-assist-max-fixes`` variable
+* Supporting emacs 21
+* Printing traceback when task runner gets interrupted
+* Not raising exceptions in hooks
 
 
 Setting Up

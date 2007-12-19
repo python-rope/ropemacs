@@ -2,6 +2,8 @@
  Done
 ======
 
+> Public Release 0.4 : December 19, 2007
+
 - supporting emacs 21 : December 18, 2007
 - added ``rope-code-assist-max-fixes`` variable : December 17, 2007
 - printing traceback when task runner gets interrupted : December 14, 2007

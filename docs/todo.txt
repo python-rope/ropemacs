@@ -3,7 +3,7 @@ TODO
 
 > Public Release 1.0
 
-> Public Release 0.4
+> Public Release 0.5
 
 * including pymacs in ropemacs?
 * change pymacs to accept unicode strings
