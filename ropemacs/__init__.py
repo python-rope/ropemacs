@@ -146,7 +146,16 @@ class RopeInterface(object):
 
     def _get_text(self):
         end = lisp.buffer_size() + 1
-        return lisp.buffer_substring_no_properties(1, end)
+        old_min = lisp.point_min()
+        old_max = lisp.point_max()
+        narrowed = old_min != 1 or old_max != end
+        if narrowed:
+            lisp.narrow_to_region(1, lisp.buffer_size() + 1)
+        try:
+            return lisp.buffer_string()
+        finally:
+            if narrowed:
+                lisp.narrow_to_region(old_min, old_max)
 
     @interactive
     def goto_definition(self):
