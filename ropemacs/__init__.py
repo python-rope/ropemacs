@@ -144,12 +144,16 @@ class RopeInterface(object):
     def _get_offset(self):
         return lisp.point() - 1
 
+    def _get_text(self):
+        end = lisp.buffer_size() + 1
+        return lisp.buffer_substring_no_properties(1, end)
+
     @interactive
     def goto_definition(self):
         self._check_project()
         resource, offset = self._get_location()
         definition = codeassist.get_definition_location(
-            self.project, lisp.buffer_string(), offset, resource)
+            self.project, self._get_text(), offset, resource)
         if tuple(definition) != (None, None):
             lisp.push_mark()
             self._goto_location(definition)
@@ -159,7 +163,7 @@ class RopeInterface(object):
         self._check_project()
         resource, offset = self._get_location()
         docs = codeassist.get_doc(
-            self.project, lisp.buffer_string(), offset, resource)
+            self.project, self._get_text(), offset, resource)
         buffer = lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
         lisp.local_set_key('q', lisp.bury_buffer)
 
@@ -213,7 +217,7 @@ class RopeInterface(object):
                 arg = len(names)
             common_start = self._calculate_prefix(names[:arg])
             lisp.insert(common_start[self._get_offset() - starting_offset:])
-        source = lisp.buffer_string()
+        source = self._get_text()
         offset = self._get_offset()
         starting = source[starting_offset:offset]
         prompt = 'Completion for %s: ' % starting
@@ -225,7 +229,7 @@ class RopeInterface(object):
     @rawprefixed
     def lucky_assist(self, prefix):
         starting_offset, names = self._calculate_proposals()
-        source = lisp.buffer_string()
+        source = self._get_text()
         offset = self._get_offset()
         starting = source[starting_offset:offset]
         selected = 0
@@ -242,7 +246,7 @@ class RopeInterface(object):
     def _calculate_proposals(self):
         self._check_project()
         resource, offset = self._get_location()
-        source = lisp.buffer_string()
+        source = self._get_text()
         maxfixes = lisp['rope-code-assist-max-fixes'].value()
         proposals = codeassist.code_assist(self.project, source, offset,
                                            resource, maxfixes=maxfixes)
@@ -272,7 +276,7 @@ class RopeInterface(object):
         names = []
         for file in files:
             names.append('<'.join(reversed(file.path.split('/'))))
-        source = lisp.buffer_string()
+        source = self._get_text()
         result = lisputils.ask_values('Rope Find File: ', names, exact=True)
         path = '/'.join(reversed(result.split('<')))
         file = self.project.get_file(path)
