@@ -111,19 +111,18 @@ class RopeInterface(object):
         root = lisputils.ask_directory('Rope project root folder: ')
         if self.project is not None:
             self.close_project()
-        base = 'Opening "%s" project ... ' % root
-        lisputils.message(base)
+        progress = lisputils.create_progress('Opening "%s" project' % root)
         self.project = project.Project(root)
-        lisputils.message(base + 'done')
+        progress.done()
 
     @interactive
     def close_project(self):
         if self.project is not None:
-            base = 'Closing "%s" project ... ' % self.project.address
-            lisputils.message(base)
+            progress = lisputils.create_progress('Closing "%s" project' %
+                                                 self.project.address)
             self.project.close()
             self.project = None
-            lisp.message(base + 'done')
+            progress.done()
 
     @interactive
     def undo_refactoring(self):

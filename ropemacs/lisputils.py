@@ -45,10 +45,7 @@ class RunTask(object):
 
     def __call__(self):
         handle = taskhandle.TaskHandle(name=self.name)
-        if _emacs_version() < 22:
-            progress = _OldProgress(self.name)
-        else:
-            progress = _LispProgress(self.name)
+        progress = create_progress(self.name)
         def update_progress():
             jobset = handle.current_jobset()
             if jobset:
@@ -90,6 +87,14 @@ class RunTask(object):
         return calculate.result
 
 
+def create_progress(name):
+    if _emacs_version() < 22:
+        progress = _OldProgress(name)
+    else:
+        progress = _LispProgress(name)
+    return progress
+
+
 class _LispProgress(object):
 
     def __init__(self, name):
@@ -108,7 +113,10 @@ class _OldProgress(object):
         self.update(0)
 
     def update(self, percent):
-        message('%s ... %s%%%%' % (self.name, percent))
+        if percent != 0:
+            message('%s ... %s%%%%' % (self.name, percent))
+        else:
+            message('%s ... ' % self.name)
 
     def done(self):
         message('%s ... done' % self.name)
