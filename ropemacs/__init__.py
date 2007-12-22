@@ -110,13 +110,15 @@ class RopeInterface(object):
         if self.project is not None:
             self.close_project()
         self.project = project.Project(root)
+        lisputils.message('Project "%s" opened' % self.project.address)
 
     @interactive
     def close_project(self):
-        if project is not None:
+        if self.project is not None:
+            path = self.project.address
             self.project.close()
             self.project = None
-            lisp.message('Project closed')
+            lisp.message('Project "%s" closed' % path)
 
     @interactive
     def undo_refactoring(self):
@@ -148,7 +150,7 @@ class RopeInterface(object):
         end = lisp.buffer_size() + 1
         old_min = lisp.point_min()
         old_max = lisp.point_max()
-        narrowed = old_min != 1 or old_max != end
+        narrowed = (old_min != 1 or old_max != end)
         if narrowed:
             lisp.narrow_to_region(1, lisp.buffer_size() + 1)
         try:
