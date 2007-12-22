@@ -81,8 +81,10 @@ class RopeInterface(object):
     @lisphook
     def before_save_actions(self):
         if self.project is not None:
+            if not self._is_python_file(lisp.buffer_file_name()):
+                return
             resource = self._get_resource()
-            if resource is not None and resource.exists():
+            if resource.exists():
                 self.old_content = resource.read()
             else:
                 self.old_content = ''
@@ -109,16 +111,19 @@ class RopeInterface(object):
         root = lisputils.ask_directory('Rope project root folder: ')
         if self.project is not None:
             self.close_project()
+        base = 'Opening "%s" project ... ' % root
+        lisputils.message(base)
         self.project = project.Project(root)
-        lisputils.message('Project "%s" opened' % self.project.address)
+        lisputils.message(base + 'done')
 
     @interactive
     def close_project(self):
         if self.project is not None:
-            path = self.project.address
+            base = 'Closing "%s" project ... ' % self.project.address
+            lisputils.message(base)
             self.project.close()
             self.project = None
-            lisp.message('Project "%s" closed' % path)
+            lisp.message(base + 'done')
 
     @interactive
     def undo_refactoring(self):
@@ -394,16 +399,16 @@ class RopeInterface(object):
         for buffer in buffers:
             filename = lisp.buffer_file_name(buffer)
             if filename:
-                if self._is_a_project_python_file(filename) and \
+                if self._is_python_file(filename) and \
                    lisp.buffer_modified_p(buffer):
                     if not ask or lisp.y_or_n_p('Save %s buffer?' % filename):
                         lisp.set_buffer(buffer)
                         lisp.save_buffer()
         lisp.set_buffer(initial)
 
-    def _is_a_project_python_file(self, path):
+    def _is_python_file(self, path):
         resource = self._get_resource(path)
-        return (resource is not None and resource.exists() and
+        return (resource is not None and
                 resource.project == self.project and
                 self.project.pycore.is_python_file(resource))
 
