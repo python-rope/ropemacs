@@ -129,16 +129,20 @@ class RopeInterface(object):
         if lisp.y_or_n_p('Undo refactoring might change'
                          ' many files; proceed? '):
             self._check_project()
-            for changes in self.project.history.undo():
-                self._reload_buffers(changes.get_changed_resources())
+            def undo(handle):
+                for changes in self.project.history.undo(task_handle=handle):
+                    self._reload_buffers(changes.get_changed_resources())
+            lisputils.RunTask(undo, 'Undo refactoring', interrupts=False)()
 
     @interactive
     def redo_refactoring(self):
         if lisp.y_or_n_p('Redo refactoring might change'
                          ' many files; proceed? '):
             self._check_project()
-            for changes in self.project.history.redo():
-                self._reload_buffers(changes.get_changed_resources())
+            def redo(handle):
+                for changes in self.project.history.redo(task_handle=handle):
+                    self._reload_buffers(changes.get_changed_resources())
+            lisputils.RunTask(redo, 'Redo refactoring', interrupts=False)()
 
     def _get_region(self):
         offset1 = self._get_offset()
