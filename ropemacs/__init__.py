@@ -424,13 +424,24 @@ def _register_functions(interface):
 
 
 DEFVARS = """\
-(defvar rope-confirm-saving t
-  "If non-nil, you have to confirm saving all modified
+(defgroup ropemacs nil
+  "ropemacs, an emacs plugin for rope."
+  :link '(url-link "http://rope.sourceforge.net/ropemacs.html")
+  :prefix 'rope-)
+
+(defcustom rope-confirm-saving t
+  "Indicates whether to confirm saving modified buffers before refactorings
+
+If non-nil, you have to confirm saving all modified
 python files before refactorings; otherwise they are
 saved automatically.")
-(defvar rope-code-assist-max-fixes 1
-  "How many errors to fix, at most, when proposing code
-completions.")
+
+(defcustom rope-code-assist-max-fixes 1
+  "The number of errors to fix before code-assist
+
+How many errors to fix, at most, when proposing code completions.")
+
+(provide 'ropemacs)
 """
 
 interface = RopeInterface()
