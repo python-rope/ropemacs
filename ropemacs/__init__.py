@@ -268,7 +268,7 @@ class RopeInterface(object):
         self._check_project()
         resource, offset = self._get_location()
         source = self._get_text()
-        maxfixes = lisp['rope-code-assist-max-fixes'].value()
+        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
         proposals = codeassist.code_assist(self.project, source, offset,
                                            resource, maxfixes=maxfixes)
         proposals = codeassist.sorted_proposals(proposals)
@@ -394,7 +394,7 @@ class RopeInterface(object):
                     lisp.find_file(new_resource.real_path)
 
     def _save_buffers(self, only_current=False):
-        ask = lisp['rope-confirm-saving'].value()
+        ask = lisp['ropemacs-confirm-saving'].value()
         initial = lisp.current_buffer()
         current_buffer = lisp.current_buffer()
         if only_current:
