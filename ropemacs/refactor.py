@@ -301,7 +301,7 @@ class ExtractMethod(_Extract):
 class OrganizeImports(Refactoring):
 
     name = 'organize_imports'
-    key = 'C-c i o'
+    key = 'C-c r o'
     saveall = False
 
     def _create_refactoring(self):
@@ -328,28 +328,28 @@ class _GenerateElement(Refactoring):
 class GenerateVariable(_GenerateElement):
 
     name = 'generate_variable'
-    key = 'C-c n v'
+    key = 'C-c r n v'
 
 
 class GenerateFunction(_GenerateElement):
 
     name = 'generate_function'
-    key = 'C-c n f'
+    key = 'C-c r n f'
 
 
 class GenerateClass(_GenerateElement):
 
     name = 'generate_class'
-    key = 'C-c n c'
+    key = 'C-c r n c'
 
 
 class GenerateModule(_GenerateElement):
 
     name = 'generate_module'
-    key = 'C-c n m'
+    key = 'C-c r n m'
 
 
 class GeneratePackage(_GenerateElement):
 
     name = 'generate_package'
-    key = 'C-c n p'
+    key = 'C-c r n p'

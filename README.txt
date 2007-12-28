@@ -198,35 +198,36 @@ Key-binding
 
 Uses almost the same keybinding as ropeide.
 
-==============  ============================
-Key             Command
-==============  ============================
-C-x p o         rope-open-project
-C-x p k         rope-close-project
-C-x p f         rope-find-file
-C-x p u         rope-undo-refactoring
-C-x p r         rope-redo-refactoring
-C-x p c         rope-project-config
-C-x p n [mpfd]  rope-create-(module|package|file|directory)
+================  ============================
+Key               Command
+================  ============================
+C-x p o           rope-open-project
+C-x p k           rope-close-project
+C-x p f           rope-find-file
+C-x p u           rope-undo-refactoring
+C-x p r           rope-redo-refactoring
+C-x p c           rope-project-config
+C-x p n [mpfd]    rope-create-(module|package|file|directory)
 
-C-c r r         rope-rename
-C-c r l         rope-extract-variable
-C-c r m         rope-extract-method
-C-c r i         rope-inline
-C-c r v         rope-move
-C-c r x         rope-restructure
-C-c r 1 r       rope-rename-current-module
-C-c r 1 v       rope-move-current-module
-C-c r 1 p       rope-module-to-package
+C-c r r           rope-rename
+C-c r l           rope-extract-variable
+C-c r m           rope-extract-method
+C-c r i           rope-inline
+C-c r v           rope-move
+C-c r x           rope-restructure
+C-c r 1 r         rope-rename-current-module
+C-c r 1 v         rope-move-current-module
+C-c r 1 p         rope-module-to-package
 
-M-/             rope-code-assist
-C-c g           rope-goto-definition
-C-c C-d         rope-show-doc
-C-c i o         rope-organize-imports
-C-c f           rope-find-occurrences
-M-?             rope-lucky-assist
-C-c n [vfcmp]   rope-generate-(variable|function|class|module|package)
-==============  ============================
+C-c r o           rope-organize-imports
+C-c r n [vfcmp]   rope-generate-(variable|function|class|module|package)
+
+M-/               rope-code-assist
+C-c g             rope-goto-definition
+C-c C-d           rope-show-doc
+C-c f         	  rope-find-occurrences
+M-?           	  rope-lucky-assist
+===============   ============================
 
 
 Variables
