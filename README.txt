@@ -196,7 +196,9 @@ restructuring can be::
 Key-binding
 -----------
 
-Uses almost the same keybinding as ropeide.
+Uses almost the same keybinding as ropeide.  Note that global commands
+have a ``C-x p`` prefix and commands have a ``C-c r`` prefix.  You can
+change that (see variables_ section).
 
 ================  ============================
 Key               Command
@@ -233,11 +235,16 @@ M-?           	  rope-lucky-assist
 Variables
 ---------
 
-* ``rope-confirm-saving``: If non-nil, you have to confirm saving all
+* ``ropemacs-confirm-saving``: If non-nil, you have to confirm saving all
   modified python files before refactorings; otherwise they are saved
   automatically. Defaults to ``t``.
-* ``rope-code-assist-max-fixes``: The maximum number of syntax errors
+* ``ropemacs-codeassist-maxfixes``: The maximum number of syntax errors
   to fix for code assists.  The default value is ``1``.
+
+* ``ropemacs-local-prefix``: The prefix for ropemacs refactorings.
+  Defaults to ``C-c r``.
+* ``ropemacs-global-prefix``: The prefix for ropemacs project commands
+  Defaults to ``C-x p``.
 
 
 Contributing

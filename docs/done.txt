@@ -2,6 +2,9 @@
  Done
 ======
 
+- deprecated rope-code-assist-max-fixes : December 28, 2007
+- deprecated rope-confirm-saving : December 28, 2007
+- added ropemacs-local-prefix and ropemacs-global-prefix : December 28, 2007
 - handling narrowed regions : December 21, 2007
 
 > Public Release 0.4 : December 19, 2007
