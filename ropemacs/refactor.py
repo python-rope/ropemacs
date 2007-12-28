@@ -10,8 +10,6 @@ from ropemacs import dialog, lisputils
 
 
 class Refactoring(object):
-
-    name = None
     key = None
     confs = {}
     optionals = {}
@@ -65,6 +63,10 @@ class Refactoring(object):
     def region(self):
         return self.interface._get_region()
 
+    @property
+    def name(self):
+        return refactoring_name(self.__class__)
+
     def _calculate_changes(self, option_values, task_handle):
         pass
 
@@ -104,8 +106,6 @@ class Refactoring(object):
 
 
 class Rename(Refactoring):
-
-    name = 'rename'
     key = 'C-c r r'
     optionals = {
         'docs': dialog.Data('Rename occurrences in comments and docs: ',
@@ -143,15 +143,11 @@ class Rename(Refactoring):
 
 
 class RenameCurrentModule(Rename):
-
-    name = 'rename_current_module'
     key = 'C-c r 1 r'
     offset = None
 
 
 class Restructure(Refactoring):
-
-    name = 'restructure'
     key = 'C-c r x'
     confs = {'pattern': dialog.Data('Restructuring pattern: '),
              'goal': dialog.Data('Restructuring goal: ')}
@@ -174,8 +170,6 @@ class Restructure(Refactoring):
 
 
 class Move(Refactoring):
-
-    name = 'move'
     key = 'C-c r v'
 
     def _create_refactoring(self):
@@ -215,16 +209,11 @@ class Move(Refactoring):
 
 
 class MoveCurrentModule(Move):
-
-    name = 'move_current_module'
     key = 'C-c r 1 v'
-
     offset = None
 
 
 class ModuleToPackage(Refactoring):
-
-    name = 'module_to_package'
     key = 'C-c r 1 p'
     saveall = False
 
@@ -237,8 +226,6 @@ class ModuleToPackage(Refactoring):
 
 
 class Inline(Refactoring):
-
-    name = 'inline'
     key = 'C-c r i'
     optionals = {'remove': dialog.Data('Remove the definition: ',
                                        values=['yes', 'no'], default='yes'),
@@ -258,7 +245,6 @@ class Inline(Refactoring):
 
 
 class _Extract(Refactoring):
-
     saveall = False
     optionals = {'similar': dialog.Data('Extract similar pieces: ',
                                         values=['yes', 'no'], default='yes'),
@@ -283,24 +269,18 @@ class _Extract(Refactoring):
 
 
 class ExtractVariable(_Extract):
-
-    name = 'extract_variable'
     key = 'C-c r l'
     kind = 'variable'
     constructor = rope.refactor.extract.ExtractVariable
 
 
 class ExtractMethod(_Extract):
-
-    name = 'extract_method'
     key = 'C-c r m'
     kind = 'method'
     constructor = rope.refactor.extract.ExtractMethod
 
 
 class OrganizeImports(Refactoring):
-
-    name = 'organize_imports'
     key = 'C-c r o'
     saveall = False
 
@@ -326,30 +306,31 @@ class _GenerateElement(Refactoring):
 
 
 class GenerateVariable(_GenerateElement):
-
-    name = 'generate_variable'
     key = 'C-c r n v'
 
 
 class GenerateFunction(_GenerateElement):
-
-    name = 'generate_function'
     key = 'C-c r n f'
 
 
 class GenerateClass(_GenerateElement):
-
-    name = 'generate_class'
     key = 'C-c r n c'
 
 
 class GenerateModule(_GenerateElement):
-
-    name = 'generate_module'
     key = 'C-c r n m'
 
 
 class GeneratePackage(_GenerateElement):
-
-    name = 'generate_package'
     key = 'C-c r n p'
+
+
+def refactoring_name(refactoring):
+    classname = refactoring.__name__
+    result = []
+    for c in classname:
+        if result and c.isupper():
+            result.append('_')
+        result.append(c.lower())
+    name = ''.join(result)
+    return name
