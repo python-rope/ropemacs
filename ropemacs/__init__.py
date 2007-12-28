@@ -44,12 +44,14 @@ class RopeInterface(object):
         lisp.add_hook(lisp.kill_emacs_hook, lisp.rope_exiting_actions)
         lisp.add_hook(lisp.python_mode_hook, lisp.rope_register_local_keys)
 
-        prefix = lisp.ropemacs_global_prefix.value() + ' '
-        for key, callback in self.global_keys:
-            lisp.global_set_key(self._key_sequence(prefix + key), callback)
+        prefix = lisp.ropemacs_global_prefix.value()
+        if prefix is not None:
+            for key, callback in self.global_keys:
+                lisp.global_set_key(self._key_sequence(prefix + ' ' + key),
+                                    callback)
 
     def _prepare_refactorings(self):
-        prefix = lisp.ropemacs_local_prefix.value() + ' '
+        prefix = lisp.ropemacs_local_prefix.value()
         for name in dir(refactor):
             if not name.startswith('_') and name != 'Refactoring':
                 attr = getattr(refactor, name)
@@ -62,7 +64,9 @@ class RopeInterface(object):
                     name = self._refactoring_name(attr)
                     setattr(self, name, do_refactor)
                     name = 'rope-' + name.replace('_', '-')
-                    self.local_keys.append((prefix + attr.key, lisp[name]))
+                    if prefix is not None:
+                        key = prefix + ' ' + attr.key
+                        self.local_keys.append((key, lisp[name]))
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
@@ -449,10 +453,14 @@ How many errors to fix, at most, when proposing code completions.")
   'rope-code-assist-max-fixes 'ropemacs-codeassist-maxfixes)
 
 (defcustom ropemacs-local-prefix "C-c r"
-  "The prefix for ropemacs refactorings")
+  "The prefix for ropemacs refactorings
+
+Use nil to prevent binding keys.")
 
 (defcustom ropemacs-global-prefix "C-x p"
-  "The prefix for ropemacs project commands")
+  "The prefix for ropemacs project commands
+
+Use nil to prevent binding keys.")
 
 (provide 'ropemacs)
 """

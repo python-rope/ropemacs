@@ -42,7 +42,7 @@ a function like this instead of that::
     (pymacs-load "ropemacs" "rope-")
     (rope-init)
     ;; Automatically save project python buffers before refactorings
-    (setq rope-confirm-saving 'nil)
+    (setq ropemacs-confirm-saving 'nil)
   )
 
 And execute ``load-ropemacs`` whenever you want to use ropemacs.  Also
@@ -59,9 +59,9 @@ Getting Started
 
 Rope refactorings use a special kind of dialog.  When you start a
 refactoring, you'll be asked to confirm saving modified python
-buffers; you can change it by using ``rope-confirm-saving`` variable.
-Adding ``(setq rope-confirm-saving 'nil)`` to your ``.emacs`` file,
-will make emacs save them without asking.
+buffers; you can change it by using ``ropemacs-confirm-saving``
+variable.  Adding ``(setq ropemacs-confirm-saving 'nil)`` to your
+``.emacs`` file, will make emacs save them without asking.
 
 After that depending on the refactoring, you'll be asked about the
 essential information a refactoring needs to know (like the new name
