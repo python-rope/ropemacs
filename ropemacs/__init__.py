@@ -431,17 +431,22 @@ DEFVARS = """\
   :link '(url-link "http://rope.sourceforge.net/ropemacs.html")
   :prefix 'rope-)
 
-(defcustom rope-confirm-saving t
+(defcustom ropemacs-confirm-saving t
   "Indicates whether to confirm saving modified buffers before refactorings
 
 If non-nil, you have to confirm saving all modified
 python files before refactorings; otherwise they are
 saved automatically.")
 
-(defcustom rope-code-assist-max-fixes 1
+(defcustom ropemacs-codeassist-maxfixes 1
   "The number of errors to fix before code-assist
 
 How many errors to fix, at most, when proposing code completions.")
+
+(make-obsolete-variable
+  'rope-confirm-saving 'ropemacs-confirm-saving)
+(make-obsolete-variable
+  'rope-code-assist-max-fixes 'ropemacs-codeassist-maxfixes)
 
 (defcustom ropemacs-local-prefix "C-c r"
   "The prefix for ropemacs refactorings")
