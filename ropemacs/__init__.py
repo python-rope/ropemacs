@@ -61,10 +61,7 @@ class RopeInterface(object):
                     name = self._refactoring_name(attr)
                     setattr(self, name, do_refactor)
                     name = 'rope-' + name.replace('_', '-')
-                    if attr.key.startswith('C-x'):
-                        self.global_keys.append((attr.key, lisp[name]))
-                    else:
-                        self.local_keys.append((attr.key, lisp[name]))
+                    self.local_keys.append(('C-c r ' + attr.key, lisp[name]))
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)

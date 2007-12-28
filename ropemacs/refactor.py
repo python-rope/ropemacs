@@ -106,7 +106,7 @@ class Refactoring(object):
 
 
 class Rename(Refactoring):
-    key = 'C-c r r'
+    key = 'r'
     optionals = {
         'docs': dialog.Data('Rename occurrences in comments and docs: ',
                             values=['yes', 'no'], default='yes'),
@@ -143,12 +143,12 @@ class Rename(Refactoring):
 
 
 class RenameCurrentModule(Rename):
-    key = 'C-c r 1 r'
+    key = '1 r'
     offset = None
 
 
 class Restructure(Refactoring):
-    key = 'C-c r x'
+    key = 'x'
     confs = {'pattern': dialog.Data('Restructuring pattern: '),
              'goal': dialog.Data('Restructuring goal: ')}
     optionals = {'checks': dialog.Data('Checks: '),
@@ -170,7 +170,7 @@ class Restructure(Refactoring):
 
 
 class Move(Refactoring):
-    key = 'C-c r v'
+    key = 'v'
 
     def _create_refactoring(self):
         self.mover = rope.refactor.move.create_move(self.project,
@@ -209,12 +209,12 @@ class Move(Refactoring):
 
 
 class MoveCurrentModule(Move):
-    key = 'C-c r 1 v'
+    key = '1 v'
     offset = None
 
 
 class ModuleToPackage(Refactoring):
-    key = 'C-c r 1 p'
+    key = '1 p'
     saveall = False
 
     def _create_refactoring(self):
@@ -226,7 +226,7 @@ class ModuleToPackage(Refactoring):
 
 
 class Inline(Refactoring):
-    key = 'C-c r i'
+    key = 'i'
     optionals = {'remove': dialog.Data('Remove the definition: ',
                                        values=['yes', 'no'], default='yes'),
                  'only_current':
@@ -269,19 +269,19 @@ class _Extract(Refactoring):
 
 
 class ExtractVariable(_Extract):
-    key = 'C-c r l'
+    key = 'l'
     kind = 'variable'
     constructor = rope.refactor.extract.ExtractVariable
 
 
 class ExtractMethod(_Extract):
-    key = 'C-c r m'
+    key = 'm'
     kind = 'method'
     constructor = rope.refactor.extract.ExtractMethod
 
 
 class OrganizeImports(Refactoring):
-    key = 'C-c r o'
+    key = 'o'
     saveall = False
 
     def _create_refactoring(self):
@@ -306,23 +306,23 @@ class _GenerateElement(Refactoring):
 
 
 class GenerateVariable(_GenerateElement):
-    key = 'C-c r n v'
+    key = 'n v'
 
 
 class GenerateFunction(_GenerateElement):
-    key = 'C-c r n f'
+    key = 'n f'
 
 
 class GenerateClass(_GenerateElement):
-    key = 'C-c r n c'
+    key = 'n c'
 
 
 class GenerateModule(_GenerateElement):
-    key = 'C-c r n m'
+    key = 'n m'
 
 
 class GeneratePackage(_GenerateElement):
-    key = 'C-c r n p'
+    key = 'n p'
 
 
 def refactoring_name(refactoring):
