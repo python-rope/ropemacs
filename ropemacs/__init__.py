@@ -14,17 +14,19 @@ class RopeInterface(object):
     def __init__(self):
         self.project = None
         self.old_content = None
+        lisp(DEFVARS)
+
         self.global_keys = [
-            ('C-x p o', lisp.rope_open_project),
-            ('C-x p k', lisp.rope_close_project),
-            ('C-x p u', lisp.rope_undo_refactoring),
-            ('C-x p r', lisp.rope_redo_refactoring),
-            ('C-x p f', lisp.rope_find_file),
-            ('C-x p c', lisp.rope_project_config),
-            ('C-x p n m', lisp.rope_create_module),
-            ('C-x p n p', lisp.rope_create_package),
-            ('C-x p n f', lisp.rope_create_file),
-            ('C-x p n d', lisp.rope_create_directory)]
+            ('o', lisp.rope_open_project),
+            ('k', lisp.rope_close_project),
+            ('u', lisp.rope_undo_refactoring),
+            ('r', lisp.rope_redo_refactoring),
+            ('f', lisp.rope_find_file),
+            ('c', lisp.rope_project_config),
+            ('n m', lisp.rope_create_module),
+            ('n p', lisp.rope_create_package),
+            ('n f', lisp.rope_create_file),
+            ('n d', lisp.rope_create_directory)]
 
         self.local_keys = [
             ('M-/', lisp.rope_code_assist),
@@ -32,8 +34,7 @@ class RopeInterface(object):
             ('C-c g', lisp.rope_goto_definition),
             ('C-c C-d', lisp.rope_show_doc),
             ('C-c f', lisp.rope_find_occurrences)]
-
-        self._register_refactorings()
+        self._prepare_refactorings()
 
     @lispfunction
     def init(self):
@@ -43,12 +44,12 @@ class RopeInterface(object):
         lisp.add_hook(lisp.kill_emacs_hook, lisp.rope_exiting_actions)
         lisp.add_hook(lisp.python_mode_hook, lisp.rope_register_local_keys)
 
-        lisp(DEFVARS)
-
+        prefix = lisp.ropemacs_global_prefix.value() + ' '
         for key, callback in self.global_keys:
-            lisp.global_set_key(self._key_sequence(key), callback)
+            lisp.global_set_key(self._key_sequence(prefix + key), callback)
 
-    def _register_refactorings(self):
+    def _prepare_refactorings(self):
+        prefix = lisp.ropemacs_local_prefix.value() + ' '
         for name in dir(refactor):
             if not name.startswith('_') and name != 'Refactoring':
                 attr = getattr(refactor, name)
@@ -61,7 +62,7 @@ class RopeInterface(object):
                     name = self._refactoring_name(attr)
                     setattr(self, name, do_refactor)
                     name = 'rope-' + name.replace('_', '-')
-                    self.local_keys.append(('C-c r ' + attr.key, lisp[name]))
+                    self.local_keys.append((prefix + attr.key, lisp[name]))
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
@@ -441,6 +442,12 @@ saved automatically.")
   "The number of errors to fix before code-assist
 
 How many errors to fix, at most, when proposing code completions.")
+
+(defcustom ropemacs-local-prefix "C-c r"
+  "The prefix for ropemacs refactorings")
+
+(defcustom ropemacs-global-prefix "C-x p"
+  "The prefix for ropemacs project commands")
 
 (provide 'ropemacs)
 """
