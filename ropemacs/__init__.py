@@ -34,15 +34,18 @@ class RopeInterface(object):
             ('C-c g', lisp.rope_goto_definition),
             ('C-c C-d', lisp.rope_show_doc),
             ('C-c f', lisp.rope_find_occurrences)]
+        self.hooks = (
+            (lisp.before_save_hook, lisp.rope_before_save_actions),
+            (lisp.after_save_hook, lisp.rope_after_save_actions),
+            (lisp.kill_emacs_hook, lisp.rope_exiting_actions),
+            (lisp.python_mode_hook, lisp.rope_register_local_keys))
         self._prepare_refactorings()
 
     @lispfunction
     def init(self):
         """Initialize rope mode"""
-        lisp.add_hook(lisp.before_save_hook, lisp.rope_before_save_actions)
-        lisp.add_hook(lisp.after_save_hook, lisp.rope_after_save_actions)
-        lisp.add_hook(lisp.kill_emacs_hook, lisp.rope_exiting_actions)
-        lisp.add_hook(lisp.python_mode_hook, lisp.rope_register_local_keys)
+        for hook, function in self.hooks:
+            lisp.add_hook(hook, function)
 
         prefix = lisp.ropemacs_global_prefix.value()
         if prefix is not None:
@@ -111,6 +114,12 @@ class RopeInterface(object):
     def exiting_actions(self):
         if self.project is not None:
             self.close_project()
+
+    @lispfunction
+    def unload_hook(self):
+        """Unload registered hooks"""
+        for hook, function in self.hooks:
+            lisp.remove_hook(hook, function)
 
     @interactive
     def open_project(self):
@@ -436,14 +445,14 @@ DEFVARS = """\
   :prefix 'rope-)
 
 (defcustom ropemacs-confirm-saving t
-  "Indicates whether to confirm saving modified buffers before refactorings
+  "Shows whether to confirm saving modified buffers before refactorings.
 
 If non-nil, you have to confirm saving all modified
 python files before refactorings; otherwise they are
 saved automatically.")
 
 (defcustom ropemacs-codeassist-maxfixes 1
-  "The number of errors to fix before code-assist
+  "The number of errors to fix before code-assist.
 
 How many errors to fix, at most, when proposing code completions.")
 
@@ -453,12 +462,12 @@ How many errors to fix, at most, when proposing code completions.")
   'rope-code-assist-max-fixes 'ropemacs-codeassist-maxfixes)
 
 (defcustom ropemacs-local-prefix "C-c r"
-  "The prefix for ropemacs refactorings
+  "The prefix for ropemacs refactorings.
 
 Use nil to prevent binding keys.")
 
 (defcustom ropemacs-global-prefix "C-x p"
-  "The prefix for ropemacs project commands
+  "The prefix for ropemacs project commands.
 
 Use nil to prevent binding keys.")
 

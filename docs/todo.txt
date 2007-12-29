@@ -10,3 +10,6 @@ TODO
 * saving the old values of refacturing config
 * showing proposal type in code-assist
 * adding a menu
+* something like grep mode for find occurrences
+
+> Public Release 0.5c1
