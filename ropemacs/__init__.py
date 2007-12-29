@@ -14,7 +14,8 @@ def _register_functions(interface):
 
 @ropemacs.lisputils.lispfunction
 def init():
-    pass
+    ropemacs.lisputils.lisp.warn(
+        'Calling (rope-init) is no longer needed.')
 
 interface = ropemacs.interface.Ropemacs()
 _register_functions(interface)

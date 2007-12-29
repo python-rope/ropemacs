@@ -26,7 +26,6 @@ After installing pymacs, add these lines to your ``~/.emacs`` file::
 
   (require 'pymacs)
   (pymacs-load "ropemacs" "rope-")
-  (rope-init)
 
 Rope registers its local keys using ``python-mode`` hook.  If you
 don't want to use rope with ``python-mode`` you can add
@@ -40,7 +39,6 @@ a function like this instead of that::
     (interactive)
     (require 'pymacs)
     (pymacs-load "ropemacs" "rope-")
-    (rope-init)
     ;; Automatically save project python buffers before refactorings
     (setq ropemacs-confirm-saving 'nil)
   )
