@@ -12,7 +12,6 @@ def _register_functions(interface):
             globals()[attrname] = attr
 
 
-@ropemacs.lisputils.lispfunction
 def init():
     ropemacs.lisputils.lisp.warn(
         'Calling (rope-init) is no longer needed.')

@@ -175,7 +175,20 @@ class Ropemacs(object):
         if narrowed:
             lisp.narrow_to_region(1, lisp.buffer_size() + 1)
         try:
-            return lisp.buffer_string()
+            #result = lisp.buffer_string()
+            result = lisp('(encode-coding-string (buffer-string) buffer-file-coding-system)')
+            coding = lisp['buffer-file-coding-system'].value()
+            if coding is not None:
+                coding_name = coding.text
+                if coding_name.split('-')[-1] in ('dos', 'unix', 'mac'):
+                    coding_name = coding_name[:coding_name.rindex('-')]
+                if coding_name.split('-')[0] in ('mule', 'iso'):
+                    coding_name = coding_name[coding_name.index('-') + 1:]
+                try:
+                    result = unicode(result, coding_name)
+                except (LookupError, UnicodeDecodeError):
+                    result = unicode(result, 'utf-8')
+            return result
         finally:
             if narrowed:
                 lisp.narrow_to_region(old_min, old_max)
@@ -433,7 +446,7 @@ DEFVARS = """\
 (defgroup ropemacs nil
   "ropemacs, an emacs plugin for rope."
   :link '(url-link "http://rope.sourceforge.net/ropemacs.html")
-  :prefix 'rope-)
+  :prefix "rope-")
 
 (defcustom ropemacs-confirm-saving t
   "Shows whether to confirm saving modified buffers before refactorings.
