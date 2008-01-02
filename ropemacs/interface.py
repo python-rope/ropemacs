@@ -180,6 +180,8 @@ class Ropemacs(object):
             coding = lisp['buffer-file-coding-system'].value()
             if coding is not None:
                 coding_name = coding.text
+                if coding_name.endswith('dos'):
+                    result = result.replace('\r', '')
                 if coding_name.split('-')[-1] in ('dos', 'unix', 'mac'):
                     coding_name = coding_name[:coding_name.rindex('-')]
                 if coding_name.split('-')[0] in ('mule', 'iso'):
