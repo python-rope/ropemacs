@@ -43,8 +43,15 @@ Features
 Source Repository
 =================
 
-Ropemacs Mercurial_ repository:
-  http://rope.sourceforge.net/hg/ropemacs
+Ropemacs:
+
+* repo url: http://rope.sourceforge.net/hg/ropemacs
+* snapshot: http://rope.sourceforge.net/hg/ropemacs/tip.tar.gz
+
+Revised pymacs:
+
+* repo url: http://rope.sourceforge.net/hg/rpymacs
+* snapshot: http://rope.sourceforge.net/hg/rpymacs/tip.tar.gz
 
 
 Feedback

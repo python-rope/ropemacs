@@ -17,10 +17,10 @@ New Features
 Setting Up
 ==========
 
-You can get pymacs_ from http://www.iro.umontreal.ca/~pinard/pymacs/.
-But version 0.22 does not work with Python 2.5 because of the lack of
-file encoding declarations.  A simple patch is included:
-``docs/pymacs_python25.patch``.
+Pymacs_ has not been maintained for a few years.  I've started a new
+Mercurial repo and applied a few fixes which is available at
+http://rope.sf.net/hg/rpymacs.  Also you can download `rpymacs
+snapshot`_.
 
 After installing pymacs, add these lines to your ``~/.emacs`` file::
 
@@ -50,6 +50,8 @@ them somewhere and add these lines to your ``.emacs``::
   ;; Add this before loading pymacs if you haven't installed rope and ropemacs
   (setq pymacs-load-path '("/home/ali/projects/rope"
 			   "/home/ali/projects/ropemacs"))
+
+.. _`rpymacs snapshot`: http://rope.sf.net/hg/rpymacs/tip.tar.gz
 
 
 Getting Started
