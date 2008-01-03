@@ -13,12 +13,6 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
-* handling narrowed regions
-* added ropemacs-local-prefix and ropemacs-global-prefix
-* deprecated rope-code-assist-max-fixes; use ropemacs-codeassist-maxfixes
-* deprecated rope-confirm-saving; use ropemacs-confirm-saving
-* fixed some of pymacs bugs
-
 
 Setting Up
 ==========
