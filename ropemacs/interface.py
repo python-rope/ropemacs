@@ -21,6 +21,7 @@ class Ropemacs(object):
             ('u', lisp.rope_undo_refactoring),
             ('r', lisp.rope_redo_refactoring),
             ('f', lisp.rope_find_file),
+            ('4 f', lisp.rope_find_file_other_window),
             ('c', lisp.rope_project_config),
             ('n m', lisp.rope_create_module),
             ('n p', lisp.rope_create_package),
@@ -327,6 +328,15 @@ class Ropemacs(object):
 
     @interactive
     def find_file(self):
+        file = self._base_find_file()
+        lisp.find_file(file.real_path)
+
+    @interactive
+    def find_file_other_window(self):
+        file = self._base_find_file()
+        lisp.find_file_other_window(file.real_path)
+
+    def _base_find_file(self):
         self._check_project()
         files = self.project.get_files()
         names = []
@@ -336,7 +346,7 @@ class Ropemacs(object):
         result = lisputils.ask_values('Rope Find File: ', names, exact=True)
         path = '/'.join(reversed(result.split('<')))
         file = self.project.get_file(path)
-        lisp.find_file(file.real_path)
+        return file
 
     @interactive
     def project_config(self):

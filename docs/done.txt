@@ -2,7 +2,8 @@
  Done
 ======
 
-- added ropemacs-enable-shortcuts : January 3, 2008
+- added rope-find-file-other-window : January 4, 2008
+- added ropemacs-enable-shortcuts variable : January 3, 2008
 
 > Public Release 0.5c1 : January 3, 2008
 

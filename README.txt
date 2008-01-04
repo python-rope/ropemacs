@@ -206,6 +206,7 @@ Key               Command
 C-x p o           rope-open-project
 C-x p k           rope-close-project
 C-x p f           rope-find-file
+C-x p 4 f         rope-find-file-other_window
 C-x p u           rope-undo-refactoring
 C-x p r           rope-redo-refactoring
 C-x p c           rope-project-config
