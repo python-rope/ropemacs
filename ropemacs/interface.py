@@ -28,10 +28,16 @@ class Ropemacs(object):
             ('n d', lisp.rope_create_directory)]
 
         self.local_keys = [
+            ('/', lisp.rope_code_assist),
+            ('?', lisp.rope_lucky_assist),
+            ('g', lisp.rope_goto_definition),
+            ('d', lisp.rope_show_doc),
+            ('f', lisp.rope_find_occurrences)]
+        self.shortcuts = [
             ('M-/', lisp.rope_code_assist),
             ('M-?', lisp.rope_lucky_assist),
             ('C-c g', lisp.rope_goto_definition),
-            ('C-c C-d', lisp.rope_show_doc),
+            ('C-c d', lisp.rope_show_doc),
             ('C-c f', lisp.rope_find_occurrences)]
         self.hooks = (
             (lisp.before_save_hook, lisp.rope_before_save_actions),
@@ -52,7 +58,6 @@ class Ropemacs(object):
                                     callback)
 
     def _prepare_refactorings(self):
-        prefix = lisp.ropemacs_local_prefix.value()
         for name in dir(refactor):
             if not name.startswith('_') and name != 'Refactoring':
                 attr = getattr(refactor, name)
@@ -65,9 +70,7 @@ class Ropemacs(object):
                     name = self._refactoring_name(attr)
                     setattr(self, name, do_refactor)
                     name = 'rope-' + name.replace('_', '-')
-                    if prefix is not None:
-                        key = prefix + ' ' + attr.key
-                        self.local_keys.append((key, lisp[name]))
+                    self.local_keys.append((attr.key, lisp[name]))
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
@@ -105,7 +108,12 @@ class Ropemacs(object):
 
     @lisphook
     def register_local_keys(self):
+        prefix = lisp.ropemacs_local_prefix.value()
         for key, callback in self.local_keys:
+            if prefix is not None:
+                key = prefix + ' ' + key
+                lisp.local_set_key(self._key_sequence(key), callback)
+        for key, callback in self.shortcuts:
             lisp.local_set_key(self._key_sequence(key), callback)
 
     @lisphook
