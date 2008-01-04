@@ -491,15 +491,15 @@ Use nil to prevent binding keys.")
 
 If non-nil it binds:
 
-========================  =========
-command                   shortcut
-========================  =========
-rope-code-assist          M-/
-rope-goto-definition      C-c g
-rope-show-doc             C-c d
-rope-find-occurrences     C-c f
-rope-lucky-assist         M-?
-========================  =========
+================  ============================
+Key               Command
+================  ============================
+M-/               rope-code-assist
+C-c g             rope-goto-definition
+C-c d             rope-show-doc
+C-c f             rope-find-occurrences
+M-?               rope-lucky-assist
+================  ============================
 ")
 
 (provide 'ropemacs)
