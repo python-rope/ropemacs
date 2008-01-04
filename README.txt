@@ -49,7 +49,7 @@ them somewhere and add these lines to your ``.emacs``::
 
   ;; Add this before loading pymacs if you haven't installed rope and ropemacs
   (setq pymacs-load-path '("/home/ali/projects/rope"
-			   "/home/ali/projects/ropemacs"))
+                           "/home/ali/projects/ropemacs"))
 
 .. _`rpymacs snapshot`: http://rope.sf.net/hg/rpymacs/tip.tar.gz
 
@@ -224,12 +224,25 @@ C-c r 1 p         rope-module-to-package
 C-c r o           rope-organize-imports
 C-c r n [vfcmp]   rope-generate-(variable|function|class|module|package)
 
+C-c r /           rope-code-assist
+C-c r g           rope-goto-definition
+C-c r d           rope-show-doc
+C-c r f           rope-find-occurrences
+C-c r ?           rope-lucky-assist
+===============   ============================
+
+These shortcut keys are enabled only when
+``ropemacs-enable-shortcuts`` variable is non-nil:
+
+================  ============================
+Key               Command
+================  ============================
 M-/               rope-code-assist
 C-c g             rope-goto-definition
-C-c C-d           rope-show-doc
-C-c f         	  rope-find-occurrences
-M-?           	  rope-lucky-assist
-===============   ============================
+C-c d             rope-show-doc
+C-c f             rope-find-occurrences
+M-?               rope-lucky-assist
+================  ============================
 
 
 Variables
@@ -245,6 +258,8 @@ Variables
   Defaults to ``C-c r``.
 * ``ropemacs-global-prefix``: The prefix for ropemacs project commands
   Defaults to ``C-x p``.
+* ``ropemacs-enable-shortcuts``: Shows whether to bind ropemacs
+  shortcuts keys.  Defaults to ``t``.
 
 
 Contributing

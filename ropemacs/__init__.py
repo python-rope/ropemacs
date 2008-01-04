@@ -30,6 +30,6 @@ def init():
     ropemacs.lisputils.lisp.warn(
         'Calling (rope-init) is no longer needed.')
 
-interface = ropemacs.interface.Ropemacs()
-_register_functions(interface)
-interface.init()
+_interface = ropemacs.interface.Ropemacs()
+_register_functions(_interface)
+_interface.init()

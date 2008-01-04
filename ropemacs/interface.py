@@ -114,7 +114,8 @@ class Ropemacs(object):
                 key = prefix + ' ' + key
                 lisp.local_set_key(self._key_sequence(key), callback)
         for key, callback in self.shortcuts:
-            lisp.local_set_key(self._key_sequence(key), callback)
+            if lisp['ropemacs-enable-shortcuts'].value():
+                lisp.local_set_key(self._key_sequence(key), callback)
 
     @lisphook
     def exiting_actions(self):
@@ -484,6 +485,22 @@ Use nil to prevent binding keys.")
   "The prefix for ropemacs project commands.
 
 Use nil to prevent binding keys.")
+
+(defcustom ropemacs-enable-shortcuts 't
+  "Shows whether to bind ropemacs shortcuts keys.
+
+If non-nil it binds:
+
+========================  =========
+command                   shortcut
+========================  =========
+rope-code-assist          M-/
+rope-goto-definition      C-c g
+rope-show-doc             C-c d
+rope-find-occurrences     C-c f
+rope-lucky-assist         M-?
+========================  =========
+")
 
 (provide 'ropemacs)
 """
