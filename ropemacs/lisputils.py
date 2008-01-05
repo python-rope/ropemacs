@@ -64,7 +64,7 @@ class RunTask(object):
             def __call__(self):
                 try:
                     self.result = self.task(handle)
-                except Exception, e:
+                except (Exception, KeyboardInterrupt), e:
                     self.exception = e
                     self.traceback = str(traceback.format_exc())
 
