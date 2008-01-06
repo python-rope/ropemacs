@@ -45,13 +45,13 @@ Source Repository
 
 Ropemacs:
 
-* repo url: http://rope.sourceforge.net/hg/ropemacs
-* snapshot: http://rope.sourceforge.net/hg/ropemacs/tip.tar.gz
+* repo url: http://rope.sf.net/hg/ropemacs
+* snapshot: http://rope.sf.net/hg/ropemacs/archive/tip.tar.gz
 
 Revised pymacs:
 
-* repo url: http://rope.sourceforge.net/hg/rpymacs
-* snapshot: http://rope.sourceforge.net/hg/rpymacs/tip.tar.gz
+* repo url: http://rope.sf.net/hg/rpymacs
+* snapshot: http://rope.sf.net/hg/rpymacs/archive/tip.tar.gz
 
 
 Feedback
