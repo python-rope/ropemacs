@@ -97,6 +97,15 @@ class ConfigTest(unittest.TestCase):
         self.assertEquals({'name': 'value'}, result)
         self.assertEquals('done', action)
 
+    def test_ignoring_trailing_colon_in_config_names(self):
+        optionals = {'name1': dialog.Data()}
+        minibuffer = _MockAskConfig(
+            ['batchset', 'name1: value1\n', 'done'])
+        action, result = dialog.show_dialog(minibuffer, ['done', 'cancel'],
+                                            optionals=optionals)
+        self.assertEquals({'name1': 'value1'}, result)
+        self.assertEquals('done', action)
+
 
 class _MockAskConfig(object):
 

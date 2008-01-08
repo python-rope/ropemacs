@@ -188,7 +188,7 @@ restructuring can be::
 
   goal ${project}.pycore.create_module(${project}.root, ${name})
 
-  checks
+  args
    create_module: name=rope.contrib.generate.create_module
    project: type=rope.base.project.Project
 

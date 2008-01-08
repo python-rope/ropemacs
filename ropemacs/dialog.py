@@ -26,6 +26,8 @@ def show_dialog(askdata, actions, confs={}, optionals={}, initial_asking=True):
         elif response == 'batchset':
             sets = askdata(batchset_question)
             for key, value in _parse_batchset(sets).items():
+                if key.endswith(':'):
+                    key = key[:-1]
                 result[key] = value
         elif response in actions:
             break
