@@ -151,22 +151,21 @@ class Restructure(Refactoring):
     key = 'x'
     confs = {'pattern': dialog.Data('Restructuring pattern: '),
              'goal': dialog.Data('Restructuring goal: ')}
-    optionals = {'checks': dialog.Data('Checks: '),
+    optionals = {'args': dialog.Data('Arguments: '),
                  'imports': dialog.Data('Imports: ')}
 
     def _calculate_changes(self, values, task_handle):
-        restructuring = rope.refactor.restructure.Restructure(
-            self.project, values['pattern'], values['goal'])
-        check_dict = {}
-        for raw_check in values.get('checks', '').split('\n'):
+        args = {}
+        for raw_check in values.get('args', '').split('\n'):
             if raw_check:
-                key, value = raw_check.split('==')
-                check_dict[key.strip()] = value.strip()
-        checks = restructuring.make_checks(check_dict)
+                key, value = raw_check.split(':', 1)
+                args[key.strip()] = value.strip()
         imports = [line.strip()
                    for line in values.get('imports', '').split('\n')]
-        return restructuring.get_changes(checks=checks, imports=imports,
-                                         task_handle=task_handle)
+        restructuring = rope.refactor.restructure.Restructure(
+            self.project, values['pattern'], values['goal'],
+            args=args, imports=imports)
+        return restructuring.get_changes(task_handle=task_handle)
 
 
 class Move(Refactoring):

@@ -164,16 +164,16 @@ that blank lines before the name of config definitions are ignored.
 ``batchset`` command is useful when performing refactorings with long
 configs, like restructurings::
 
-  pattern ${?pycore}.create_module(${?project}.root, ${?name})
+  pattern ${pycore}.create_module(${project}.root, ${name})
 
-  goal generate.create_module(${?project}, ${?name})
+  goal generate.create_module(${project}, ${name})
 
   imports
    from rope.contrib import generate
 
-  checks
-   ?pycore.type == rope.base.pycore.PyCore
-   ?project.type == rope.base.project.Project
+  args
+   pycore: type=rope.base.pycore.PyCore
+   project: type=rope.base.project.Project
 
 .. ignore the two-space indents
 
@@ -184,13 +184,13 @@ done by prefixing refactorings.
 Just for the sake of completeness, the reverse of the above
 restructuring can be::
 
-  pattern ${?create_module}(${?project}, ${?name})
+  pattern ${create_module}(${project}, ${name})
 
-  goal ${?project}.pycore.create_module(${?project}.root, ${?name})
+  goal ${project}.pycore.create_module(${project}.root, ${name})
 
   checks
-   ?create_module == rope.contrib.generate.create_module
-   ?project.type == rope.base.project.Project
+   create_module: name=rope.contrib.generate.create_module
+   project: type=rope.base.project.Project
 
 
 Key-binding
