@@ -149,9 +149,12 @@ class Ropemacs(object):
 
     @interactive
     def undo_refactoring(self):
-        if lisp.y_or_n_p('Undo refactoring might change'
-                         ' many files; proceed? '):
-            self._check_project()
+        self._check_project()
+        change = self.project.history.tobe_undone
+        if change is None:
+            lisputils.message('Nothing to undo!')
+            return
+        if lisp.y_or_n_p('Undo <%s>? ' % str(change)):
             def undo(handle):
                 for changes in self.project.history.undo(task_handle=handle):
                     self._reload_buffers(changes.get_changed_resources())
@@ -159,8 +162,12 @@ class Ropemacs(object):
 
     @interactive
     def redo_refactoring(self):
-        if lisp.y_or_n_p('Redo refactoring might change'
-                         ' many files; proceed? '):
+        self._check_project()
+        change = self.project.history.tobe_redone
+        if change is None:
+            lisputils.message('Nothing to redo!')
+            return
+        if lisp.y_or_n_p('Redo <%s>? ' % str(change)):
             self._check_project()
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
