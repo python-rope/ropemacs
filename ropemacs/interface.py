@@ -429,7 +429,7 @@ class Ropemacs(object):
 
     def _check_project(self):
         if self.project is None:
-            lisp.call_interactively(lisp.rope_open_project)
+            self.open_project()
         else:
             self.project.validate(self.project.root)
 
