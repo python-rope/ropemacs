@@ -18,8 +18,8 @@ class Ropemacs(object):
         self.global_keys = [
             ('o', lisp.rope_open_project),
             ('k', lisp.rope_close_project),
-            ('u', lisp.rope_undo_refactoring),
-            ('r', lisp.rope_redo_refactoring),
+            ('u', lisp.rope_undo),
+            ('r', lisp.rope_redo),
             ('f', lisp.rope_find_file),
             ('4 f', lisp.rope_find_file_other_window),
             ('c', lisp.rope_project_config),
@@ -148,7 +148,7 @@ class Ropemacs(object):
             progress.done()
 
     @interactive
-    def undo_refactoring(self):
+    def undo(self):
         self._check_project()
         change = self.project.history.tobe_undone
         if change is None:
@@ -161,7 +161,7 @@ class Ropemacs(object):
             lisputils.RunTask(undo, 'Undo refactoring', interrupts=False)()
 
     @interactive
-    def redo_refactoring(self):
+    def redo(self):
         self._check_project()
         change = self.project.history.tobe_redone
         if change is None:
