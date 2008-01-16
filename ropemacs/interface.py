@@ -193,10 +193,10 @@ class Ropemacs(object):
             lisp.narrow_to_region(1, lisp.buffer_size() + 1)
         try:
             #result = lisp.buffer_string()
-            result = lisp('(encode-coding-string (buffer-string) buffer-file-coding-system)')
-            coding = lisp['buffer-file-coding-system'].value()
-            if coding is not None:
-                coding_name = coding.text
+	    coding_name = self._find_file_coding()
+            result = lisp('(encode-coding-string'
+                          ' (buffer-string) buffer-file-coding-system)')
+            if coding_name:
                 if coding_name.endswith('dos'):
                     result = result.replace('\r', '')
                 if coding_name.split('-')[-1] in ('dos', 'unix', 'mac'):
@@ -211,6 +211,19 @@ class Ropemacs(object):
         finally:
             if narrowed:
                 lisp.narrow_to_region(old_min, old_max)
+
+    def _find_file_coding(self):
+        coding_name = ''
+        if lisp.fboundp(lisp['coding-system-name']):
+            coding = lisp('(coding-system-name'
+                          ' buffer-file-coding-system)')
+        else:
+            coding = lisp['buffer-file-coding-system']
+        if isinstance(coding, str):
+            coding_name = coding
+        elif coding is not None and hasattr(coding, 'text'):
+            coding_name = coding.text
+        return coding_name
 
     @interactive
     def goto_definition(self):
