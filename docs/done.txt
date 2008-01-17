@@ -2,6 +2,9 @@
  Done
 ======
 
+> Public Release 0.5c2 : January 17, 2008
+
+- showing change description in undo/redo : January 8, 2008
 - added rope-find-file-other-window : January 4, 2008
 - added ropemacs-enable-shortcuts variable : January 3, 2008
 

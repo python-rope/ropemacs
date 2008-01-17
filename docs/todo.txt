@@ -8,9 +8,9 @@ TODO
 * including pymacs in ropemacs?
 * change pymacs to handle unicode buffers
 * pymacs should not raise string exceptions
-* saving the old values of refacturing config
+* saving the old values of refactoring configs
 * showing proposal type in code-assist
 * adding a menu
 * something like grep mode for find occurrences
 
-> Public Release 0.5c2
+> Public Release 0.5c3
