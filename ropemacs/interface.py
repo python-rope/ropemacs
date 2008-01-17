@@ -361,7 +361,6 @@ class Ropemacs(object):
         names = []
         for file in files:
             names.append('<'.join(reversed(file.path.split('/'))))
-        source = self._get_text()
         result = lisputils.ask_values('Rope Find File: ', names, exact=True)
         path = '/'.join(reversed(result.split('<')))
         file = self.project.get_file(path)
