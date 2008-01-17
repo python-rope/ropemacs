@@ -193,6 +193,7 @@ class Ropemacs(object):
         try:
             #result = lisp.buffer_string()
 	    coding_name = self._find_file_coding()
+            print 'Guessed coding is %s' % coding_name
             result = lisp('(encode-coding-string'
                           ' (buffer-string) buffer-file-coding-system)')
             if coding_name:
@@ -212,17 +213,15 @@ class Ropemacs(object):
                 lisp.narrow_to_region(old_min, old_max)
 
     def _find_file_coding(self):
-        coding_name = ''
         if lisp.fboundp(lisp['coding-system-name']):
             coding = lisp('(coding-system-name'
                           ' buffer-file-coding-system)')
         else:
-            coding = lisp['buffer-file-coding-system']
+            coding = lisp['buffer-file-coding-system'].value()
         if isinstance(coding, str):
-            coding_name = coding
+            return coding
         elif coding is not None and hasattr(coding, 'text'):
-            coding_name = coding.text
-        return coding_name
+            return coding.text
 
     @interactive
     def goto_definition(self):
