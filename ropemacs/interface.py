@@ -168,7 +168,6 @@ class Ropemacs(object):
             lisputils.message('Nothing to redo!')
             return
         if lisp.y_or_n_p('Redo <%s>? ' % str(change)):
-            self._check_project()
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
                     self._reload_buffers(changes.get_changed_resources())
