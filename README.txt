@@ -13,13 +13,6 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
-* showing change description in undo/redo
-* added rope-find-file-other-window
-* added ropemacs-enable-shortcuts variable
-
-I've tested rope and rpymacs on Emacs21 and XEmacs.  So this release
-probably will work on Emacs22, Emacs21 and XEmacs.
-
 
 Setting Up
 ==========
