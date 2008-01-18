@@ -1,5 +1,6 @@
+import rope.base.change
 from Pymacs import lisp
-from rope.base import project, libutils
+from rope.base import libutils
 from rope.contrib import codeassist, generate
 
 import ropemacs
@@ -135,7 +136,7 @@ class Ropemacs(object):
         if self.project is not None:
             self.close_project()
         progress = lisputils.create_progress('Opening "%s" project' % root)
-        self.project = project.Project(root)
+        self.project = rope.base.project.Project(root)
         progress.done()
 
     @interactive
@@ -157,7 +158,7 @@ class Ropemacs(object):
         if lisp.y_or_n_p('Undo <%s>? ' % str(change)):
             def undo(handle):
                 for changes in self.project.history.undo(task_handle=handle):
-                    self._reload_buffers(changes.get_changed_resources())
+                    self._reload_buffers(changes, undo=True)
             lisputils.RunTask(undo, 'Undo refactoring', interrupts=False)()
 
     @interactive
@@ -170,7 +171,7 @@ class Ropemacs(object):
         if lisp.y_or_n_p('Redo <%s>? ' % str(change)):
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
-                    self._reload_buffers(changes.get_changed_resources())
+                    self._reload_buffers(changes)
             lisputils.RunTask(redo, 'Redo refactoring', interrupts=False)()
 
     def _get_region(self):
@@ -220,7 +221,7 @@ class Ropemacs(object):
             coding = lisp['buffer-file-coding-system'].value()
         if isinstance(coding, str):
             return coding
-        elif coding is not None and hasattr(coding, 'text'):
+        if coding is not None and hasattr(coding, 'text'):
             return coding.text
 
     @interactive
@@ -443,17 +444,33 @@ class Ropemacs(object):
         else:
             self.project.validate(self.project.root)
 
-    def _reload_buffers(self, changed_resources, moved={}):
+    def _reload_buffers(self, changes, undo=False):
+        self._reload_buffers_for_changes(changes.get_changed_resources(),
+                             self._get_moved_resources(changes, undo))
+
+    def _reload_buffers_for_changes(self, changed_resources,
+                                    moved_resources={}):
         for resource in changed_resources:
             buffer = lisp.find_buffer_visiting(str(resource.real_path))
             if buffer:
                 if resource.exists():
                     lisp.set_buffer(buffer)
                     lisp.revert_buffer(None, 1)
-                elif resource in moved:
-                    new_resource = moved[resource]
+                elif resource in moved_resources:
+                    new_resource = moved_resources[resource]
                     lisp.kill_buffer(buffer)
                     lisp.find_file(new_resource.real_path)
+
+    def _get_moved_resources(self, changes, undo=False):
+        result = {}
+        if isinstance(changes, rope.base.change.ChangeSet):
+            for change in changes.changes:
+                result.update(self._get_moved_resources(change))
+        if isinstance(changes, rope.base.change.MoveResource):
+            result[changes.resource] = changes.new_resource
+        if undo:
+            return dict([(value, key) for key, value in result.items()])
+        return result
 
     def _save_buffers(self, only_current=False):
         ask = lisp['ropemacs-confirm-saving'].value()

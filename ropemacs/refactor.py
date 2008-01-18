@@ -82,11 +82,10 @@ class Refactoring(object):
             return
         def perform(handle, self=self, changes=changes):
             self.project.do(changes, task_handle=handle)
-            self.interface._reload_buffers(changes.get_changed_resources(),
-                                           self._get_moved_resources(changes))
+            self.interface._reload_buffers(changes)
             self._done()
         lisputils.RunTask(perform, 'Making %s changes' % self.name,
-                           interrupts=False)()
+                          interrupts=False)()
         lisputils.message(str(changes.description) + ' finished')
 
     def _get_confs(self):
@@ -94,15 +93,6 @@ class Refactoring(object):
 
     def _get_optionals(self):
         return self.optionals
-
-    def _get_moved_resources(self, changes):
-        result = {}
-        if isinstance(changes, rope.base.change.ChangeSet):
-            for change in changes.changes:
-                result.update(self._get_moved_resources(change))
-        if isinstance(changes, rope.base.change.MoveResource):
-            result[changes.resource] = changes.new_resource
-        return result
 
 
 class Rename(Refactoring):
