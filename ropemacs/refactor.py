@@ -346,7 +346,8 @@ def _resources(project, text):
     result = []
     for line in text.splitlines():
         try:
-            result.append(project.get_resource(line.strip()))
+            if line.strip() != '':
+                result.append(project.get_resource(line.strip()))
         except rope.base.exceptions.ResourceNotFoundError:
             pass
     return result
