@@ -166,6 +166,8 @@ class Restructure(Refactoring):
 
 class Move(Refactoring):
     key = 'v'
+    optionals = {
+        'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
         self.mover = rope.refactor.move.create_move(self.project,
@@ -174,24 +176,28 @@ class Move(Refactoring):
 
     def _calculate_changes(self, values, task_handle):
         destination = values['destination']
+        resources = _resources(self.project, values.get('resources', None))
         if isinstance(self.mover, rope.refactor.move.MoveGlobal):
-            return self._move_global(destination, task_handle)
+            return self._move_global(destination, resources, task_handle)
         if isinstance(self.mover, rope.refactor.move.MoveModule):
-            return self._move_module(destination, task_handle)
+            return self._move_module(destination, resources, task_handle)
         if isinstance(self.mover, rope.refactor.move.MoveMethod):
-            return self._move_method(destination, task_handle)
+            return self._move_method(destination, resources, task_handle)
 
-    def _move_global(self, dest, handle):
+    def _move_global(self, dest, resources, handle):
         destination = self.project.pycore.find_module(dest)
-        return self.mover.get_changes(destination, task_handle=handle)
-
-    def _move_method(self, dest, handle):
         return self.mover.get_changes(
-            dest, self.mover.get_method_name(), task_handle=handle)
+            destination, resources=resources, task_handle=handle)
 
-    def _move_module(self, dest, handle):
+    def _move_method(self, dest, resources, handle):
+        return self.mover.get_changes(
+            dest, self.mover.get_method_name(),
+            resources=resources, task_handle=handle)
+
+    def _move_module(self, dest, resources, handle):
         destination = self.project.pycore.find_module(dest)
-        return self.mover.get_changes(destination, task_handle=handle)
+        return self.mover.get_changes(
+            destination, resources=resources, task_handle=handle)
 
     def _get_confs(self):
         if isinstance(self.mover, rope.refactor.move.MoveGlobal):
