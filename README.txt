@@ -130,9 +130,9 @@ Finding Occurrences
 -------------------
 
 The find occurrences command (``C-c f`` by default) can be used to
-find the occurrences of a python name.  If prefixed, it will also show
-unsure occurrences; unsure occurrences are indicated with a ``?`` mark
-in the end.
+find the occurrences of a python name.  If ``unsure`` option is
+``yes``, it will also show unsure occurrences; unsure occurrences are
+indicated with a ``?`` mark in the end.
 
 
 Dialog ``batchset`` Command

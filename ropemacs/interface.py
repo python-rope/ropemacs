@@ -243,28 +243,40 @@ class Ropemacs(object):
         buffer = lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
         lisp.local_set_key('q', lisp.bury_buffer)
 
-    @prefixed
+    @interactive
     def find_occurrences(self, prefix):
         self._check_project()
         self._save_buffers()
         resource, offset = self._get_location()
-        def calculate(handle):
-            return codeassist.find_occurrences(
-                self.project, resource, offset,
-                unsure=(prefix != 1), task_handle=handle)
-        result = lisputils.RunTask(calculate, 'Find Occurrences')()
-        text = []
-        for occurrence in result:
-            line = '%s : %s' % (occurrence.resource.path, occurrence.offset)
-            if occurrence.unsure:
-                line += ' ?'
-            text.append(line)
-        text = '\n'.join(text) + '\n'
-        buffer = lisputils.make_buffer('*rope-occurrences*',
-                                       text, switch=True)
-        lisp.set_buffer(buffer)
-        lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
-        lisp.local_set_key('q', lisp.rope_occurrences_quit)
+
+        optionals = {
+            'unsure': ropemacs.dialog.Data('Find uncertain occurrences: ',
+                                           default='no', values=['yes', 'no']),
+            'resources': ropemacs.dialog.Data('Files to search: ')}
+        action, values = ropemacs.dialog.show_dialog(
+            lisputils.askdata, ['search', 'cancel'], optionals=optionals)
+        if action == 'search':
+            unsure = values.get('unsure') == 'yes'
+            resources = ropemacs.refactor._resources(self.project,
+                                                     values.get('resources'))
+            def calculate(handle):
+                return codeassist.find_occurrences(
+                    self.project, resource, offset,
+                    unsure=unsure, resources=resources, task_handle=handle)
+            result = lisputils.RunTask(calculate, 'Find Occurrences')()
+            text = []
+            for occurrence in result:
+                line = '%s : %s' % (occurrence.resource.path, occurrence.offset)
+                if occurrence.unsure:
+                    line += ' ?'
+                text.append(line)
+            text = '\n'.join(text) + '\n'
+            buffer = lisputils.make_buffer('*rope-occurrences*',
+                                           text, switch=True)
+            lisp.set_buffer(buffer)
+            lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
+            lisp.local_set_key('q', lisp.rope_occurrences_quit)
+
 
     @interactive
     def occurrences_goto_occurrence(self):
