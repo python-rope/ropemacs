@@ -228,11 +228,13 @@ class ModuleToPackage(Refactoring):
 
 class Inline(Refactoring):
     key = 'i'
-    optionals = {'remove': dialog.Data('Remove the definition: ',
-                                       values=['yes', 'no'], default='yes'),
-                 'only_current':
-                     dialog.Data('Inline this occurrence only: ',
-                                 values=['yes', 'no'], default='no')}
+    optionals = {
+        'remove': dialog.Data('Remove the definition: ',
+                              values=['yes', 'no'], default='yes'),
+        'only_current':
+            dialog.Data('Inline this occurrence only: ',
+                        values=['yes', 'no'], default='no'),
+        'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
         self.inliner = rope.refactor.inline.create_inline(
@@ -241,8 +243,10 @@ class Inline(Refactoring):
     def _calculate_changes(self, values, task_handle):
         remove = values.get('remove', 'yes') == 'yes'
         only_current = values.get('only_current', 'no') == 'yes'
+        resources = _resources(self.project, values.get('resources'))
         return self.inliner.get_changes(
-            remove=remove, only_current=only_current, task_handle=task_handle)
+            remove=remove, only_current=only_current,
+            resources=resources, task_handle=task_handle)
 
 
 class _Extract(Refactoring):
