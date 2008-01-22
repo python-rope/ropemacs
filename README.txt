@@ -51,7 +51,7 @@ them somewhere and add these lines to your ``.emacs``::
   (setq pymacs-load-path '("/home/ali/projects/rope"
                            "/home/ali/projects/ropemacs"))
 
-.. _`rpymacs snapshot`: http://rope.sf.net/hg/rpymacs/tip.tar.gz
+.. _`rpymacs snapshot`: http://rope.sf.net/hg/rpymacs/archive/tip.tar.gz
 
 
 Getting Started
