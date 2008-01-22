@@ -1,4 +1,5 @@
 import rope.base.change
+import rope.base.exceptions
 import rope.contrib.generate
 import rope.refactor.extract
 import rope.refactor.inline
@@ -102,8 +103,7 @@ class Rename(Refactoring):
                             values=['yes', 'no'], default='yes'),
         'in_hierarchy': dialog.Data('Method in class hierarchy: ',
                                     values=['yes', 'no'], default='no'),
-        'in_file': dialog.Data('Only rename occurrences in the same file: ',
-                               values=['yes', 'no'], default='no'),
+        'resources': dialog.Data('Files to apply this refactoring on: '),
         'unsure': dialog.Data('Unsure occurrences: ',
                               values=['ignore', 'match'], default='ignore')}
     saveall = True
@@ -118,10 +118,12 @@ class Rename(Refactoring):
     def _calculate_changes(self, values, task_handle):
         newname = values['newname']
         unsure = values.get('unsure', 'ignore') == 'match'
+        resources = _resources(self.project, values.get('resources', None))
         kwds = {
             'docs': values.get('docs', 'yes') == 'yes',
             'in_file': values.get('in_file', 'no') == 'yes',
-            'unsure': (lambda occurrence: unsure)}
+            'unsure': (lambda occurrence: unsure),
+            'resources': resources}
         if self.renamer.is_method():
             kwds['in_hierarchy'] = values.get('in_hierarchy', 'no') == 'yes'
         return self.renamer.get_changes(newname,
@@ -323,3 +325,14 @@ def refactoring_name(refactoring):
         result.append(c.lower())
     name = ''.join(result)
     return name
+
+def _resources(project, text):
+    if text is None:
+        return None
+    result = []
+    for line in text.splitlines():
+        try:
+            result.append(project.get_resource(line.strip()))
+        except rope.base.exceptions.ResourceNotFoundError:
+            pass
+    return result
