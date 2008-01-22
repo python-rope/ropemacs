@@ -143,8 +143,10 @@ class Restructure(Refactoring):
     key = 'x'
     confs = {'pattern': dialog.Data('Restructuring pattern: '),
              'goal': dialog.Data('Restructuring goal: ')}
-    optionals = {'args': dialog.Data('Arguments: '),
-                 'imports': dialog.Data('Imports: ')}
+    optionals = {
+        'args': dialog.Data('Arguments: '),
+        'imports': dialog.Data('Imports: '),
+        'resources': dialog.Data('Files to apply this restructuring: ')}
 
     def _calculate_changes(self, values, task_handle):
         args = {}
@@ -154,10 +156,12 @@ class Restructure(Refactoring):
                 args[key.strip()] = value.strip()
         imports = [line.strip()
                    for line in values.get('imports', '').split('\n')]
+        resources = _resources(self.project, values.get('resources', None))
         restructuring = rope.refactor.restructure.Restructure(
             self.project, values['pattern'], values['goal'],
             args=args, imports=imports)
-        return restructuring.get_changes(task_handle=task_handle)
+        return restructuring.get_changes(resources=resources,
+                                         task_handle=task_handle)
 
 
 class Move(Refactoring):
@@ -327,7 +331,7 @@ def refactoring_name(refactoring):
     return name
 
 def _resources(project, text):
-    if text is None:
+    if text is None or text.strip() == '':
         return None
     result = []
     for line in text.splitlines():
