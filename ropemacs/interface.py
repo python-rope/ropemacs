@@ -243,7 +243,7 @@ class Ropemacs(object):
         lisp.local_set_key('q', lisp.bury_buffer)
 
     @interactive
-    def find_occurrences(self, prefix):
+    def find_occurrences(self):
         self._check_project()
         self._save_buffers()
         resource, offset = self._get_location()
