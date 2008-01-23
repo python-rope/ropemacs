@@ -194,7 +194,6 @@ class Ropemacs(object):
         try:
             #result = lisp.buffer_string()
 	    coding_name = self._find_file_coding()
-            print 'Guessed coding is %s' % coding_name
             result = lisp('(encode-coding-string'
                           ' (buffer-string) buffer-file-coding-system)')
             if coding_name:
