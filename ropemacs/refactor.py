@@ -165,7 +165,7 @@ class Restructure(Refactoring):
                                          task_handle=task_handle)
 
 
-class Restructure(Refactoring):
+class UseFunction(Refactoring):
     key = 'u'
     optionals = {
         'resources': dialog.Data('Files to apply this restructuring: ')}
