@@ -262,6 +262,7 @@ Variables
   Defaults to ``C-x p``.
 * ``ropemacs-enable-shortcuts``: Shows whether to bind ropemacs
   shortcuts keys.  Defaults to ``t``.
+* ``ropemacs-enable-autoimport``: Shows whether to enable autoimport.
 
 
 Contributing

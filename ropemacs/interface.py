@@ -139,7 +139,8 @@ class Ropemacs(object):
             self.close_project()
         progress = lisputils.create_progress('Opening "%s" project' % root)
         self.project = rope.base.project.Project(root)
-        self.autoimport = autoimport.AutoImport(self.project)
+        if lisp['ropemacs-enable-autoimport'].value():
+            self.autoimport = autoimport.AutoImport(self.project)
         progress.done()
 
     @interactive
@@ -336,6 +337,8 @@ class Ropemacs(object):
     @rawprefixed
     def auto_import(self, prefix):
         self._check_project()
+        if self.autoimport is None:
+            return
         name = lisp.current_word()
         modules = self.autoimport.get_modules(name)
         if modules:
@@ -546,6 +549,9 @@ saved automatically.")
   "The number of errors to fix before code-assist.
 
 How many errors to fix, at most, when proposing code completions.")
+
+(defcustom ropemacs-enable-autoimport 'nil
+  "Specifies whether autoimport should be enabled.")
 
 (make-obsolete-variable
   'rope-confirm-saving 'ropemacs-confirm-saving)
