@@ -218,6 +218,7 @@ C-c r m           rope-extract-method
 C-c r i           rope-inline
 C-c r v           rope-move
 C-c r x           rope-restructure
+C-c r u           rope-use-function
 C-c r 1 r         rope-rename-current-module
 C-c r 1 v         rope-move-current-module
 C-c r 1 p         rope-module-to-package

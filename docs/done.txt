@@ -2,6 +2,8 @@
  Done
 ======
 
+- added use function refactoring : January 25, 2008
+
 > Public Release 0.5c2 : January 17, 2008
 
 - showing change description in undo/redo : January 8, 2008
