@@ -328,7 +328,6 @@ class _GenerateElement(Refactoring):
 
 
 class MethodObject(Refactoring):
-    key = None
     saveall = False
     confs = {'classname': dialog.Data('New class name: ',
                                       default='_ExtractedClass')}

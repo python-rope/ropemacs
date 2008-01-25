@@ -1,7 +1,7 @@
 import rope.base.change
 from Pymacs import lisp
 from rope.base import libutils
-from rope.contrib import codeassist, generate
+from rope.contrib import codeassist, generate, autoimport
 
 import ropemacs
 from ropemacs import refactor, lisputils
@@ -47,6 +47,7 @@ class Ropemacs(object):
             (lisp.kill_emacs_hook, lisp.rope_exiting_actions),
             (lisp.python_mode_hook, lisp.rope_register_local_keys))
         self._prepare_refactorings()
+        self.autoimport = None
 
     def init(self):
         """Initialize rope mode"""
@@ -138,6 +139,7 @@ class Ropemacs(object):
             self.close_project()
         progress = lisputils.create_progress('Opening "%s" project' % root)
         self.project = rope.base.project.Project(root)
+        self.autoimport = autoimport.AutoImport(self.project)
         progress.done()
 
     @interactive
@@ -331,6 +333,25 @@ class Ropemacs(object):
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 
+    @rawprefixed
+    def auto_import(self, prefix):
+        self._check_project()
+        name = lisp.current_word()
+        modules = self.autoimport.get_modules(name)
+        if modules:
+            if len(modules) == 1:
+                module = modules[0]
+            else:
+                module = lisputils.ask_values('Which module to import: ',
+                                              modules)
+            current = lisp.point()
+            lisp.goto_char(0)
+            newimport = 'from %s import %s\n' % (module, name)
+            lisp.insert(newimport)
+            lisp.goto_char(current + len(newimport))
+        else:
+            lisputils.message('Not found!')
+
     def _calculate_proposals(self):
         self._check_project()
         resource, offset = self._get_location()
@@ -386,7 +407,6 @@ class Ropemacs(object):
             lisp.find_file(config.real_path)
         else:
             lisputils.message('No rope project folder found')
-
 
     @interactive
     def create_module(self):
