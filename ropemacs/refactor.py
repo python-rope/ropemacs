@@ -171,11 +171,14 @@ class UseFunction(Refactoring):
     optionals = {
         'resources': dialog.Data('Files to apply this refactoring on: ')}
 
+    def _create_refactoring(self):
+        self.user = rope.refactor.usefunction.UseFunction(
+            self.project, self.resource, self.offset)
+
     def _calculate_changes(self, values, task_handle):
         resources = _resources(self.project, values.get('resources', None))
-        user = rope.refactor.usefunction.UseFunction(
-            self.project, self.resource, self.offset)
-        return user.get_changes(resources=resources, task_handle=task_handle)
+        return self.user.get_changes(resources=resources,
+                                     task_handle=task_handle)
 
 
 class Move(Refactoring):
