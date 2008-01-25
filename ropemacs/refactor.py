@@ -7,6 +7,7 @@ import rope.refactor.move
 import rope.refactor.rename
 import rope.refactor.restructure
 import rope.refactor.usefunction
+import rope.refactor.method_object
 
 from ropemacs import dialog, lisputils
 
@@ -321,6 +322,21 @@ class _GenerateElement(Refactoring):
 
     def _done(self):
         self.interface._goto_location(self.generator.get_location())
+
+
+class MethodObject(Refactoring):
+    key = None
+    saveall = False
+    confs = {'classname': dialog.Data('New class name: ',
+                                      default='_ExtractedClass')}
+
+    def _create_refactoring(self):
+        self.objecter = rope.refactor.method_object.MethodObject(
+            self.project, self.resource, self.offset)
+
+    def _calculate_changes(self, values, task_handle):
+        classname = values.get('classname')
+        return self.objecter.get_changes(classname)
 
 
 class GenerateVariable(_GenerateElement):

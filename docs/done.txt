@@ -2,6 +2,7 @@
  Done
 ======
 
+- added introduce method object refactoring : January 25, 2008
 - added use function refactoring : January 25, 2008
 
 > Public Release 0.5c2 : January 17, 2008

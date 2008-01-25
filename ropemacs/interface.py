@@ -72,7 +72,8 @@ class Ropemacs(object):
                     name = self._refactoring_name(attr)
                     setattr(self, name, do_refactor)
                     name = 'rope-' + name.replace('_', '-')
-                    self.local_keys.append((attr.key, lisp[name]))
+                    if attr.key is not None:
+                        self.local_keys.append((attr.key, lisp[name]))
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
