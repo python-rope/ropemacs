@@ -87,6 +87,9 @@ class RunTask(object):
         return calculate.result
 
 
+def runtask(command, name, interrupts=True):
+    return RunTask(command, name, interrupts)()
+
 def create_progress(name):
     if _emacs_version() < 22:
         progress = _OldProgress(name)

@@ -35,7 +35,7 @@ class Refactoring(object):
         def calculate(handle):
             return self._calculate_changes(result, handle)
         name = 'Calculating %s changes' % self.name
-        changes = lisputils.RunTask(calculate, name=name)()
+        changes = lisputils.runtask(calculate, name=name)
         if action == 'perform':
             self._perform(changes)
         if action == 'preview':
@@ -87,8 +87,8 @@ class Refactoring(object):
             self.project.do(changes, task_handle=handle)
             self.interface._reload_buffers(changes)
             self._done()
-        lisputils.RunTask(perform, 'Making %s changes' % self.name,
-                          interrupts=False)()
+        lisputils.runtask(perform, 'Making %s changes' % self.name,
+                          interrupts=False)
         lisputils.message(str(changes.description) + ' finished')
 
     def _get_confs(self):

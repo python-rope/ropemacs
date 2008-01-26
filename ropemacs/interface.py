@@ -164,7 +164,7 @@ class Ropemacs(object):
             def undo(handle):
                 for changes in self.project.history.undo(task_handle=handle):
                     self._reload_buffers(changes, undo=True)
-            lisputils.RunTask(undo, 'Undo refactoring', interrupts=False)()
+            lisputils.runtask(undo, 'Undo refactoring', interrupts=False)
 
     @interactive
     def redo(self):
@@ -177,7 +177,7 @@ class Ropemacs(object):
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
                     self._reload_buffers(changes)
-            lisputils.RunTask(redo, 'Redo refactoring', interrupts=False)()
+            lisputils.runtask(redo, 'Redo refactoring', interrupts=False)
 
     def _get_region(self):
         offset1 = self._get_offset()
@@ -267,7 +267,7 @@ class Ropemacs(object):
                 return codeassist.find_occurrences(
                     self.project, resource, offset,
                     unsure=unsure, resources=resources, task_handle=handle)
-            result = lisputils.RunTask(calculate, 'Find Occurrences')()
+            result = lisputils.runtask(calculate, 'Find Occurrences')
             text = []
             for occurrence in result:
                 line = '%s : %s' % (occurrence.resource.path, occurrence.offset)
@@ -393,7 +393,7 @@ class Ropemacs(object):
         def generate(handle):
             self.autoimport.generate_cache(task_handle=handle)
             self.autoimport.generate_modules_cache(modules, task_handle=handle)
-        lisputils.RunTask(generate, 'Generate autoimport cache')()
+        lisputils.runtask(generate, 'Generate autoimport cache')
 
     def _insert_import(self, name, module):
         current = lisp.point()
