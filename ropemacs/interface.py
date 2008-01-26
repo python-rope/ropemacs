@@ -357,7 +357,7 @@ class Ropemacs(object):
                     'Which module to import: ', modules)
             self._insert_import(name, module)
         else:
-            lisputils.message('Not found!')
+            lisputils.message('Global name %s not found!' % name)
 
     @interactive
     def complete_and_import(self):
@@ -376,7 +376,8 @@ class Ropemacs(object):
             lisp.insert(name[len(starting):])
             self._insert_import(name, module)
         else:
-            lisputils.message('Not found!')
+            lisputils.message(
+                'No global name starting with %s found!' % starting)
 
     @interactive
     def generate_autoimport_cache(self):

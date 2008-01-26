@@ -262,7 +262,11 @@ Variables
   Defaults to ``C-x p``.
 * ``ropemacs-enable-shortcuts``: Shows whether to bind ropemacs
   shortcuts keys.  Defaults to ``t``.
+
 * ``ropemacs-enable-autoimport``: Shows whether to enable autoimport.
+* ``ropemacs-autoimport-modules``: The name of modules whose global
+  names should be cached.  The `rope-generate-autoimport-cache' reads
+  this list and fills its cache.
 
 
 Contributing
