@@ -3,11 +3,11 @@ import rope.base.exceptions
 import rope.contrib.generate
 import rope.refactor.extract
 import rope.refactor.inline
+import rope.refactor.method_object
 import rope.refactor.move
 import rope.refactor.rename
 import rope.refactor.restructure
 import rope.refactor.usefunction
-import rope.refactor.method_object
 
 from ropemacs import dialog, lisputils
 

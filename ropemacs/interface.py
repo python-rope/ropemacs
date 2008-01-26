@@ -334,8 +334,8 @@ class Ropemacs(object):
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 
-    @rawprefixed
-    def auto_import(self, prefix):
+    @interactive
+    def auto_import(self):
         self._check_project()
         if self.autoimport is None:
             return
@@ -345,15 +345,38 @@ class Ropemacs(object):
             if len(modules) == 1:
                 module = modules[0]
             else:
-                module = lisputils.ask_values('Which module to import: ',
-                                              modules)
-            current = lisp.point()
-            lisp.goto_char(0)
-            newimport = 'from %s import %s\n' % (module, name)
-            lisp.insert(newimport)
-            lisp.goto_char(current + len(newimport))
+                module = lisputils.ask_values(
+                    'Which module to import: ', modules)
+            self._insert_import(name, module)
         else:
             lisputils.message('Not found!')
+
+    @interactive
+    def complete_and_import(self):
+        self._check_project()
+        if self.autoimport is None:
+            return
+        starting = lisp.current_word()
+        proposals = [x[0] + ' : ' + x[1]
+                     for x in self.autoimport.import_assist(starting)]
+        if proposals:
+            if len(proposals) == 1:
+                proposal = proposals[0]
+            else:
+                proposal = lisputils.ask_values('Which to import: ',
+                                                proposals)
+            name, module = proposal.rsplit(' :', 1)
+            lisp.insert(name[len(starting):])
+            self._insert_import(name, module)
+        else:
+            lisputils.message('Not found!')
+
+    def _insert_import(self, name, module):
+        current = lisp.point()
+        lisp.goto_char(0)
+        newimport = 'from %s import %s\n' % (module, name)
+        lisp.insert(newimport)
+        lisp.goto_char(current + len(newimport))
 
     def _calculate_proposals(self):
         self._check_project()
@@ -480,8 +503,9 @@ class Ropemacs(object):
             self.project.validate(self.project.root)
 
     def _reload_buffers(self, changes, undo=False):
-        self._reload_buffers_for_changes(changes.get_changed_resources(),
-                             self._get_moved_resources(changes, undo))
+        self._reload_buffers_for_changes(
+            changes.get_changed_resources(),
+            self._get_moved_resources(changes, undo))
 
     def _reload_buffers_for_changes(self, changed_resources,
                                     moved_resources={}):
@@ -490,7 +514,7 @@ class Ropemacs(object):
             if buffer:
                 if resource.exists():
                     lisp.set_buffer(buffer)
-                    lisp.revert_buffer(None, 1)
+                    lisp.revert_buffer(False, True)
                 elif resource in moved_resources:
                     new_resource = moved_resources[resource]
                     lisp.kill_buffer(buffer)
