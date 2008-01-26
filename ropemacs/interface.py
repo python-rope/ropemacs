@@ -405,8 +405,9 @@ class Ropemacs(object):
         lisputils.runtask(generate, 'Generate autoimport cache')
 
     def _insert_import(self, name, module):
+        lineno = self.autoimport.find_insertion_line(self._get_text())
         current = lisp.point()
-        lisp.goto_char(0)
+        lisp.goto_line(lineno)
         newimport = 'from %s import %s\n' % (module, name)
         lisp.insert(newimport)
         lisp.goto_char(current + len(newimport))
