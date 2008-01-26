@@ -334,10 +334,17 @@ class Ropemacs(object):
         lisp.delete_region(starting_offset + 1, offset + 1)
         lisp.insert(result)
 
+    def _check_autoimport(self):
+        self._check_project()
+        if self.auto_import is None:
+            lisputils.message('autoimport is disabled; '
+                              'see `ropemacs-enable-autoimport\' variable')
+            return False
+        return True
+
     @interactive
     def auto_import(self):
-        self._check_project()
-        if self.autoimport is None:
+        if not self._check_autoimport():
             return
         name = lisp.current_word()
         modules = self.autoimport.get_modules(name)
@@ -353,8 +360,7 @@ class Ropemacs(object):
 
     @interactive
     def complete_and_import(self):
-        self._check_project()
-        if self.autoimport is None:
+        if not self._check_autoimport():
             return
         starting = lisp.current_word()
         proposals = [x[0] + ' : ' + x[1]
