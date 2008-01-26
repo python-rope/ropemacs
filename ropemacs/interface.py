@@ -15,6 +15,7 @@ class Ropemacs(object):
         self.project = None
         self.old_content = None
         lisp(DEFVARS)
+        #lisp['pymacs-forget-mutability'] = True
 
         self.global_keys = [
             ('o', lisp.rope_open_project),
@@ -371,7 +372,7 @@ class Ropemacs(object):
             else:
                 proposal = lisputils.ask_values('Which to import: ',
                                                 proposals)
-            name, module = proposal.rsplit(' :', 1)
+            name, module = proposal.rsplit(' : ', 1)
             lisp.insert(name[len(starting):])
             self._insert_import(name, module)
         else:
@@ -383,6 +384,13 @@ class Ropemacs(object):
             return
         for file in self.project.pycore.get_python_files():
             self.autoimport.update_resource(file)
+        modules = lisp['ropemacs-autoimport-modules'].value()
+        if modules:
+            for i in range(len(modules)):
+                modname = modules[i]
+                if not isinstance(modname, basestring):
+                    modname = modname.value()
+                self.autoimport.update_module(modname)
 
     def _insert_import(self, name, module):
         current = lisp.point()
@@ -589,6 +597,11 @@ How many errors to fix, at most, when proposing code completions.")
 
 (defcustom ropemacs-enable-autoimport 'nil
   "Specifies whether autoimport should be enabled.")
+(defcustom ropemacs-autoimport-modules nil
+  "The name of modules whose global names should be cached.
+
+The `rope-generate-autoimport-cache' reads this list and fills its
+cache.")
 
 (make-obsolete-variable
   'rope-confirm-saving 'ropemacs-confirm-saving)
