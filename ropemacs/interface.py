@@ -377,6 +377,13 @@ class Ropemacs(object):
         else:
             lisputils.message('Not found!')
 
+    @interactive
+    def generate_autoimport_cache(self):
+        if not self._check_autoimport():
+            return
+        for file in self.project.pycore.get_python_files():
+            self.autoimport.update_resource(file)
+
     def _insert_import(self, name, module):
         current = lisp.point()
         lisp.goto_char(0)
