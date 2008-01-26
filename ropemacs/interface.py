@@ -154,6 +154,14 @@ class Ropemacs(object):
             progress.done()
 
     @interactive
+    def write_project(self):
+        if self.project is not None:
+            progress = lisputils.create_progress(
+                'Writing "%s" project data to disk' % self.project.address)
+            self.project.sync()
+            progress.done()
+
+    @interactive
     def undo(self):
         self._check_project()
         change = self.project.history.tobe_undone
