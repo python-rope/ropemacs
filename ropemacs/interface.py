@@ -382,15 +382,18 @@ class Ropemacs(object):
     def generate_autoimport_cache(self):
         if not self._check_autoimport():
             return
-        for file in self.project.pycore.get_python_files():
-            self.autoimport.update_resource(file)
         modules = lisp['ropemacs-autoimport-modules'].value()
+        modnames = []
         if modules:
             for i in range(len(modules)):
                 modname = modules[i]
                 if not isinstance(modname, basestring):
                     modname = modname.value()
-                self.autoimport.update_module(modname)
+                modnames.append(modname)
+        def generate(handle):
+            self.autoimport.generate_cache(task_handle=handle)
+            self.autoimport.generate_modules_cache(modules, task_handle=handle)
+        lisputils.RunTask(generate, 'Generate autoimport cache')()
 
     def _insert_import(self, name, module):
         current = lisp.point()
