@@ -441,12 +441,14 @@ class Ropemacs(object):
     @interactive
     def find_file(self):
         file = self._base_find_file()
-        lisp.find_file(file.real_path)
+        if file is not None:
+            lisp.find_file(file.real_path)
 
     @interactive
     def find_file_other_window(self):
         file = self._base_find_file()
-        lisp.find_file_other_window(file.real_path)
+        if file is not None:
+            lisp.find_file_other_window(file.real_path)
 
     def _base_find_file(self):
         self._check_project()
@@ -455,9 +457,11 @@ class Ropemacs(object):
         for file in files:
             names.append('<'.join(reversed(file.path.split('/'))))
         result = lisputils.ask_values('Rope Find File: ', names, exact=True)
-        path = '/'.join(reversed(result.split('<')))
-        file = self.project.get_file(path)
-        return file
+        if result is not None:
+            path = '/'.join(reversed(result.split('<')))
+            file = self.project.get_file(path)
+            return file
+        lisputils.message('No file selected')
 
     @interactive
     def project_config(self):
