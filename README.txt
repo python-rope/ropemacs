@@ -211,6 +211,7 @@ C-x p u           rope-undo
 C-x p r           rope-redo
 C-x p c           rope-project-config
 C-x p n [mpfd]    rope-create-(module|package|file|directory)
+                  rope-write-project
 
 C-c r r           rope-rename
 C-c r l           rope-extract-variable
@@ -231,6 +232,10 @@ C-c r g           rope-goto-definition
 C-c r d           rope-show-doc
 C-c r f           rope-find-occurrences
 C-c r ?           rope-lucky-assist
+
+                  rope-auto-import
+                  rope-complete-and-import
+                  rope-generate-autoimport-cache
 ===============   ============================
 
 These shortcut keys are enabled only when
@@ -245,6 +250,40 @@ C-c d             rope-show-doc
 C-c f             rope-find-occurrences
 M-?               rope-lucky-assist
 ================  ============================
+
+
+Enabling Autoimport
+-------------------
+
+Ropemacs provides two commands called ``rope-auto-import`` and
+``rope-complete-and-import`` that can be used to find the module a
+name is defined in and add an import for that name.  But they are
+disabled by default.  Before using them you should add::
+
+  (setq ropemacs-enable-autoimport 't)
+
+to your ``~/.emacs`` file.  After enabling, rope maintains a cache of
+global names for each project.  It updates the cache only when modules
+are changed; if you want to cache all your modules at once, use
+``rope-generate-autoimport-cache``.  It will cache all of the modules
+inside a project plus those whose names are listed in
+``ropemacs-autoimport-modules`` list::
+
+  # add the name of modules you want to autoimport
+  (setq ropemacs-autoimport-modules '("os" "shutil"))
+
+Now if you are in a buffer that contains::
+
+  rmtree
+
+and you execute ``ropemacs-auto-import`` you'll end up with::
+
+  from shutil import rmtree
+  rmtree
+
+``ropemacs-complete-and-import`` proposes names starting with the
+given word, too.  Note that these commands are not bound to a key by
+default.  You can do that yourself if you use them a lot.
 
 
 Variables
