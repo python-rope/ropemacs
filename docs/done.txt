@@ -2,7 +2,9 @@
  Done
 ======
 
-- added support for autoimport : January 25, 2008
+> Public Release 0.5c3 : January 28, 2008
+
+- added support for autoimport : January 26, 2008
 - added introduce method object refactoring : January 25, 2008
 - added use function refactoring : January 25, 2008
 
