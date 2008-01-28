@@ -13,10 +13,6 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
-* added use function refactoring
-* auto-importing modules; see `enabling autoimport`_ section
-* added introduce method object refactoring
-
 
 Setting Up
 ==========
