@@ -323,8 +323,7 @@ class Ropemacs(object):
         prompt = 'Completion for %s: ' % starting
         result = lisputils.ask_values(prompt, names,
                                       starting=starting, exact=None)
-        lisp.delete_region(starting_offset + 1, offset + 1)
-        lisp.insert(result)
+        self._apply_assist(result, starting_offset, offset)
 
     @rawprefixed
     def lucky_assist(self, prefix):
@@ -340,12 +339,37 @@ class Ropemacs(object):
         else:
             lisputils.message('Not enough proposals!')
             return
-        lisp.delete_region(starting_offset + 1, offset + 1)
-        lisp.insert(result)
+        self._apply_assist(result, starting_offset, offset)
+
+    def _apply_assist(self, assist, start, offset):
+        if ' : ' in assist:
+            name, module = assist.rsplit(' : ', 1)
+            lisp.delete_region(start + 1, offset + 1)
+            lisp.insert(name)
+            self._insert_import(name, module)
+        else:
+            lisp.delete_region(start + 1, offset + 1)
+            lisp.insert(assist)
+
+    def _calculate_proposals(self):
+        self._check_project()
+        resource, offset = self._get_location()
+        source = self._get_text()
+        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
+        proposals = codeassist.code_assist(self.project, source, offset,
+                                           resource, maxfixes=maxfixes)
+        proposals = codeassist.sorted_proposals(proposals)
+        starting_offset = codeassist.starting_offset(source, offset)
+        names = [proposal.name for proposal in proposals]
+        if self.autoimport is not None:
+            starting = source[starting_offset:offset]
+            names.extend(x[0] + ' : ' + x[1]
+                         for x in self.autoimport.import_assist(starting))   
+        return starting_offset, names
 
     def _check_autoimport(self):
         self._check_project()
-        if self.auto_import is None:
+        if self.autoimport is None:
             lisputils.message('autoimport is disabled; '
                               'see `ropemacs-enable-autoimport\' variable')
             return False
@@ -411,18 +435,6 @@ class Ropemacs(object):
         newimport = 'from %s import %s\n' % (module, name)
         lisp.insert(newimport)
         lisp.goto_char(current + len(newimport))
-
-    def _calculate_proposals(self):
-        self._check_project()
-        resource, offset = self._get_location()
-        source = self._get_text()
-        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
-        proposals = codeassist.code_assist(self.project, source, offset,
-                                           resource, maxfixes=maxfixes)
-        proposals = codeassist.sorted_proposals(proposals)
-        starting_offset = codeassist.starting_offset(source, offset)
-        names = [proposal.name for proposal in proposals]
-        return starting_offset, names
 
     def _calculate_prefix(self, names):
         if not names:
