@@ -234,7 +234,6 @@ C-c r f           rope-find-occurrences
 C-c r ?           rope-lucky-assist
 
                   rope-auto-import
-                  rope-complete-and-import
                   rope-generate-autoimport-cache
 ===============   ============================
 
@@ -255,10 +254,9 @@ M-?               rope-lucky-assist
 Enabling Autoimport
 -------------------
 
-Ropemacs provides two commands called ``rope-auto-import`` and
-``rope-complete-and-import`` that can be used to find the module a
-name is defined in and add an import for that name.  But they are
-disabled by default.  Before using them you should add::
+Rope can propose and automatically import global names in other
+modules.  But this feature disabled by default.  Before using them you
+should add::
 
   (setq ropemacs-enable-autoimport 't)
 
@@ -281,9 +279,9 @@ and you execute ``ropemacs-auto-import`` you'll end up with::
   from shutil import rmtree
   rmtree
 
-``ropemacs-complete-and-import`` proposes names starting with the
-given word, too.  Note that these commands are not bound to a key by
-default.  You can do that yourself if you use them a lot.
+Also ``rope-code-assist`` and ``rope-lucky-assist`` propose
+auto-imported names by using ``name : module`` style.  Selecting them
+will import the module automatically.
 
 
 Variables

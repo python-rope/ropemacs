@@ -392,26 +392,6 @@ class Ropemacs(object):
             lisputils.message('Global name %s not found!' % name)
 
     @interactive
-    def complete_and_import(self):
-        if not self._check_autoimport():
-            return
-        starting = lisp.current_word()
-        proposals = [x[0] + ' : ' + x[1]
-                     for x in self.autoimport.import_assist(starting)]
-        if proposals:
-            if len(proposals) == 1:
-                proposal = proposals[0]
-            else:
-                proposal = lisputils.ask_values('Which to import: ',
-                                                proposals)
-            name, module = proposal.rsplit(' : ', 1)
-            lisp.insert(name[len(starting):])
-            self._insert_import(name, module)
-        else:
-            lisputils.message(
-                'No global name starting with %s found!' % starting)
-
-    @interactive
     def generate_autoimport_cache(self):
         if not self._check_autoimport():
             return
