@@ -423,10 +423,9 @@ class Ropemacs(object):
         for name in names:
             common = 0
             for c1, c2 in zip(prefix, name):
-                if c1 == c2:
-                    common += 1
-                else:
+                if c1 != c2 or ' ' in (c1, c2):
                     break
+                common += 1
             prefix = prefix[:common]
         return prefix
 
