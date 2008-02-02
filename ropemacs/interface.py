@@ -364,7 +364,7 @@ class Ropemacs(object):
         if self.autoimport is not None:
             starting = source[starting_offset:offset]
             names.extend(x[0] + ' : ' + x[1]
-                         for x in self.autoimport.import_assist(starting))   
+                         for x in self.autoimport.import_assist(starting))
         return starting_offset, names
 
     def _check_autoimport(self):
@@ -429,21 +429,24 @@ class Ropemacs(object):
             prefix = prefix[:common]
         return prefix
 
-    @interactive
-    def find_file(self):
-        file = self._base_find_file()
+    @rawprefixed
+    def find_file(self, prefix):
+        file = self._base_find_file(prefix)
         if file is not None:
             lisp.find_file(file.real_path)
 
-    @interactive
-    def find_file_other_window(self):
-        file = self._base_find_file()
+    @rawprefixed
+    def find_file_other_window(self, prefix):
+        file = self._base_find_file(prefix)
         if file is not None:
             lisp.find_file_other_window(file.real_path)
 
-    def _base_find_file(self):
+    def _base_find_file(self, prefix):
         self._check_project()
-        files = self.project.get_files()
+        if prefix:
+            files = self.project.pycore.get_python_files()
+        else:
+            files = self.project.get_files()
         names = []
         for file in files:
             names.append('<'.join(reversed(file.path.split('/'))))

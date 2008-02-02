@@ -85,7 +85,9 @@ for files in your project.  When you complete the minibuffer you'll
 see all files in the project; files are shown as their reversed paths.
 For instance ``projectroot/docs/todo.txt`` is shown like
 ``todo.txt<docs``.  This way you can find files faster in your
-project.
+project.  ``rope-find-file-other-window`` (``C-x p 4 f``) opens the
+file in the other window.  With prefix, these commands show python
+files only.
 
 
 Code-Assist
