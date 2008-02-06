@@ -310,14 +310,14 @@ class Ropemacs(object):
 
     @rawprefixed
     def code_assist(self, prefix):
-        starting_offset, names = self._calculate_proposals()
+        source = self._get_text()
+        starting_offset, names = self._calculate_proposals(source)
         if prefix is not None:
             arg = lisp.prefix_numeric_value(prefix)
             if arg == 0:
                 arg = len(names)
             common_start = self._calculate_prefix(names[:arg])
             lisp.insert(common_start[self._get_offset() - starting_offset:])
-        source = self._get_text()
         offset = self._get_offset()
         starting = source[starting_offset:offset]
         prompt = 'Completion for %s: ' % starting
@@ -327,8 +327,8 @@ class Ropemacs(object):
 
     @rawprefixed
     def lucky_assist(self, prefix):
-        starting_offset, names = self._calculate_proposals()
         source = self._get_text()
+        starting_offset, names = self._calculate_proposals(source)
         offset = self._get_offset()
         starting = source[starting_offset:offset]
         selected = 0
@@ -346,15 +346,14 @@ class Ropemacs(object):
             name, module = assist.rsplit(' : ', 1)
             lisp.delete_region(start + 1, offset + 1)
             lisp.insert(name)
-            self._insert_import(name, module)
+            self._insert_import(source, name, module)
         else:
             lisp.delete_region(start + 1, offset + 1)
             lisp.insert(assist)
 
-    def _calculate_proposals(self):
+    def _calculate_proposals(self, source):
         self._check_project()
         resource, offset = self._get_location()
-        source = self._get_text()
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
         proposals = codeassist.code_assist(self.project, source, offset,
                                            resource, maxfixes=maxfixes)
@@ -388,7 +387,7 @@ class Ropemacs(object):
             else:
                 module = lisputils.ask_values(
                     'Which module to import: ', modules)
-            self._insert_import(name, module)
+            self._insert_import(source, name, module)
         else:
             lisputils.message('Global name %s not found!' % name)
 
@@ -409,8 +408,8 @@ class Ropemacs(object):
             self.autoimport.generate_modules_cache(modules, task_handle=handle)
         lisputils.runtask(generate, 'Generate autoimport cache')
 
-    def _insert_import(self, name, module):
-        lineno = self.autoimport.find_insertion_line(self._get_text())
+    def _insert_import(self, source, name, module):
+        lineno = self.autoimport.find_insertion_line(source)
         current = lisp.point()
         lisp.goto_line(lineno)
         newimport = 'from %s import %s\n' % (module, name)
