@@ -363,8 +363,9 @@ class Ropemacs(object):
         names = [proposal.name for proposal in proposals]
         if self.autoimport is not None:
             starting = source[starting_offset:offset]
-            names.extend(x[0] + ' : ' + x[1]
-                         for x in self.autoimport.import_assist(starting))
+            if starting.strip():
+                names.extend(x[0] + ' : ' + x[1]
+                             for x in self.autoimport.import_assist(starting))
         return starting_offset, names
 
     def _check_autoimport(self):
