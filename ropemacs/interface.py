@@ -198,6 +198,8 @@ class Ropemacs(object):
         return lisp.point() - 1
 
     def _get_text(self):
+        if not lisp.buffer_modified_p():
+            return self._get_resource().read()
         end = lisp.buffer_size() + 1
         old_min = lisp.point_min()
         old_max = lisp.point_max()
