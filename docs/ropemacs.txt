@@ -48,11 +48,6 @@ Ropemacs:
 * repo url: http://rope.sf.net/hg/ropemacs
 * snapshot: http://rope.sf.net/hg/ropemacs/archive/tip.tar.gz
 
-Revised pymacs:
-
-* repo url: http://rope.sf.net/hg/rpymacs
-* snapshot: http://rope.sf.net/hg/rpymacs/archive/tip.tar.gz
-
 
 Feedback
 ========
@@ -68,5 +63,5 @@ Ropemacs is under the terms of GNU GPL (GNU General Public License).
 
 .. _project download page: http://sf.net/projects/rope/files
 .. _`rope-dev (at) googlegroups.com`: http://groups.google.com/group/rope-dev
-.. _pymacs: http://www.iro.umontreal.ca/~pinard/pymacs/
+.. _pymacs: http://pymacs.progiciels-bpi.ca/pymacs.html
 .. _Mercurial: http://selenic.com/mercurial

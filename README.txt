@@ -7,7 +7,7 @@ like refactorings and code-assists.  You should install rope_ library
 and pymacs_ before using ropemacs.
 
 .. _`rope`: http://rope.sf.net/
-.. _pymacs: http://www.iro.umontreal.ca/~pinard/pymacs/
+.. _pymacs: http://pymacs.progiciels-bpi.ca/pymacs.html
 
 
 New Features
@@ -16,11 +16,6 @@ New Features
 
 Setting Up
 ==========
-
-Pymacs_ has not been maintained for a few years.  I've started a new
-Mercurial repo and applied a few fixes which is available at
-http://rope.sf.net/hg/rpymacs.  Also you can download `rpymacs
-snapshot`_.
 
 After installing pymacs, add these lines to your ``~/.emacs`` file::
 
@@ -48,10 +43,8 @@ if you don't want to install rope library and ropemacs you can extract
 them somewhere and add these lines to your ``.emacs``::
 
   ;; Add this before loading pymacs if you haven't installed rope and ropemacs
-  (setq pymacs-load-path '("/home/ali/projects/rope"
-                           "/home/ali/projects/ropemacs"))
-
-.. _`rpymacs snapshot`: http://rope.sf.net/hg/rpymacs/archive/tip.tar.gz
+  (setq pymacs-load-path '("/path/to/rope"
+                           "/path/to/ropemacs"))
 
 
 Getting Started
