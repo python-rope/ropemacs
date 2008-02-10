@@ -325,7 +325,7 @@ class Ropemacs(object):
         prompt = 'Completion for %s: ' % starting
         result = lisputils.ask_values(prompt, names,
                                       starting=starting, exact=None)
-        self._apply_assist(result, starting_offset, offset)
+        self._apply_assist(source, result, starting_offset, offset)
 
     @rawprefixed
     def lucky_assist(self, prefix):
@@ -341,9 +341,9 @@ class Ropemacs(object):
         else:
             lisputils.message('Not enough proposals!')
             return
-        self._apply_assist(result, starting_offset, offset)
+        self._apply_assist(source, result, starting_offset, offset)
 
-    def _apply_assist(self, assist, start, offset):
+    def _apply_assist(self, source, assist, start, offset):
         if ' : ' in assist:
             name, module = assist.rsplit(' : ', 1)
             lisp.delete_region(start + 1, offset + 1)
