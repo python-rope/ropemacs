@@ -312,63 +312,15 @@ class Ropemacs(object):
 
     @rawprefixed
     def code_assist(self, prefix):
-        source = self._get_text()
-        starting_offset, names = self._calculate_proposals(source)
-        if prefix is not None:
-            arg = lisp.prefix_numeric_value(prefix)
-            if arg == 0:
-                arg = len(names)
-            common_start = self._calculate_prefix(names[:arg])
-            lisp.insert(common_start[self._get_offset() - starting_offset:])
-        offset = self._get_offset()
-        starting = source[starting_offset:offset]
-        prompt = 'Completion for %s: ' % starting
-        result = lisputils.ask_values(prompt, names,
-                                      starting=starting, exact=None)
-        self._apply_assist(source, result, starting_offset, offset)
+        _CodeAssist(self).code_assist(prefix)
 
     @rawprefixed
     def lucky_assist(self, prefix):
-        source = self._get_text()
-        starting_offset, names = self._calculate_proposals(source)
-        offset = self._get_offset()
-        starting = source[starting_offset:offset]
-        selected = 0
-        if prefix is not None:
-            selected = lisp.prefix_numeric_value(prefix)
-        if 0 <= selected < len(names):
-            result = names[selected]
-        else:
-            lisputils.message('Not enough proposals!')
-            return
-        self._apply_assist(source, result, starting_offset, offset)
+        _CodeAssist(self).lucky_assist(prefix)
 
-    def _apply_assist(self, source, assist, start, offset):
-        if ' : ' in assist:
-            name, module = assist.rsplit(' : ', 1)
-            lisp.delete_region(start + 1, offset + 1)
-            lisp.insert(name)
-            self._insert_import(source, name, module)
-        else:
-            lisp.delete_region(start + 1, offset + 1)
-            lisp.insert(assist)
-
-    def _calculate_proposals(self, source):
-        self._check_project()
-        resource, offset = self._get_location()
-        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
-        proposals = codeassist.code_assist(self.project, source, offset,
-                                           resource, maxfixes=maxfixes)
-        proposals = codeassist.sorted_proposals(proposals)
-        starting_offset = codeassist.starting_offset(source, offset)
-        starting_expression = codeassist.starting_expression(source, offset)
-        names = [proposal.name for proposal in proposals]
-        if self.autoimport is not None:
-            starting = source[starting_offset:offset]
-            if starting.strip() and '.' not in starting_expression:
-                names.extend(x[0] + ' : ' + x[1]
-                             for x in self.autoimport.import_assist(starting))
-        return starting_offset, names
+    @interactive
+    def auto_import(self):
+        _CodeAssist(self).auto_import()
 
     def _check_autoimport(self):
         self._check_project()
@@ -377,22 +329,6 @@ class Ropemacs(object):
                               'see `ropemacs-enable-autoimport\' variable')
             return False
         return True
-
-    @interactive
-    def auto_import(self):
-        if not self._check_autoimport():
-            return
-        name = lisp.current_word()
-        modules = self.autoimport.get_modules(name)
-        if modules:
-            if len(modules) == 1:
-                module = modules[0]
-            else:
-                module = lisputils.ask_values(
-                    'Which module to import: ', modules)
-            self._insert_import(source, name, module)
-        else:
-            lisputils.message('Global name %s not found!' % name)
 
     @interactive
     def generate_autoimport_cache(self):
@@ -410,27 +346,6 @@ class Ropemacs(object):
             self.autoimport.generate_cache(task_handle=handle)
             self.autoimport.generate_modules_cache(modules, task_handle=handle)
         lisputils.runtask(generate, 'Generate autoimport cache')
-
-    def _insert_import(self, source, name, module):
-        lineno = self.autoimport.find_insertion_line(source)
-        current = lisp.point()
-        lisp.goto_line(lineno)
-        newimport = 'from %s import %s\n' % (module, name)
-        lisp.insert(newimport)
-        lisp.goto_char(current + len(newimport))
-
-    def _calculate_prefix(self, names):
-        if not names:
-            return ''
-        prefix = names[0]
-        for name in names:
-            common = 0
-            for c1, c2 in zip(prefix, name):
-                if c1 != c2 or ' ' in (c1, c2):
-                    break
-                common += 1
-            prefix = prefix[:common]
-        return prefix
 
     @rawprefixed
     def find_file(self, prefix):
@@ -589,6 +504,138 @@ class Ropemacs(object):
         return (resource is not None and
                 resource.project == self.project and
                 self.project.pycore.is_python_file(resource))
+
+
+class _CodeAssist(object):
+
+    def __init__(self, interface):
+        self.interface = interface
+        self.autoimport = interface.autoimport
+        self._source = None
+        self._offset = None
+        self._starting_offset = None
+        self._starting = None
+        self._expression = None
+
+    def code_assist(self, prefix):
+        names = self._calculate_proposals()
+        if prefix is not None:
+            arg = lisp.prefix_numeric_value(prefix)
+            if arg == 0:
+                arg = len(names)
+            common_start = self._calculate_prefix(names[:arg])
+            lisp.insert(common_start[self.offset - self.starting_offset:])
+            self._starting = common_start
+            self._offset = self.starting_offset + len(common_start)
+        prompt = 'Completion for %s: ' % self.expression
+        result = lisputils.ask_values(prompt, names,
+                                      starting=self.starting, exact=None)
+        self._apply_assist(result)
+
+    def lucky_assist(self, prefix):
+        names = self._calculate_proposals()
+        selected = 0
+        if prefix is not None:
+            selected = lisp.prefix_numeric_value(prefix)
+        if 0 <= selected < len(names):
+            result = names[selected]
+        else:
+            lisputils.message('Not enough proposals!')
+            return
+        self._apply_assist(result)
+
+    def auto_import(self):
+        if not self.interface._check_autoimport():
+            return
+        name = lisp.current_word()
+        modules = self.autoimport.get_modules(name)
+        if modules:
+            if len(modules) == 1:
+                module = modules[0]
+            else:
+                module = lisputils.ask_values(
+                    'Which module to import: ', modules)
+            self._insert_import(name, module)
+        else:
+            lisputils.message('Global name %s not found!' % name)
+
+    def _apply_assist(self, assist):
+        if ' : ' in assist:
+            name, module = assist.rsplit(' : ', 1)
+            lisp.delete_region(self.starting_offset + 1, self.offset + 1)
+            lisp.insert(name)
+            self._insert_import(name, module)
+        else:
+            lisp.delete_region(self.starting_offset + 1, self.offset + 1)
+            lisp.insert(assist)
+
+    def _calculate_proposals(self):
+        self.interface._check_project()
+        resource = self.interface._get_resource()
+        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
+        proposals = codeassist.code_assist(
+            self.interface.project, self.source, self.offset,
+            resource, maxfixes=maxfixes)
+        proposals = codeassist.sorted_proposals(proposals)
+        names = [proposal.name for proposal in proposals]
+        if self.autoimport is not None:
+            if self.starting.strip() and '.' not in self.expression:
+                import_assists = self.autoimport.import_assist(self.starting)
+                names.extend(x[0] + ' : ' + x[1] for x in import_assists)
+        return names
+
+    def _insert_import(self, name, module):
+        lineno = self.autoimport.find_insertion_line(self.source)
+        current = lisp.point()
+        lisp.goto_line(lineno)
+        newimport = 'from %s import %s\n' % (module, name)
+        lisp.insert(newimport)
+        lisp.goto_char(current + len(newimport))
+
+    def _calculate_prefix(self, names):
+        if not names:
+            return ''
+        prefix = names[0]
+        for name in names:
+            common = 0
+            for c1, c2 in zip(prefix, name):
+                if c1 != c2 or ' ' in (c1, c2):
+                    break
+                common += 1
+            prefix = prefix[:common]
+        return prefix
+
+    @property
+    def offset(self):
+        if self._offset is None:
+            self._offset = self.interface._get_offset()
+        return self._offset
+
+    @property
+    def source(self):
+        if self._source is None:
+            self._source = self.interface._get_text()
+        return self._source
+
+    @property
+    def starting_offset(self):
+        if self._starting_offset is None:
+            self._starting_offset = codeassist.starting_offset(self.source,
+                                                               self.offset)
+        return self._starting_offset
+
+    @property
+    def starting(self):
+        if self._starting is None:
+            self._starting = self.source[self.starting_offset:self.offset]
+        return self._starting
+
+    @property
+    def expression(self):
+        if self._expression is None:
+            self._expression = codeassist.starting_expression(self.source,
+                                                              self.offset)
+        return self._expression
 
 
 DEFVARS = """\
