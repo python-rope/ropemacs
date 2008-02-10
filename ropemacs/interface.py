@@ -361,10 +361,11 @@ class Ropemacs(object):
                                            resource, maxfixes=maxfixes)
         proposals = codeassist.sorted_proposals(proposals)
         starting_offset = codeassist.starting_offset(source, offset)
+        starting_expression = codeassist.starting_expression(source, offset)
         names = [proposal.name for proposal in proposals]
         if self.autoimport is not None:
             starting = source[starting_offset:offset]
-            if starting.strip():
+            if starting.strip() and '.' not in starting_expression:
                 names.extend(x[0] + ' : ' + x[1]
                              for x in self.autoimport.import_assist(starting))
         return starting_offset, names
