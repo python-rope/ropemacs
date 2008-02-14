@@ -123,7 +123,6 @@ class Rename(Refactoring):
         resources = _resources(self.project, values.get('resources', None))
         kwds = {
             'docs': values.get('docs', 'yes') == 'yes',
-            'in_file': values.get('in_file', 'no') == 'yes',
             'unsure': (lambda occurrence: unsure),
             'resources': resources}
         if self.renamer.is_method():
