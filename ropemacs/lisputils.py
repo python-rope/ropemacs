@@ -52,7 +52,9 @@ class RunTask(object):
                 if percent is not None:
                     progress.update(percent)
         handle.add_observer(update_progress)
-        return self.task(handle)
+        result = self.task(handle)
+        progress.done()
+        return result
 
 
 def runtask(command, name, interrupts=True):
