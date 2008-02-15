@@ -1,4 +1,3 @@
-import threading
 import traceback
 
 from Pymacs import lisp
@@ -53,38 +52,7 @@ class RunTask(object):
                 if percent is not None:
                     progress.update(percent)
         handle.add_observer(update_progress)
-        class Calculate(object):
-
-            def __init__(self, task):
-                self.task = task
-                self.result = None
-                self.exception = None
-                self.traceback = None
-
-            def __call__(self):
-                try:
-                    self.result = self.task(handle)
-                except (Exception, KeyboardInterrupt), e:
-                    self.exception = e
-                    self.traceback = str(traceback.format_exc())
-
-        calculate = Calculate(self.task)
-        thread = threading.Thread(target=calculate)
-        try:
-            thread.start()
-            thread.join()
-            progress.done()
-            raised = calculate.exception
-            if raised is not None:
-                description = type(raised).__name__ + ': ' + str(raised)
-                raise exceptions.InterruptedTaskError(
-                    '%s\nTask <%s> was interrupted.\nReason: <%s>\n' %
-                    (calculate.traceback, self.name, description))
-        except:
-            handle.stop()
-            message('%s interrupted!' % self.name)
-            raise
-        return calculate.result
+        return self.task(handle)
 
 
 def runtask(command, name, interrupts=True):
