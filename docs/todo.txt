@@ -13,4 +13,4 @@ TODO
 * adding a menu
 * something like grep mode for find occurrences
 
-> Public Release 0.5c4
+> Public Release 0.5c5
