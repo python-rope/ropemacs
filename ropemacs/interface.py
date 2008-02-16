@@ -207,9 +207,7 @@ class Ropemacs(object):
         if narrowed:
             lisp.narrow_to_region(1, lisp.buffer_size() + 1)
         try:
-            #result = lisp.buffer_string()
-            result = lisp('(encode-coding-string (buffer-string) \'utf-8)')
-            return unicode(result, 'utf-8')
+            return lisp.buffer_string()
         finally:
             if narrowed:
                 lisp.narrow_to_region(old_min, old_max)
