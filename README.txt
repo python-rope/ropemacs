@@ -13,6 +13,12 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
+* merged rope-complete-and-import with code-assist
+* prefixing rope-find-file shows only python files
+* faster code-assists
+
+Also rpymacs is now obsolete; you can use pymacs>=0.23 instead.
+
 
 Setting Up
 ==========
