@@ -61,10 +61,10 @@ def runtask(command, name, interrupts=True):
     return RunTask(command, name, interrupts)()
 
 def create_progress(name):
-    if _emacs_version() < 22:
-        progress = _OldProgress(name)
-    else:
+    if lisp.fboundp(lisp['make-progress-reporter']):
         progress = _LispProgress(name)
+    else:
+        progress = _OldProgress(name)
     return progress
 
 
