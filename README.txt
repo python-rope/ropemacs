@@ -115,9 +115,9 @@ Key           Inserts     Minibuffer Completions
 M-/                       xxaa, xxab, xxba, xxbb
 C-u M-/       x           xxaa, xxab, xxba, xxbb
 C-u 2 M-/     xa          xxaa, xxab
-M-?           xxaa
-C-u 1 M-/     xxab
-C-u 3 M-/     xxbb
+M-?           xaa
+C-u 1 M-/     xab
+C-u 3 M-/     xbb
 ============  ==========  =======================
 
 
@@ -250,7 +250,7 @@ Enabling Autoimport
 -------------------
 
 Rope can propose and automatically import global names in other
-modules.  But this feature disabled by default.  Before using them you
+modules.  But this feature disabled by default.  Before using it, you
 should add::
 
   (setq ropemacs-enable-autoimport 't)
