@@ -8,6 +8,7 @@ import rope.refactor.move
 import rope.refactor.rename
 import rope.refactor.restructure
 import rope.refactor.usefunction
+import rope.refactor.introduce_factory
 
 from ropemacs import dialog, lisputils
 
@@ -247,9 +248,8 @@ class Inline(Refactoring):
     optionals = {
         'remove': dialog.Data('Remove the definition: ',
                               values=['yes', 'no'], default='yes'),
-        'only_current':
-            dialog.Data('Inline this occurrence only: ',
-                        values=['yes', 'no'], default='no'),
+        'only_current': dialog.Data('Inline this occurrence only: ',
+                                    values=['yes', 'no'], default='no'),
         'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
@@ -312,20 +312,6 @@ class OrganizeImports(Refactoring):
         return self.organizer.organize_imports(self.resource)
 
 
-class _GenerateElement(Refactoring):
-
-    def _create_refactoring(self):
-        kind = self.name.split('_')[-1]
-        self.generator = rope.contrib.generate.create_generate(
-            kind, self.project, self.resource, self.offset)
-
-    def _calculate_changes(self, values, task_handle):
-        return self.generator.get_changes()
-
-    def _done(self):
-        self.interface._goto_location(self.generator.get_location())
-
-
 class MethodObject(Refactoring):
     saveall = False
     confs = {'classname': dialog.Data('New class name: ',
@@ -338,6 +324,41 @@ class MethodObject(Refactoring):
     def _calculate_changes(self, values, task_handle):
         classname = values.get('classname')
         return self.objecter.get_changes(classname)
+
+
+class IntroduceFactory(Refactoring):
+    saveall = True
+    key = 'f'
+    confs = {'factory_name': dialog.Data('Factory name: ', default='create_object')}
+    optionals = {'global_factory': dialog.Data(
+            'Make global: ', values=['yes', 'no'], default='yes'),
+                 'resources': dialog.Data('Files to apply this refactoring on: ')}
+
+    def _create_refactoring(self):
+        self.factory = rope.refactor.introduce_factory.IntroduceFactory(
+            self.project, self.resource, self.offset)
+
+    def _calculate_changes(self, values, task_handle):
+        name = values.get('factory_name')
+        global_ = values.get('global_factory', 'yes') == 'yes'
+        resources = _resources(self.project, values.get('resources'))
+        return self.factory.get_changes(name, global_factory=global_,
+                                        resources=resources,
+                                        task_handle=task_handle)
+
+
+class _GenerateElement(Refactoring):
+
+    def _create_refactoring(self):
+        kind = self.name.split('_')[-1]
+        self.generator = rope.contrib.generate.create_generate(
+            kind, self.project, self.resource, self.offset)
+
+    def _calculate_changes(self, values, task_handle):
+        return self.generator.get_changes()
+
+    def _done(self):
+        self.interface._goto_location(self.generator.get_location())
 
 
 class GenerateVariable(_GenerateElement):
