@@ -105,7 +105,7 @@ class Rename(Refactoring):
     optionals = {
         'docs': dialog.Data('Rename occurrences in comments and docs: ',
                             values=['yes', 'no'], default='yes'),
-        'in_hierarchy': dialog.Data('Method in class hierarchy: ',
+        'in_hierarchy': dialog.Data('Rename methods in class hierarchy: ',
                                     values=['yes', 'no'], default='no'),
         'resources': dialog.Data('Files to apply this refactoring on: '),
         'unsure': dialog.Data('Unsure occurrences: ',
@@ -330,7 +330,6 @@ class MethodObject(Refactoring):
 class IntroduceFactory(Refactoring):
     saveall = True
     key = 'f'
-    confs = {'factory_name': dialog.Data('Factory name: ', default='create_object')}
     optionals = {'global_factory': dialog.Data(
             'Make global: ', values=['yes', 'no'], default='yes'),
                  'resources': dialog.Data('Files to apply this refactoring on: ')}
@@ -346,6 +345,10 @@ class IntroduceFactory(Refactoring):
         return self.factory.get_changes(name, global_factory=global_,
                                         resources=resources,
                                         task_handle=task_handle)
+
+    def _get_confs(self):
+        default = 'create_%s' % self.factory.old_name.lower()
+        return {'factory_name': dialog.Data('Factory name: ', default)}
 
 
 class _GenerateElement(Refactoring):
