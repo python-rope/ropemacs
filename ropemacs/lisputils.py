@@ -31,8 +31,9 @@ def make_buffer(name, contents, empty_goto=True,
             else:
                 lisp.switch_to_buffer_other_window(new_buffer)
         elif window == 'other':
-            lisp.display_buffer(new_buffer)
-        lisp.goto_line(1)
+            new_window = lisp.display_buffer(new_buffer)
+            lisp.set_window_point(new_window, lisp.point_min())
+        lisp.goto_char(lisp.point_min())
     return new_buffer
 
 
