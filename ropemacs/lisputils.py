@@ -8,7 +8,13 @@ def yes_or_no(prompt):
     return lisp.yes_or_no_p(prompt)
 
 
-def make_buffer(name, contents, empty_goto=True, switch=False, modes=[]):
+def make_buffer(name, contents, empty_goto=True,
+                switch=False, window='other', modes=[]):
+    """Make an emacs buffer
+
+    `window` can be one of `None`, 'current' or 'other'.
+
+    """
     new_buffer = lisp.get_buffer_create(name)
     lisp.set_buffer(new_buffer)
     lisp.toggle_read_only(-1)
@@ -17,22 +23,30 @@ def make_buffer(name, contents, empty_goto=True, switch=False, modes=[]):
         lisp.insert(contents)
         for mode in modes:
             lisp[mode + '-mode']()
-        lisp.display_buffer(new_buffer)
         lisp.buffer_disable_undo(new_buffer)
         lisp.toggle_read_only(1)
         if switch:
-            lisp.switch_to_buffer_other_window(new_buffer)
+            if window == 'current':
+                lisp.switch_to_buffer(new_buffer)
+            else:
+                lisp.switch_to_buffer_other_window(new_buffer)
+        elif window == 'other':
+            lisp.display_buffer(new_buffer)
         lisp.goto_line(1)
     return new_buffer
 
 
-def hide_buffer(name):
+def hide_buffer(name, delete=True):
     buffer = lisp.get_buffer(name)
     if buffer is not None:
         window = lisp.get_buffer_window(buffer)
         if window is not None:
-            lisp.delete_window(window)
             lisp.bury_buffer(buffer)
+            if delete:
+                lisp.delete_window(window)
+            else:
+                if lisp.buffer_name(lisp.current_buffer()) == name:
+                    lisp.switch_to_buffer(None)
 
 
 class RunTask(object):

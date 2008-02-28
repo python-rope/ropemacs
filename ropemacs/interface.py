@@ -15,7 +15,6 @@ class Ropemacs(object):
         self.project = None
         self.old_content = None
         lisp(DEFVARS)
-        #lisp['pymacs-forget-mutability'] = True
 
         self.global_keys = [
             ('o', lisp.rope_open_project),
@@ -433,6 +432,7 @@ class Ropemacs(object):
 
     def _reload_buffers_for_changes(self, changed_resources,
                                     moved_resources={}):
+        initial = lisp.current_buffer()
         for resource in changed_resources:
             buffer = lisp.find_buffer_visiting(str(resource.real_path))
             if buffer:
@@ -443,6 +443,7 @@ class Ropemacs(object):
                     new_resource = moved_resources[resource]
                     lisp.kill_buffer(buffer)
                     lisp.find_file(new_resource.real_path)
+        lisp.set_buffer(initial)
 
     def _get_moved_resources(self, changes, undo=False):
         result = {}
