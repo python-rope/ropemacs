@@ -22,12 +22,14 @@ After installing pymacs, add these lines to your ``~/.emacs`` file::
   (require 'pymacs)
   (pymacs-load "ropemacs" "rope-")
 
-Rope registers its local keys using ``python-mode`` hook.  If you
-don't want to use rope with ``python-mode`` you can add
-``rope-register-local-keys`` lisp function to some other hook.
+Note that rope and ropemacs should be in your ``PYTHONPATH`` for this
+to work.
+
+Loading Lazily
+--------------
 
 If you want to load ropemacs only when you really need it, you can use
-a function like this instead of that::
+a function like this in your ``~/.emacs``::
 
   (defun load-ropemacs ()
     "Load pymacs and ropemacs"
@@ -37,14 +39,31 @@ a function like this instead of that::
     ;; Automatically save project python buffers before refactorings
     (setq ropemacs-confirm-saving 'nil)
   )
+  (global-set-key "\C-xpl" 'load-ropemacs)
 
-And execute ``load-ropemacs`` whenever you want to use ropemacs.  Also
-if you don't want to install rope library and ropemacs you can extract
+And execute ``load-ropemacs`` (or use ``C-x p l``) whenever you want
+to use ropemacs.
+
+
+Not Installing
+--------------
+
+If you don't want to install rope library and ropemacs you can extract
 them somewhere and add these lines to your ``.emacs``::
 
   ;; Add this before loading pymacs if you haven't installed rope and ropemacs
   (setq pymacs-load-path '("/path/to/rope"
                            "/path/to/ropemacs"))
+
+
+Python Mode Local Keys
+----------------------
+
+Rope registers its local keys using ``python-mode`` hook (this hook is
+available if you are using emacs' ``python.el`` or XEmacs'
+``python-mode.el``).  If you want to activate rope local keys in some
+other major mode, you can use ``rope-register-local-keys`` lisp
+function.
 
 
 Getting Started
@@ -92,7 +111,7 @@ inserts the common prefix, automatically.  If a numeric argument is
 given, rope will insert the common prefix for that many of the first
 proposals.
 
-``rope-lucky-assist`` command (``M-?``) does not ask, anything;
+``rope-lucky-assist`` command (``M-?``) does not ask anything;
 instead, it inserts the first proposal.  By prefixing it, you can
 choose which proposal to insert.  ``C-u 1 M-?`` uses the second
 propsal, for instance.
@@ -137,7 +156,7 @@ When you use rope dialogs there is a command called ``batchset``.  It
 can be used to set many configs at the same time.  After selecting
 this command from dialog base prompt, you are asked to enter a string.
 
-``batchset`` strings can give value to configs in two ways.  The
+``batchset`` strings can set the value of configs in two ways.  The
 single line form is like this::
 
   name1 value1
@@ -215,6 +234,7 @@ C-c r i           rope-inline
 C-c r v           rope-move
 C-c r x           rope-restructure
 C-c r u           rope-use-function
+C-c r f           rope-introduce-factory
 C-c r 1 r         rope-rename-current-module
 C-c r 1 v         rope-move-current-module
 C-c r 1 p         rope-module-to-package
@@ -259,7 +279,7 @@ to your ``~/.emacs`` file.  After enabling, rope maintains a cache of
 global names for each project.  It updates the cache only when modules
 are changed; if you want to cache all your modules at once, use
 ``rope-generate-autoimport-cache``.  It will cache all of the modules
-inside a project plus those whose names are listed in
+inside the project plus those whose names are listed in
 ``ropemacs-autoimport-modules`` list::
 
   # add the name of modules you want to autoimport
