@@ -2,6 +2,9 @@
  Done
 ======
 
+- filtering resources : February 29, 2008
+- added support for introduce factory refactoring : February 25, 2008
+
 > Public Release 0.5c4 : February 16, 2008
 
 - compatibility with pymacs : February 14, 2008
