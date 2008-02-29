@@ -10,7 +10,7 @@ import rope.refactor.restructure
 import rope.refactor.usefunction
 import rope.refactor.introduce_factory
 
-from ropemacs import dialog, lisputils
+from ropemacs import dialog, lisputils, filter
 
 
 class Refactoring(object):
@@ -398,11 +398,4 @@ def refactoring_name(refactoring):
 def _resources(project, text):
     if text is None or text.strip() == '':
         return None
-    result = []
-    for line in text.splitlines():
-        try:
-            if line.strip() != '':
-                result.append(project.get_resource(line.strip()))
-        except rope.base.exceptions.ResourceNotFoundError:
-            pass
-    return result
+    return filter.resources(project, text)
