@@ -69,6 +69,9 @@ function.
 Getting Started
 ===============
 
+Refactoring Dialog
+------------------
+
 Rope refactorings use a special kind of dialog.  When you start a
 refactoring, you'll be asked to confirm saving modified python
 buffers; you can change it by using ``ropemacs-confirm-saving``
@@ -207,6 +210,88 @@ restructuring can be::
    project: type=rope.base.project.Project
 
 
+Enabling Autoimport
+-------------------
+
+Rope can propose and automatically import global names in other
+modules.  But this feature disabled by default.  Before using it, you
+should add::
+
+  (setq ropemacs-enable-autoimport 't)
+
+to your ``~/.emacs`` file.  After enabling, rope maintains a cache of
+global names for each project.  It updates the cache only when modules
+are changed; if you want to cache all your modules at once, use
+``rope-generate-autoimport-cache``.  It will cache all of the modules
+inside the project plus those whose names are listed in
+``ropemacs-autoimport-modules`` list::
+
+  # add the name of modules you want to autoimport
+  (setq ropemacs-autoimport-modules '("os" "shutil"))
+
+Now if you are in a buffer that contains::
+
+  rmtree
+
+and you execute ``ropemacs-auto-import`` you'll end up with::
+
+  from shutil import rmtree
+  rmtree
+
+Also ``rope-code-assist`` and ``rope-lucky-assist`` propose
+auto-imported names by using ``name : module`` style.  Selecting them
+will import the module automatically.
+
+
+Filtering Resources
+-------------------
+
+Some refactorings, restructuring and find occurrences take an option
+called resources.  This option can be used to limit the resources on
+which a refactoring should be applied.
+
+It uses a simple format: each line starts with either '+' or '-'.
+Each '+' means include the file (or its children if it's a folder)
+that comes after it.  '-' has the same meaning for exclusion.  So
+using::
+
+  +rope
+  +ropetest
+  -rope/contrib
+
+means include all python files inside ``rope`` and ``ropetest``
+folders and their subfolder, but those that are in ``rope/contrib``.
+Or::
+
+  -ropetest
+  -setup.py
+
+means include all python files inside the project but ``setup.py`` and
+those under ``ropetest`` folder.
+
+
+Variables
+---------
+
+* ``ropemacs-confirm-saving``: If non-nil, you have to confirm saving all
+  modified python files before refactorings; otherwise they are saved
+  automatically. Defaults to ``t``.
+* ``ropemacs-codeassist-maxfixes``: The maximum number of syntax errors
+  to fix for code assists.  The default value is ``1``.
+
+* ``ropemacs-local-prefix``: The prefix for ropemacs refactorings.
+  Defaults to ``C-c r``.
+* ``ropemacs-global-prefix``: The prefix for ropemacs project commands
+  Defaults to ``C-x p``.
+* ``ropemacs-enable-shortcuts``: Shows whether to bind ropemacs
+  shortcuts keys.  Defaults to ``t``.
+
+* ``ropemacs-enable-autoimport``: Shows whether to enable autoimport.
+* ``ropemacs-autoimport-modules``: The name of modules whose global
+  names should be cached.  The `rope-generate-autoimport-cache' reads
+  this list and fills its cache.
+
+
 Key-binding
 -----------
 
@@ -264,61 +349,6 @@ C-c d             rope-show-doc
 C-c f             rope-find-occurrences
 M-?               rope-lucky-assist
 ================  ============================
-
-
-Enabling Autoimport
--------------------
-
-Rope can propose and automatically import global names in other
-modules.  But this feature disabled by default.  Before using it, you
-should add::
-
-  (setq ropemacs-enable-autoimport 't)
-
-to your ``~/.emacs`` file.  After enabling, rope maintains a cache of
-global names for each project.  It updates the cache only when modules
-are changed; if you want to cache all your modules at once, use
-``rope-generate-autoimport-cache``.  It will cache all of the modules
-inside the project plus those whose names are listed in
-``ropemacs-autoimport-modules`` list::
-
-  # add the name of modules you want to autoimport
-  (setq ropemacs-autoimport-modules '("os" "shutil"))
-
-Now if you are in a buffer that contains::
-
-  rmtree
-
-and you execute ``ropemacs-auto-import`` you'll end up with::
-
-  from shutil import rmtree
-  rmtree
-
-Also ``rope-code-assist`` and ``rope-lucky-assist`` propose
-auto-imported names by using ``name : module`` style.  Selecting them
-will import the module automatically.
-
-
-Variables
----------
-
-* ``ropemacs-confirm-saving``: If non-nil, you have to confirm saving all
-  modified python files before refactorings; otherwise they are saved
-  automatically. Defaults to ``t``.
-* ``ropemacs-codeassist-maxfixes``: The maximum number of syntax errors
-  to fix for code assists.  The default value is ``1``.
-
-* ``ropemacs-local-prefix``: The prefix for ropemacs refactorings.
-  Defaults to ``C-c r``.
-* ``ropemacs-global-prefix``: The prefix for ropemacs project commands
-  Defaults to ``C-x p``.
-* ``ropemacs-enable-shortcuts``: Shows whether to bind ropemacs
-  shortcuts keys.  Defaults to ``t``.
-
-* ``ropemacs-enable-autoimport``: Shows whether to enable autoimport.
-* ``ropemacs-autoimport-modules``: The name of modules whose global
-  names should be cached.  The `rope-generate-autoimport-cache' reads
-  this list and fills its cache.
 
 
 Contributing

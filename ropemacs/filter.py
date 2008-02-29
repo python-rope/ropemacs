@@ -10,7 +10,7 @@ def resources(project, rules):
     exclusion.
 
     """
-    all_files = set(project.pycore.get_python_files())
+    all = set(project.pycore.get_python_files())
     files = None
     for line in rules.splitlines():
         if not line.strip():
@@ -19,22 +19,21 @@ def resources(project, rules):
         if first not in '+-':
             continue
         try:
-            resource = project.get_resource(path)
-            if resource.is_folder():
-                matches = set(filter(lambda item: resource.contains(item),
-                                     all_files))
-            else:
-                matches = set([resource])
-            if first == '+':
-                if files is None:
-                    files = set()
-                files.update(matches)
-            if first == '-':
-                if files is None:
-                    files = set(all_files)
-                files -= matches
+            resource = project.get_resource(path.strip())
         except exceptions.ResourceNotFoundError:
-            pass
+            continue
+        if resource.is_folder():
+            matches = set(filter(lambda item: resource.contains(item), all))
+        else:
+            matches = set([resource])
+        if first == '+':
+            if files is None:
+                files = set()
+            files.update(matches)
+        if first == '-':
+            if files is None:
+                files = set(all)
+            files -= matches
     if files is None:
-        return all_files
+        return all
     return files
