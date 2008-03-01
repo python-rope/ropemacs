@@ -48,6 +48,8 @@ class Ropemacs(object):
             (lisp.python_mode_hook, lisp.rope_register_local_keys))
         self._prepare_refactorings()
         self.autoimport = None
+        self._init_ropemacs_keymap()
+        lisp(MINOR_MODE)
 
     def init(self):
         """Initialize rope mode"""
@@ -112,14 +114,19 @@ class Ropemacs(object):
 
     @lisphook
     def register_local_keys(self):
+        lisp.ropemacs_mode()
+
+    def _init_ropemacs_keymap(self):
         prefix = lisp.ropemacs_local_prefix.value()
         for key, callback in self.local_keys:
             if prefix is not None:
                 key = prefix + ' ' + key
-                lisp.local_set_key(self._key_sequence(key), callback)
+                lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
+                     (self._key_sequence(key), callback.text))
         for key, callback in self.shortcuts:
             if lisp['ropemacs-enable-shortcuts'].value():
-                lisp.local_set_key(self._key_sequence(key), callback)
+                lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
+                     (self._key_sequence(key), callback.text))
 
     @lisphook
     def exiting_actions(self):
@@ -670,5 +677,16 @@ M-?               rope-lucky-assist
 ================  ============================
 ")
 
+(defvar ropemacs-local-keymap (make-sparse-keymap))
+
 (provide 'ropemacs)
+"""
+
+MINOR_MODE = """\
+(define-minor-mode ropemacs-mode "ropemacs, rope in emacs!"
+  :lighter " rope"
+  :global nil
+  :init-value nil
+  :keymap ropemacs-local-keymap)
+)
 """
