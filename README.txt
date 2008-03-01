@@ -56,14 +56,15 @@ them somewhere and add these lines to your ``.emacs``::
                            "/path/to/ropemacs"))
 
 
-Python Mode Local Keys
-----------------------
+Ropemacs Minor Mode
+-------------------
 
-Rope registers its local keys using ``python-mode`` hook (this hook is
-available if you are using emacs' ``python.el`` or XEmacs'
-``python-mode.el``).  If you want to activate rope local keys in some
-other major mode, you can use ``rope-register-local-keys`` lisp
-function.
+Rope registers its local keys when ``ropemacs-mode`` is enabled.  By
+default it is enabled using ``python-mode`` hook (this hook is
+available if you are using Emacs' ``python.el`` or XEmacs'
+``python-mode.el``).  If you want to enable it in other major modes
+either execute ``ropemacs-mode`` manually or call it in some other
+hook.
 
 
 Getting Started

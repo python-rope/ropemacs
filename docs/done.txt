@@ -2,6 +2,8 @@
  Done
 ======
 
+- added ropemacs minor mode : March 1, 2008
+
 > Public Release 0.5c5 : March 1, 2008
 
 - filtering resources : February 29, 2008
