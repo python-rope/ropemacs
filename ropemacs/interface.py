@@ -45,7 +45,7 @@ class Ropemacs(object):
             (lisp.before_save_hook, lisp.rope_before_save_actions),
             (lisp.after_save_hook, lisp.rope_after_save_actions),
             (lisp.kill_emacs_hook, lisp.rope_exiting_actions),
-            (lisp.python_mode_hook, lisp.rope_register_local_keys))
+            (lisp.python_mode_hook, lisp.ropemacs_mode))
         self._prepare_refactorings()
         self.autoimport = None
         self._init_ropemacs_keymap()
@@ -111,10 +111,6 @@ class Ropemacs(object):
             libutils.report_change(self.project, lisp.buffer_file_name(),
                                    self.old_content)
             self.old_content = None
-
-    @lisphook
-    def register_local_keys(self):
-        lisp.ropemacs_mode()
 
     def _init_ropemacs_keymap(self):
         prefix = lisp.ropemacs_local_prefix.value()
