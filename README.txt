@@ -299,8 +299,9 @@ Variables
   shortcuts keys.  Defaults to ``t``.
 
 * ``ropemacs-enable-autoimport``: Shows whether to enable autoimport.
+  Defaults to ``nil``.
 * ``ropemacs-autoimport-modules``: The name of modules whose global
-  names should be cached.  The `rope-generate-autoimport-cache' reads
+  names should be cached.  `rope-generate-autoimport-cache' reads
   this list and fills its cache.
 
 
@@ -339,11 +340,11 @@ C-c r 1 p         rope-module-to-package
 C-c r o           rope-organize-imports
 C-c r n [vfcmp]   rope-generate-(variable|function|class|module|package)
 
-C-c r /           rope-code-assist
-C-c r g           rope-goto-definition
-C-c r d           rope-show-doc
-C-c r f           rope-find-occurrences
-C-c r ?           rope-lucky-assist
+C-c r a /         rope-code-assist
+C-c r a g         rope-goto-definition
+C-c r a d         rope-show-doc
+C-c r a f         rope-find-occurrences
+C-c r a ?         rope-lucky-assist
 
                   rope-auto-import
                   rope-generate-autoimport-cache

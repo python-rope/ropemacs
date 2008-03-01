@@ -30,11 +30,11 @@ class Ropemacs(object):
             ('n d', lisp.rope_create_directory)]
 
         self.local_keys = [
-            ('/', lisp.rope_code_assist),
-            ('?', lisp.rope_lucky_assist),
-            ('g', lisp.rope_goto_definition),
-            ('d', lisp.rope_show_doc),
-            ('f', lisp.rope_find_occurrences)]
+            ('a /', lisp.rope_code_assist),
+            ('a ?', lisp.rope_lucky_assist),
+            ('a g', lisp.rope_goto_definition),
+            ('a d', lisp.rope_show_doc),
+            ('a f', lisp.rope_find_occurrences)]
         self.shortcuts = [
             ('M-/', lisp.rope_code_assist),
             ('M-?', lisp.rope_lucky_assist),
