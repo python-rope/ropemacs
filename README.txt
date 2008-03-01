@@ -13,6 +13,12 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
+* filtering resources for refactorings
+* added support for introduce factory refactoring
+
+You can limit the resources to analyze in refactorings.  See
+`Filtering Resources`_ section for more information.
+
 
 Setting Up
 ==========
