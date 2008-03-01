@@ -56,6 +56,17 @@ them somewhere and add these lines to your ``.emacs``::
                            "/path/to/ropemacs"))
 
 
+Multiple Python Versions
+------------------------
+
+Rope needs at least Python2.5.  If you have older versions of Python
+you can use ``PYMACS_PYTHON`` environment variable.  You can add::
+
+  (setenv "PYMACS_PYTHON" "python2.5")
+
+to force pymacs to use Python2.5.
+
+
 Ropemacs Minor Mode
 -------------------
 
