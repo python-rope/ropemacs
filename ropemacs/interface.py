@@ -683,10 +683,8 @@ M-?               rope-lucky-assist
 """
 
 MINOR_MODE = """\
-(define-minor-mode ropemacs-mode "ropemacs, rope in emacs!"
-  :lighter " rope"
-  :global nil
-  :init-value nil
-  :keymap ropemacs-local-keymap)
+(define-minor-mode ropemacs-mode
+ "ropemacs, rope in emacs!" nil " rope" ropemacs-local-keymap
+  :global nil)
 )
 """
