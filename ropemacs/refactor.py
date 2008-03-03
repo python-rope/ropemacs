@@ -1,14 +1,13 @@
 import rope.base.change
-import rope.base.exceptions
 import rope.contrib.generate
 import rope.refactor.extract
 import rope.refactor.inline
+import rope.refactor.introduce_factory
 import rope.refactor.method_object
 import rope.refactor.move
 import rope.refactor.rename
 import rope.refactor.restructure
 import rope.refactor.usefunction
-import rope.refactor.introduce_factory
 
 from ropemacs import dialog, lisputils, filter
 

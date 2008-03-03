@@ -5,8 +5,7 @@ from rope.contrib import codeassist, generate, autoimport
 
 import ropemacs
 from ropemacs import refactor, lisputils
-from ropemacs.lisputils import (lispfunction, interactive,
-                                prefixed, rawprefixed, lisphook)
+from ropemacs.lisputils import lispfunction, interactive, rawprefixed, lisphook
 
 
 class Ropemacs(object):
