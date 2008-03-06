@@ -217,8 +217,9 @@ class Ropemacs(object):
     def goto_definition(self):
         self._check_project()
         resource, offset = self._get_location()
+        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
         definition = codeassist.get_definition_location(
-            self.project, self._get_text(), offset, resource)
+            self.project, self._get_text(), offset, resource, maxfixes)
         if tuple(definition) != (None, None):
             lisp.push_mark()
             self._goto_location(definition)
@@ -229,7 +230,7 @@ class Ropemacs(object):
         resource, offset = self._get_location()
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
         docs = codeassist.get_doc(self.project, self._get_text(), offset,
-                                  resource, maxfixes=maxfixes)
+                                  resource, maxfixes)
         buffer = lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
         lisp.local_set_key('q', lisp.bury_buffer)
 
@@ -419,6 +420,8 @@ class Ropemacs(object):
     def _get_resource(self, filename=None):
         if filename is None:
             filename = lisp.buffer_file_name()
+        if filename is None:
+            return
         resource = libutils.path_to_resource(self.project, filename, 'file')
         return resource
 
