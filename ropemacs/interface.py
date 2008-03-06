@@ -224,15 +224,19 @@ class Ropemacs(object):
             lisp.push_mark()
             self._goto_location(definition)
 
-    @interactive
-    def show_doc(self):
+    @rawprefixed
+    def show_doc(self, prefix):
         self._check_project()
         resource, offset = self._get_location()
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
         docs = codeassist.get_doc(self.project, self._get_text(), offset,
                                   resource, maxfixes)
-        buffer = lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
-        lisp.local_set_key('q', lisp.bury_buffer)
+        if not prefix:
+            buffer = lisputils.make_buffer('*rope-pydoc*', docs,
+                                           empty_goto=False)
+            lisp.local_set_key('q', lisp.bury_buffer)
+        else:
+            lisputils.message(docs)
 
     @interactive
     def find_occurrences(self):
