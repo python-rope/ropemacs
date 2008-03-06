@@ -290,6 +290,8 @@ Variables
   automatically. Defaults to ``t``.
 * ``ropemacs-codeassist-maxfixes``: The maximum number of syntax errors
   to fix for code assists.  The default value is ``1``.
+* ``ropemacs-separate-doc-buffer``: Should ``rope-show-doc`` use a
+  separate buffer or the minibuffer.  Defaults to ``t``.
 
 * ``ropemacs-local-prefix``: The prefix for ropemacs refactorings.
   Defaults to ``C-c r``.
