@@ -235,6 +235,7 @@ class Ropemacs(object):
         if lisp['ropemacs-separate-doc-buffer'].value():
             use_minibuffer = not use_minibuffer
         if use_minibuffer:
+            docs = '\n'.join(docs.split('\n')[:7])
             lisputils.message(docs)
         else:
             buffer = lisputils.make_buffer('*rope-pydoc*', docs,
