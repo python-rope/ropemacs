@@ -227,10 +227,27 @@ class Ropemacs(object):
     @rawprefixed
     def show_doc(self, prefix):
         self._check_project()
-        resource, offset = self._get_location()
+        self._base_show_doc(prefix)
+
+    @rawprefixed
+    def show_call_doc(self, prefix):
+        self._check_project()
+        offset = self._get_offset()
+        text = self._get_text()
+        try:
+            offset = text.rindex('(', 0, offset) - 1
+            self._base_show_doc(prefix, text, offset)
+        except ValueError:
+            lisputils.message('Not inside a function')
+
+    def _base_show_doc(self, prefix, text=None, offset=None):
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
-        docs = codeassist.get_doc(self.project, self._get_text(), offset,
-                                  resource, maxfixes)
+        if text is None:
+            text = self._get_text()
+        if offset is None:
+            offset = self._get_offset()
+        docs = codeassist.get_doc(self.project, text, offset,
+                                  self._get_resource(), maxfixes)
         use_minibuffer = not prefix
         if lisp['ropemacs-separate-doc-buffer'].value():
             use_minibuffer = not use_minibuffer
