@@ -305,8 +305,8 @@ Variables
   this list and fills its cache.
 
 
-Key-binding
------------
+Keybinding
+----------
 
 Uses almost the same keybinding as ropeide.  Note that global commands
 have a ``C-x p`` prefix and commands have a ``C-c r`` prefix.  You can
@@ -351,7 +351,8 @@ C-c r a ?         rope-lucky-assist
 ===============   ============================
 
 These shortcut keys are enabled only when
-``ropemacs-enable-shortcuts`` variable is non-nil:
+``ropemacs-enable-shortcuts`` variable is non-nil (it is enabled by
+default):
 
 ================  ============================
 Key               Command
