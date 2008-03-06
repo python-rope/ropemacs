@@ -231,12 +231,15 @@ class Ropemacs(object):
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
         docs = codeassist.get_doc(self.project, self._get_text(), offset,
                                   resource, maxfixes)
-        if not prefix:
+        use_minibuffer = not prefix
+        if lisp['ropemacs-separate-doc-buffer'].value():
+            use_minibuffer = not use_minibuffer
+        if use_minibuffer:
+            lisputils.message(docs)
+        else:
             buffer = lisputils.make_buffer('*rope-pydoc*', docs,
                                            empty_goto=False)
             lisp.local_set_key('q', lisp.bury_buffer)
-        else:
-            lisputils.message(docs)
 
     @interactive
     def find_occurrences(self):
@@ -644,6 +647,8 @@ saved automatically.")
   "The number of errors to fix before code-assist.
 
 How many errors to fix, at most, when proposing code completions.")
+(defcustom ropemacs-separate-doc-buffer t
+  "Should `rope-show-doc' use a separate buffer or the minibuffer.")
 
 (defcustom ropemacs-enable-autoimport 'nil
   "Specifies whether autoimport should be enabled.")
