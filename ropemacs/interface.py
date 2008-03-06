@@ -227,8 +227,9 @@ class Ropemacs(object):
     def show_doc(self):
         self._check_project()
         resource, offset = self._get_location()
-        docs = codeassist.get_doc(
-            self.project, self._get_text(), offset, resource)
+        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
+        docs = codeassist.get_doc(self.project, self._get_text(), offset,
+                                  resource, maxfixes=maxfixes)
         buffer = lisputils.make_buffer('*rope-pydoc*', docs, empty_goto=False)
         lisp.local_set_key('q', lisp.bury_buffer)
 
