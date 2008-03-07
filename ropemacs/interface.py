@@ -262,7 +262,8 @@ class Ropemacs(object):
             lisputils.message(docs)
         else:
             buffer = lisputils.make_buffer('*rope-pydoc*', docs,
-                                           empty_goto=False)
+                                           empty_goto=False,
+                                           fit_lines = lisp["ropemacs-max-doc-buffer-height"].value())
             lisp.local_set_key('q', lisp.bury_buffer)
 
     @local_command('a f', shortcut='C-c f')
@@ -671,8 +672,11 @@ saved automatically.")
   "The number of errors to fix before code-assist.
 
 How many errors to fix, at most, when proposing code completions.")
+
 (defcustom ropemacs-separate-doc-buffer t
   "Should `rope-show-doc' use a separate buffer or the minibuffer.")
+(defcustom ropemacs-max-doc-buffer-height 22
+  "The maximum buffer height for `rope-show-doc'.")
 
 (defcustom ropemacs-enable-autoimport 'nil
   "Specifies whether autoimport should be enabled.")

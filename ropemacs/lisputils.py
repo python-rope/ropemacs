@@ -9,7 +9,8 @@ def yes_or_no(prompt):
 
 
 def make_buffer(name, contents, empty_goto=True,
-                switch=False, window='other', modes=[]):
+                switch=False, window='other', modes=[],
+                fit_lines=None):
     """Make an emacs buffer
 
     `window` can be one of `None`, 'current' or 'other'.
@@ -33,6 +34,12 @@ def make_buffer(name, contents, empty_goto=True,
         elif window == 'other':
             new_window = lisp.display_buffer(new_buffer)
             lisp.set_window_point(new_window, lisp.point_min())
+            if fit_lines != None:
+                max_height = min(fit_lines,
+                                 lisp.count_lines(lisp.point_min(),
+                                                  lisp.point_max())) + 1
+                lisp.fit_window_to_buffer(new_window, max_height, max_height)
+
         lisp.goto_char(lisp.point_min())
     return new_buffer
 
