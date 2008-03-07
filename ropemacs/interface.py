@@ -715,6 +715,54 @@ M-?               rope-lucky-assist
 
 (defvar ropemacs-local-keymap (make-sparse-keymap))
 
+(easy-menu-define ropemacs-mode-menu ropemacs-local-keymap
+"`ropemacs' menu"
+                  '("Rope"
+                    ["Code assist" rope-code-assist t]
+                    ["Lucky assist" rope-lucky-assist t]
+                    ["Goto definition" rope-goto-definition t]
+                    ["Show documentation" rope-show-doc t]
+                    ["Find Occurrences" rope-find-occurrences t]
+                    ("Refactor"
+                      ["Inline" rope-inline t]
+                      ["Extract Variable" rope-extract-variable t]
+                      ["Extract Method" rope-extract-method t]
+                      ["Organize Imports" rope-organize-imports t]
+                      ["Rename" rope-rename t]
+                      ["Move" rope-move t]
+                      ["Restructure" rope-restructure t]
+                      ["Use Function" rope-use-function t]
+                      ["Introduce Factory" rope-introduce-factory t]
+                      ("Generate"
+                        ["Class" rope-generate-class t]
+                        ["Function" rope-generate-function t]
+                        ["Module" rope-generate-module t]
+                        ["Package" rope-generate-package t]
+                        ["Variable" rope-generate-variable t]
+                      )
+                      ("Module"
+                        ["Module to Package" rope-module-to-package t]
+                        ["Rename Module" rope-rename-current-module t]
+                        ["Move Module" rope-move-current-module t]
+                      )
+                      "--"
+                      ["Undo" rope-undo t]
+                      ["Redo" rope-redo t]
+                    )
+                    ("Project"
+                      ["Open project" rope-open-project t]
+                      ["Close project" rope-close-project t]
+                      ["Find file" rope-find-file t]
+                      ["Open project config" rope-project-config t]
+                    )
+                    ("Create"
+                      ["Module" rope-create-module t]
+                      ["Package" rope-create-package t]
+                      ["File" rope-create-file t]
+                      ["Directory" rope-create-directory t]
+                    )
+                    ))
+
 (provide 'ropemacs)
 """
 
