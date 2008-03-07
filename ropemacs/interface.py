@@ -248,10 +248,11 @@ class Ropemacs(object):
             offset = self._get_offset()
         docs = codeassist.get_doc(self.project, text, offset,
                                   self._get_resource(), maxfixes)
+
         use_minibuffer = not prefix
         if lisp['ropemacs-separate-doc-buffer'].value():
             use_minibuffer = not use_minibuffer
-        if use_minibuffer:
+        if use_minibuffer and docs:
             docs = '\n'.join(docs.split('\n')[:7])
             lisputils.message(docs)
         else:
