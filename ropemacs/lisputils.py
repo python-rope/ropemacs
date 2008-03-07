@@ -166,17 +166,8 @@ def lispfunction(func):
     func.lisp = None
     return func
 
-
 def interactive(func):
     func.interaction = ''
-    return func
-
-def prefixed(func):
-    func.interaction = 'p'
-    return func
-
-def rawprefixed(func):
-    func.interaction = 'P'
     return func
 
 def lisphook(func):

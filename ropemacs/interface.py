@@ -8,23 +8,27 @@ from ropemacs import refactor, lisputils
 
 
 def _lisp_name(func):
-    return 'rope-' + refactor.refactoring_name(func).replace('_', '-')
+    return 'rope-' + func.__name__.replace('_', '-')
 
-def global_command(key=None, lisper=lisputils.interactive):
+def global_command(key=None, interaction=''):
     def decorator(func):
-        func = lisper(func)
+        if interaction is not None:
+            func.interaction = interaction
         if key:
             global_keys.append((key, _lisp_name(func)))
         return func
     return decorator
 
-def local_command(key=None, lisper=lisputils.interactive, shortcut=None):
-    def decorator(func):
-        func = lisper(func)
+def local_command(key=None, interaction='', shortcut=None, name=None):
+    def decorator(func, name=name):
+        if name is None:
+            name = _lisp_name(func)
+        if interaction is not None:
+            func.interaction = interaction
         if key:
-            local_keys.append((key, _lisp_name(func)))
+            local_keys.append((key, name))
         if shortcut:
-            shortcuts.append((shortcut, _lisp_name(func)))
+            shortcuts.append((shortcut, name))
         return func
     return decorator
 
@@ -70,15 +74,13 @@ class Ropemacs(object):
                 attr = getattr(refactor, name)
                 if isinstance(attr, type) and \
                    issubclass(attr, refactor.Refactoring):
-                    @lisputils.rawprefixed
+                    ref_name = self._refactoring_name(attr)
+                    lisp_name = 'rope-' + ref_name.replace('_', '-')
+                    @local_command(attr.key, 'P', None, lisp_name)
                     def do_refactor(prefix, self=self, refactoring=attr):
                         initial_asking = prefix is None
                         refactoring(self).show(initial_asking=initial_asking)
-                    name = self._refactoring_name(attr)
-                    setattr(self, name, do_refactor)
-                    name = 'rope-' + name.replace('_', '-')
-                    if attr.key is not None:
-                        local_keys.append((attr.key, name))
+                    setattr(self, ref_name, do_refactor)
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
@@ -227,12 +229,12 @@ class Ropemacs(object):
             lisp.push_mark()
             self._goto_location(definition)
 
-    @local_command('a d', lisputils.rawprefixed, 'C-c d')
+    @local_command('a d', 'P', 'C-c d')
     def show_doc(self, prefix):
         self._check_project()
         self._base_show_doc(prefix)
 
-    @local_command(lisper=lisputils.rawprefixed)
+    @local_command(interaction='P')
     def show_call_doc(self, prefix):
         self._check_project()
         offset = self._get_offset()
@@ -316,11 +318,11 @@ class Ropemacs(object):
     def occurrences_quit(self):
         lisputils.hide_buffer('*rope-occurrences*')
 
-    @local_command('a /', lisputils.rawprefixed, 'M-/')
+    @local_command('a /', 'P', 'M-/')
     def code_assist(self, prefix):
         _CodeAssist(self).code_assist(prefix)
 
-    @local_command('a ?', lisputils.rawprefixed, 'M-?')
+    @local_command('a ?', 'P', 'M-?')
     def lucky_assist(self, prefix):
         _CodeAssist(self).lucky_assist(prefix)
 
@@ -353,13 +355,13 @@ class Ropemacs(object):
             self.autoimport.generate_modules_cache(modules, task_handle=handle)
         lisputils.runtask(generate, 'Generate autoimport cache')
 
-    @global_command('f', lisputils.rawprefixed)
+    @global_command('f', 'P')
     def find_file(self, prefix):
         file = self._base_find_file(prefix)
         if file is not None:
             lisp.find_file(file.real_path)
 
-    @global_command('4 f', lisputils.rawprefixed)
+    @global_command('4 f', 'P')
     def find_file_other_window(self, prefix):
         file = self._base_find_file(prefix)
         if file is not None:
