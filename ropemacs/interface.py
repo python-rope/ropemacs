@@ -5,8 +5,41 @@ from rope.contrib import codeassist, generate, autoimport
 
 import ropemacs
 from ropemacs import refactor, lisputils
-from ropemacs.lisputils import lispfunction, interactive, rawprefixed, lisphook
 
+
+def _lisp_name(func):
+    return 'rope-' + refactor.refactoring_name(func).replace('_', '-')
+
+def global_command(key=None, lisper=lisputils.interactive):
+    def decorator(func):
+        func = lisper(func)
+        if key:
+            global_keys.append((key, _lisp_name(func)))
+        return func
+    return decorator
+
+def local_command(key=None, lisper=lisputils.interactive, shortcut=None):
+    def decorator(func):
+        func = lisper(func)
+        if key:
+            local_keys.append((key, _lisp_name(func)))
+        if shortcut:
+            shortcuts.append((shortcut, _lisp_name(func)))
+        return func
+    return decorator
+
+def rope_hook(hook):
+    def decorator(func):
+        name = _lisp_name(func)
+        func = lisputils.lisphook(func)
+        hooks.append((hook, name))
+        return func
+    return decorator
+
+global_keys = []
+local_keys = []
+shortcuts = []
+hooks = [('python-mode-hook', 'ropemacs-mode')]
 
 class Ropemacs(object):
 
@@ -15,36 +48,6 @@ class Ropemacs(object):
         self.old_content = None
         lisp(DEFVARS)
 
-        self.global_keys = [
-            ('o', lisp.rope_open_project),
-            ('k', lisp.rope_close_project),
-            ('u', lisp.rope_undo),
-            ('r', lisp.rope_redo),
-            ('f', lisp.rope_find_file),
-            ('4 f', lisp.rope_find_file_other_window),
-            ('c', lisp.rope_project_config),
-            ('n m', lisp.rope_create_module),
-            ('n p', lisp.rope_create_package),
-            ('n f', lisp.rope_create_file),
-            ('n d', lisp.rope_create_directory)]
-
-        self.local_keys = [
-            ('a /', lisp.rope_code_assist),
-            ('a ?', lisp.rope_lucky_assist),
-            ('a g', lisp.rope_goto_definition),
-            ('a d', lisp.rope_show_doc),
-            ('a f', lisp.rope_find_occurrences)]
-        self.shortcuts = [
-            ('M-/', lisp.rope_code_assist),
-            ('M-?', lisp.rope_lucky_assist),
-            ('C-c g', lisp.rope_goto_definition),
-            ('C-c d', lisp.rope_show_doc),
-            ('C-c f', lisp.rope_find_occurrences)]
-        self.hooks = (
-            (lisp.before_save_hook, lisp.rope_before_save_actions),
-            (lisp.after_save_hook, lisp.rope_after_save_actions),
-            (lisp.kill_emacs_hook, lisp.rope_exiting_actions),
-            (lisp.python_mode_hook, lisp.ropemacs_mode))
         self._prepare_refactorings()
         self.autoimport = None
         self._init_ropemacs_keymap()
@@ -52,14 +55,14 @@ class Ropemacs(object):
 
     def init(self):
         """Initialize rope mode"""
-        for hook, function in self.hooks:
-            lisp.add_hook(hook, function)
+        for hook, function in hooks:
+            lisp.add_hook(lisp[hook], lisp[function])
 
         prefix = lisp.ropemacs_global_prefix.value()
         if prefix is not None:
-            for key, callback in self.global_keys:
+            for key, callback in global_keys:
                 lisp.global_set_key(self._key_sequence(prefix + ' ' + key),
-                                    callback)
+                                    lisp[callback])
 
     def _prepare_refactorings(self):
         for name in dir(refactor):
@@ -67,7 +70,7 @@ class Ropemacs(object):
                 attr = getattr(refactor, name)
                 if isinstance(attr, type) and \
                    issubclass(attr, refactor.Refactoring):
-                    @rawprefixed
+                    @lisputils.rawprefixed
                     def do_refactor(prefix, self=self, refactoring=attr):
                         initial_asking = prefix is None
                         refactoring(self).show(initial_asking=initial_asking)
@@ -75,7 +78,7 @@ class Ropemacs(object):
                     setattr(self, name, do_refactor)
                     name = 'rope-' + name.replace('_', '-')
                     if attr.key is not None:
-                        self.local_keys.append((attr.key, lisp[name]))
+                        local_keys.append((attr.key, name))
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
@@ -93,7 +96,7 @@ class Ropemacs(object):
                 result.append(key)
         return ''.join(result)
 
-    @lisphook
+    @rope_hook('before-save-hook')
     def before_save_actions(self):
         if self.project is not None:
             if not self._is_python_file(lisp.buffer_file_name()):
@@ -104,7 +107,7 @@ class Ropemacs(object):
             else:
                 self.old_content = ''
 
-    @lisphook
+    @rope_hook('after-save-hook')
     def after_save_actions(self):
         if self.project is not None and self.old_content is not None:
             libutils.report_change(self.project, lisp.buffer_file_name(),
@@ -113,28 +116,28 @@ class Ropemacs(object):
 
     def _init_ropemacs_keymap(self):
         prefix = lisp.ropemacs_local_prefix.value()
-        for key, callback in self.local_keys:
+        for key, callback in local_keys:
             if prefix is not None:
                 key = prefix + ' ' + key
                 lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
-                     (self._key_sequence(key), callback.text))
-        for key, callback in self.shortcuts:
+                     (self._key_sequence(key), callback))
+        for key, callback in shortcuts:
             if lisp['ropemacs-enable-shortcuts'].value():
                 lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
-                     (self._key_sequence(key), callback.text))
+                     (self._key_sequence(key), callback))
 
-    @lisphook
+    @rope_hook('kill-emacs-hook')
     def exiting_actions(self):
         if self.project is not None:
             self.close_project()
 
-    @lispfunction
+    @lisputils.lispfunction
     def unload_hook(self):
         """Unload registered hooks"""
-        for hook, function in self.hooks:
-            lisp.remove_hook(hook, function)
+        for hook, function in hooks:
+            lisp.remove_hook(lisp[hook], lisp[function])
 
-    @interactive
+    @global_command('o')
     def open_project(self):
         root = lisputils.ask_directory('Rope project root folder: ')
         if self.project is not None:
@@ -145,7 +148,7 @@ class Ropemacs(object):
             self.autoimport = autoimport.AutoImport(self.project)
         progress.done()
 
-    @interactive
+    @global_command('k')
     def close_project(self):
         if self.project is not None:
             progress = lisputils.create_progress('Closing "%s" project' %
@@ -154,7 +157,7 @@ class Ropemacs(object):
             self.project = None
             progress.done()
 
-    @interactive
+    @global_command()
     def write_project(self):
         if self.project is not None:
             progress = lisputils.create_progress(
@@ -162,7 +165,7 @@ class Ropemacs(object):
             self.project.sync()
             progress.done()
 
-    @interactive
+    @global_command('u')
     def undo(self):
         self._check_project()
         change = self.project.history.tobe_undone
@@ -175,7 +178,7 @@ class Ropemacs(object):
                     self._reload_buffers(changes, undo=True)
             lisputils.runtask(undo, 'Undo refactoring', interrupts=False)
 
-    @interactive
+    @global_command('r')
     def redo(self):
         self._check_project()
         change = self.project.history.tobe_redone
@@ -213,7 +216,7 @@ class Ropemacs(object):
             if narrowed:
                 lisp.narrow_to_region(old_min, old_max)
 
-    @interactive
+    @local_command('a g', shortcut='C-c g')
     def goto_definition(self):
         self._check_project()
         resource, offset = self._get_location()
@@ -224,12 +227,12 @@ class Ropemacs(object):
             lisp.push_mark()
             self._goto_location(definition)
 
-    @rawprefixed
+    @local_command('a d', lisputils.rawprefixed, 'C-c d')
     def show_doc(self, prefix):
         self._check_project()
         self._base_show_doc(prefix)
 
-    @rawprefixed
+    @local_command(lisper=lisputils.rawprefixed)
     def show_call_doc(self, prefix):
         self._check_project()
         offset = self._get_offset()
@@ -260,7 +263,7 @@ class Ropemacs(object):
                                            empty_goto=False)
             lisp.local_set_key('q', lisp.bury_buffer)
 
-    @interactive
+    @local_command('a f', shortcut='C-c f')
     def find_occurrences(self):
         self._check_project()
         self._save_buffers()
@@ -295,7 +298,7 @@ class Ropemacs(object):
             lisp.local_set_key('q', lisp.rope_occurrences_quit)
 
 
-    @interactive
+    @lisputils.interactive
     def occurrences_goto_occurrence(self):
         self._check_project()
         start = lisp.line_beginning_position()
@@ -309,19 +312,19 @@ class Ropemacs(object):
             lisp.goto_char(offset + 1)
             lisp.switch_to_buffer_other_window('*rope-occurrences*')
 
-    @interactive
+    @lisputils.interactive
     def occurrences_quit(self):
         lisputils.hide_buffer('*rope-occurrences*')
 
-    @rawprefixed
+    @local_command('a /', lisputils.rawprefixed, 'M-/')
     def code_assist(self, prefix):
         _CodeAssist(self).code_assist(prefix)
 
-    @rawprefixed
+    @local_command('a ?', lisputils.rawprefixed, 'M-?')
     def lucky_assist(self, prefix):
         _CodeAssist(self).lucky_assist(prefix)
 
-    @interactive
+    @local_command()
     def auto_import(self):
         _CodeAssist(self).auto_import()
 
@@ -333,7 +336,7 @@ class Ropemacs(object):
             return False
         return True
 
-    @interactive
+    @global_command()
     def generate_autoimport_cache(self):
         if not self._check_autoimport():
             return
@@ -350,13 +353,13 @@ class Ropemacs(object):
             self.autoimport.generate_modules_cache(modules, task_handle=handle)
         lisputils.runtask(generate, 'Generate autoimport cache')
 
-    @rawprefixed
+    @global_command('f', lisputils.rawprefixed)
     def find_file(self, prefix):
         file = self._base_find_file(prefix)
         if file is not None:
             lisp.find_file(file.real_path)
 
-    @rawprefixed
+    @global_command('4 f', lisputils.rawprefixed)
     def find_file_other_window(self, prefix):
         file = self._base_find_file(prefix)
         if file is not None:
@@ -378,7 +381,7 @@ class Ropemacs(object):
             return file
         lisputils.message('No file selected')
 
-    @interactive
+    @global_command('c')
     def project_config(self):
         self._check_project()
         if self.project.ropefolder is not None:
@@ -387,26 +390,26 @@ class Ropemacs(object):
         else:
             lisputils.message('No rope project folder found')
 
-    @interactive
+    @global_command('n m')
     def create_module(self):
         def callback(sourcefolder, name):
             return generate.create_module(self.project, name, sourcefolder)
         self._create('module', callback)
 
-    @interactive
+    @global_command('n p')
     def create_package(self):
         def callback(sourcefolder, name):
             folder = generate.create_package(self.project, name, sourcefolder)
             return folder.get_child('__init__.py')
         self._create('package', callback)
 
-    @interactive
+    @global_command('n f')
     def create_file(self):
         def callback(parent, name):
             return parent.create_file(name)
         self._create('file', callback, 'parent')
 
-    @interactive
+    @global_command('n d')
     def create_directory(self):
         def callback(parent, name):
             parent.create_folder(name)
