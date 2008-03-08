@@ -140,8 +140,9 @@ class Ropemacs(object):
             lisp.remove_hook(lisp[hook], lisp[function])
 
     @global_command('o')
-    def open_project(self):
-        root = lisputils.ask_directory('Rope project root folder: ')
+    def open_project(self, root=None):
+        if not root:
+            root = lisputils.ask_directory('Rope project root folder: ')
         if self.project is not None:
             self.close_project()
         progress = lisputils.create_progress('Opening "%s" project' % root)
