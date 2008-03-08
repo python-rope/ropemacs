@@ -34,11 +34,8 @@ def make_buffer(name, contents, empty_goto=True,
         elif window == 'other':
             new_window = lisp.display_buffer(new_buffer)
             lisp.set_window_point(new_window, lisp.point_min())
-            if fit_lines != None:
-                max_height = min(fit_lines,
-                                 lisp.count_lines(lisp.point_min(),
-                                                  lisp.point_max())) + 1
-                lisp.fit_window_to_buffer(new_window, max_height, max_height)
+            if fit_lines is not None:
+                lisp.fit_window_to_buffer(new_window, fit_lines)
 
         lisp.goto_char(lisp.point_min())
     return new_buffer

@@ -261,9 +261,10 @@ class Ropemacs(object):
             docs = '\n'.join(docs.split('\n')[:7])
             lisputils.message(docs)
         else:
+            fit_lines = lisp["ropemacs-max-doc-buffer-height"].value()
             buffer = lisputils.make_buffer('*rope-pydoc*', docs,
                                            empty_goto=False,
-                                           fit_lines = lisp["ropemacs-max-doc-buffer-height"].value())
+                                           fit_lines=fit_lines)
             lisp.local_set_key('q', lisp.bury_buffer)
 
     @local_command('a f', shortcut='C-c f')
