@@ -277,17 +277,21 @@ class Ropemacs(object):
         optionals = {
             'unsure': ropemacs.dialog.Data('Find uncertain occurrences: ',
                                            default='no', values=['yes', 'no']),
-            'resources': ropemacs.dialog.Data('Files to search: ')}
+            'resources': ropemacs.dialog.Data('Files to search: '),
+            'in_hierarchy': ropemacs.dialog.Data(
+                    'Rename methods in class hierarchy: ',
+                    default='no', values=['yes', 'no'])}
         action, values = ropemacs.dialog.show_dialog(
             lisputils.askdata, ['search', 'cancel'], optionals=optionals)
         if action == 'search':
             unsure = values.get('unsure') == 'yes'
+            hier = values.get('in_hierarchy') == 'yes'
             resources = ropemacs.refactor._resources(self.project,
                                                      values.get('resources'))
             def calculate(handle):
                 return codeassist.find_occurrences(
-                    self.project, resource, offset,
-                    unsure=unsure, resources=resources, task_handle=handle)
+                    self.project, resource, offset, unsure=unsure,
+                    resources=resources, in_hierarchy=hier, task_handle=handle)
             result = lisputils.runtask(calculate, 'Find Occurrences')
             text = []
             for occurrence in result:
