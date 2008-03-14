@@ -352,18 +352,26 @@ C-c r a ?         rope-lucky-assist
                   rope-generate-autoimport-cache
 ===============   ============================
 
-These shortcut keys are enabled only when
-``ropemacs-enable-shortcuts`` variable is non-nil (it is enabled by
-default):
+
+Shortcuts
+---------
+
+Some commands are used very frequently; specially the commands in
+code-assist group.  You can define your own shortcuts like this::
+
+  (define-key ropemacs-local-keymap "\C-cg" 'rope-goto-definition)
+
+Rope itself comes with a few shortcuts.  These shortcuts will be used
+only when ropemacs-enable-shortcuts is non-nil.
 
 ================  ============================
 Key               Command
 ================  ============================
 M-/               rope-code-assist
+M-?               rope-lucky-assist
 C-c g             rope-goto-definition
 C-c d             rope-show-doc
 C-c f             rope-find-occurrences
-M-?               rope-lucky-assist
 ================  ============================
 
 
