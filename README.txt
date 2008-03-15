@@ -13,37 +13,6 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
-* added ropemacs minor mode
-* supporting maxfixes option in rope-goto-definition and rope-show-doc
-* added ropemacs-separate-doc-buffer variable
-* added ropemacs-max-doc-buffer-height variable
-* added rope-show-call-doc command
-* added ropemacs menu
-* supporting in_hierarchy option of find_occurrences
-* added rope-analyze-module command
-
-``rope-show-call-doc`` command shows the documentation of the
-surrounding function.  For instance calling this command in::
-
-  for x in range(2, $
-
-will show builtin `range` docs (where ``$`` shows cursor position).
-
-``rope-analyze-module`` asks rope to perform static object inference
-analysis on a module.  This command is useful when you have a module
-that was written without ropemacs (ropemacs automatically performs SOI
-analysis on changed scopes when saving modules).  As a simple example,
-in::
-
-  def f(p):
-      print p.upper()
-
-  f('test')
-
-Rope won't know the type of parameter `p`, if this module is not
-analyzed (you can test that by calling ``rope-show-doc`` on
-``upper``).  Calling ``rope-analyze-module`` forces rope to do so.
-
 
 Setting Up
 ==========
