@@ -2,6 +2,16 @@
  Done
 ======
 
+> Public Release 0.5c6 : March 15, 2008
+
+- added rope-analyze-module command : March 15, 2008
+- supporting in_hierarchy option of find_occurrences : March 10, 2008
+- added ropemacs-max-doc-buffer-height variable : March 7, 2008
+- added ropemacs menu : March 7, 2008
+- added rope-show-call-doc command : March 6, 2008
+- added ropemacs-separate-doc-buffer variable : March 6, 2008
+- supporting maxfixes option of rope-goto-definition : March 6, 2008
+- supporting maxfixes option of rope-show-doc : March 6, 2008
 - added ropemacs minor mode : March 1, 2008
 
 > Public Release 0.5c5 : March 1, 2008
