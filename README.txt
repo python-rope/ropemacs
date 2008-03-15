@@ -347,6 +347,7 @@ C-c r a g         rope-goto-definition
 C-c r a d         rope-show-doc
 C-c r a f         rope-find-occurrences
 C-c r a ?         rope-lucky-assist
+                  rope-analyze-module
 
                   rope-auto-import
                   rope-generate-autoimport-cache

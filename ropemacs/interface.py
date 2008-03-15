@@ -424,6 +424,13 @@ class Ropemacs(object):
             parent.create_folder(name)
         self._create('directory', callback, 'parent')
 
+    @global_command()
+    def analyze_module(self):
+        """Perform static object inference analysis on this module"""
+        self._check_project()
+        resource = self._get_resource()
+        self.project.pycore.analyze_module(resource)
+
     def _create(self, name, callback, parentname='source'):
         self._check_project()
         confs = {'name': ropemacs.dialog.Data(name.title() + ' name: ')}
