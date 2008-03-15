@@ -37,6 +37,7 @@ def make_buffer(name, contents, empty_goto=True,
             lisp.set_window_point(new_window, lisp.point_min())
             if fit_lines and lisp.fboundp(lisp['fit-window-to-buffer']):
                 lisp.fit_window_to_buffer(new_window, fit_lines)
+                lisp.bury_buffer(new_buffer)
     return new_buffer
 
 
