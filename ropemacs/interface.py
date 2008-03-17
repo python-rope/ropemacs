@@ -228,7 +228,7 @@ class Ropemacs(object):
             self.project, self._get_text(), offset, resource, maxfixes)
         if tuple(definition) != (None, None):
             lisp.push_mark()
-            self._goto_location(definition)
+            self._goto_location(definition[0], definition[1])
 
     @local_command('a d', 'P', 'C-c d')
     def show_doc(self, prefix):
@@ -380,6 +380,9 @@ class Ropemacs(object):
             files = self.project.pycore.get_python_files()
         else:
             files = self.project.get_files()
+        return self._ask_file(files)
+
+    def _ask_file(self, files):
         names = []
         for file in files:
             names.append('<'.join(reversed(file.path.split('/'))))
@@ -389,6 +392,16 @@ class Ropemacs(object):
             file = self.project.get_file(path)
             return file
         lisputils.message('No file selected')
+
+    @local_command()
+    def jump_to_global(self):
+        if not self._check_autoimport():
+            return
+        name = lisputils.ask('Global name: ')
+        result = dict(self.autoimport.get_name_locations(name))
+        file = self._ask_file(result.keys())
+        if file:
+            self._goto_location(file, result[file])
 
     @global_command('c')
     def project_config(self):
@@ -447,15 +460,15 @@ class Ropemacs(object):
             if resource:
                 lisp.find_file(resource.real_path)
 
-    def _goto_location(self, location, readonly=False):
-        if location[0]:
-            resource = location[0]
+    def _goto_location(self, resource, lineno):
+        if resource:
+            resource = resource
             if resource.project == self.project:
-                lisp.find_file(str(location[0].real_path))
+                lisp.find_file(str(resource.real_path))
             else:
-                lisp.find_file_read_only(str(location[0].real_path))
-        if location[1]:
-            lisp.goto_line(location[1])
+                lisp.find_file_read_only(str(resource.real_path))
+        if lineno:
+            lisp.goto_line(lineno)
 
     def _get_location(self):
         resource = self._get_resource()
