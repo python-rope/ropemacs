@@ -236,7 +236,7 @@ class Ropemacs(object):
         self._check_project()
         self._base_show_doc(prefix)
 
-    @local_command(interaction='P')
+    @local_command('a c', 'P')
     def show_call_doc(self, prefix):
         self._check_project()
         offset = self._get_offset()
@@ -394,7 +394,7 @@ class Ropemacs(object):
             return file
         lisputils.message('No file selected')
 
-    @local_command()
+    @local_command('a j')
     def jump_to_global(self):
         if not self._check_autoimport():
             return

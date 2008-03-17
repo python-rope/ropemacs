@@ -347,6 +347,8 @@ C-c r a g         rope-goto-definition
 C-c r a d         rope-show-doc
 C-c r a f         rope-find-occurrences
 C-c r a ?         rope-lucky-assist
+C-c r a j         rope-jump-to-global
+C-c r a c         rope-show-call-doc
                   rope-analyze-module
 
                   rope-auto-import
