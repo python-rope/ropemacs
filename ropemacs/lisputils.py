@@ -136,7 +136,8 @@ def ask_values(prompt, values, default=None, starting=None, exact=True):
         values = [[value, value] for value in values]
     if exact and default is not None:
         prompt = prompt + ('[%s] ' % default)
-    result = lisp.completing_read(prompt, values, None, exact, starting)
+    result = lisp["ropemacs-completing-read-function"].value()(prompt, values,
+                                                               None, exact, starting)
     if result == '' and exact:
         return default
     return result

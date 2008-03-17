@@ -716,6 +716,16 @@ How many errors to fix, at most, when proposing code completions.")
 The `rope-generate-autoimport-cache' reads this list and fills its
 cache.")
 
+(defcustom ropemacs-completing-read-function (if (and (boundp 'ido-mode)
+                                                      ido-mode)
+                                                 'ido-completing-read
+                                               'completing-read)
+  "Function to call when prompting user to choose between a list of options.
+This should take the same arguments as `completing-read'.
+Possible values are `completing-read' and `ido-completing-read'.
+Note that you must set `ido-mode' if using`ido-completing-read'."
+  :type 'function)
+
 (make-obsolete-variable
   'rope-confirm-saving 'ropemacs-confirm-saving)
 (make-obsolete-variable
