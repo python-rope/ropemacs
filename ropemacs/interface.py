@@ -120,13 +120,14 @@ class Ropemacs(object):
         prefix = lisp.ropemacs_local_prefix.value()
         for key, callback in local_keys:
             if prefix is not None:
-                key = prefix + ' ' + key
-                lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
-                     (self._key_sequence(key), callback))
-        for key, callback in shortcuts:
-            if lisp['ropemacs-enable-shortcuts'].value():
-                lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
-                     (self._key_sequence(key), callback))
+                self._bind_local_key(callback, prefix + ' ' + key)
+        if lisp['ropemacs-enable-shortcuts'].value():
+            for key, callback in shortcuts:
+                self._bind_local_key(callback, key)
+
+    def _bind_local_key(self, callback, key):
+        lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
+             (self._key_sequence(key), callback))
 
     @rope_hook('kill-emacs-hook')
     def exiting_actions(self):
@@ -466,7 +467,6 @@ class Ropemacs(object):
 
     def _goto_location(self, resource, lineno):
         if resource:
-            resource = resource
             if resource.project == self.project:
                 lisp.find_file(str(resource.real_path))
             else:
