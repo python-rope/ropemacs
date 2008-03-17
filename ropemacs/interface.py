@@ -397,7 +397,8 @@ class Ropemacs(object):
     def jump_to_global(self):
         if not self._check_autoimport():
             return
-        name = lisputils.ask('Global name: ')
+        all_names = list(self.autoimport.get_all_names())
+        name = lisputils.ask_values('Global name: ', all_names)
         result = dict(self.autoimport.get_name_locations(name))
         file = self._ask_file(result.keys())
         if file:
