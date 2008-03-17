@@ -400,9 +400,12 @@ class Ropemacs(object):
         all_names = list(self.autoimport.get_all_names())
         name = lisputils.ask_values('Global name: ', all_names)
         result = dict(self.autoimport.get_name_locations(name))
-        file = self._ask_file(result.keys())
-        if file:
-            self._goto_location(file, result[file])
+        if len(result) == 1:
+            resource = list(result.keys())[0]
+        else:
+            resource = self._ask_file(result.keys())
+        if resource:
+            self._goto_location(resource, result[resource])
 
     @global_command('c')
     def project_config(self):
