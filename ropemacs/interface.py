@@ -755,8 +755,10 @@ M-?               rope-lucky-assist
                     ["Code assist" rope-code-assist t]
                     ["Lucky assist" rope-lucky-assist t]
                     ["Goto definition" rope-goto-definition t]
+                    ["Jump to global" rope-jump-to-global t]
                     ["Show documentation" rope-show-doc t]
                     ["Find Occurrences" rope-find-occurrences t]
+                    ["Analyze module" rope-analyze-module t]
                     ("Refactor"
                       ["Inline" rope-inline t]
                       ["Extract Variable" rope-extract-variable t]
