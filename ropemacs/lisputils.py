@@ -136,8 +136,8 @@ def ask_values(prompt, values, default=None, starting=None, exact=True):
         values = [[value, value] for value in values]
     if exact and default is not None:
         prompt = prompt + ('[%s] ' % default)
-    result = lisp["ropemacs-completing-read-function"].value()(prompt, values,
-                                                               None, exact, starting)
+    reader = lisp['ropemacs-completing-read-function'].value()
+    result = reader(prompt, values, None, exact, starting)
     if result == '' and exact:
         return default
     return result
@@ -155,10 +155,10 @@ def ask(prompt, default=None, starting=None):
 def ask_directory(prompt, default=None, starting=None):
     if default is not None:
         prompt = prompt + ('[%s] ' % default)
-    if _emacs_version() < 22:
-        result = lisp.read_file_name(prompt, starting, default)
-    else:
+    if lisp.fboundp(lisp['read-directory-name']):
         result = lisp.read_directory_name(prompt, starting, default)
+    else:
+        result = lisp.read_file_name(prompt, starting, default)
     if result == '' and default is not None:
         return default
     return result
