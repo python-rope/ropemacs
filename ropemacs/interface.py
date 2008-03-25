@@ -270,7 +270,7 @@ class Ropemacs(object):
                                            empty_goto=False,
                                            fit_lines=fit_lines)
             lisp.local_set_key('q', lisp.bury_buffer)
-        if does is None:
+        if docs is None:
             lisputils.message('No docs avilable!')
 
     @local_command('a f', shortcut='C-c f')
