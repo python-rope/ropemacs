@@ -230,6 +230,8 @@ class Ropemacs(object):
         if tuple(definition) != (None, None):
             lisp.push_mark()
             self._goto_location(definition[0], definition[1])
+        else:
+            lisputils.message('Cannot find the definition!')
 
     @local_command('a d', 'P', 'C-c d')
     def show_doc(self, prefix):
