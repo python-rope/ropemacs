@@ -15,28 +15,14 @@ class Ropemacs(object):
 
         self._prepare_refactorings()
         self.autoimport = None
-        self._init_ropemacs_keymap()
+        self._init_ropemacs()
         lisp(MINOR_MODE)
 
     def init(self):
         """Initialize rope mode"""
-        global_prefix = lisp.ropemacs_global_prefix.value()
-        for attrname in dir(self):
-            attr = getattr(self, attrname)
-            if not callable(attr):
-                continue
-            kind = getattr(attr, 'kind', None)
-            if kind == 'global':
-                global_key = getattr(attr, 'global_key', None)
-                if global_key:
-                    key = self._key_sequence(global_prefix + ' ' + global_key)
-                    lisp.global_set_key(key, lisp[attr.lisp_name])
-            if kind == 'hook':
-                hook = getattr(attr, 'hook', None)
-                lisp.add_hook(lisp[hook], lisp[attr.lisp_name])
-        lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
 
-    def _init_ropemacs_keymap(self):
+    def _init_ropemacs(self):
+        global_prefix = lisp.ropemacs_global_prefix.value()
         local_prefix = lisp.ropemacs_local_prefix.value()
         enable_shortcuts = lisp['ropemacs-enable-shortcuts'].value()
         for attrname in dir(self):
@@ -53,6 +39,15 @@ class Ropemacs(object):
                                          local_prefix + ' ' + local_key)
                 if enable_shortcuts and shortcut_key:
                     self._bind_local_key(attr.lisp_name, shortcut_key)
+            if kind == 'global':
+                global_key = getattr(attr, 'global_key', None)
+                if global_key:
+                    key = self._key_sequence(global_prefix + ' ' + global_key)
+                    lisp.global_set_key(key, lisp[attr.lisp_name])
+            if kind == 'hook':
+                hook = getattr(attr, 'hook', None)
+                lisp.add_hook(lisp[hook], lisp[attr.lisp_name])
+        lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
 
     def _prepare_refactorings(self):
         for name in dir(refactor):
