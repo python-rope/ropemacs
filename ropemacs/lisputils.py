@@ -165,23 +165,3 @@ def ask_directory(prompt, default=None, starting=None):
 
 def _emacs_version():
     return int(lisp['emacs-version'].value().split('.')[0])
-
-
-def lispfunction(func):
-    func.lisp = None
-    return func
-
-def interactive(func):
-    func.interaction = ''
-    return func
-
-def lisphook(func):
-    def newfunc(*args, **kwds):
-        try:
-            func(*args, **kwds)
-        except Exception, e:
-            trace = str(traceback.format_exc())
-            message('%s\nIgnored an exception in ropemacs hook: %s: %s' %
-                    (trace, type(e).__name__, str(e)))
-    newfunc.lisp = None
-    return newfunc
