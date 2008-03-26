@@ -3,7 +3,6 @@ import traceback
 from rope.base import exceptions
 
 from ropemacs import lisputils
-from ropemacs.lisputils import message
 
 
 def lisphook(func):
@@ -12,8 +11,9 @@ def lisphook(func):
             func(*args, **kwds)
         except Exception, e:
             trace = str(traceback.format_exc())
-            message('%s\nIgnored an exception in ropemacs hook: %s: %s' %
-                    (trace, type(e).__name__, str(e)))
+            lisputils.message(
+                '%s\nIgnored an exception in ropemacs hook: %s: %s' %
+                (trace, type(e).__name__, str(e)))
     newfunc.lisp = None
     newfunc.__name__ = func.__name__
     newfunc.__doc__ = func.__doc__
