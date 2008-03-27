@@ -12,8 +12,8 @@ def lisphook(func):
         except Exception, e:
             trace = str(traceback.format_exc())
             lisputils.message(
-                '%s\nIgnored an exception in ropemacs hook: %s: %s' %
-                (trace, type(e).__name__, str(e)))
+                '%s\nIgnored an exception in ropemacs hook: %s' %
+                (trace, _exception_message(e)))
     newfunc.lisp = None
     newfunc.__name__ = func.__name__
     newfunc.__doc__ = func.__doc__
@@ -30,7 +30,9 @@ def lispfunction(func):
     return func
 
 
-input_exceptions = (exceptions.RefactoringError,)
+input_exceptions = (exceptions.RefactoringError,
+                    exceptions.ModuleSyntaxError,
+                    exceptions.BadIdentifierError)
 
 def _lisp_name(func):
     return 'rope-' + func.__name__.replace('_', '-')
@@ -40,13 +42,15 @@ def _exception_handler(func):
         try:
             func(*args, **kwds)
         except exceptions.RopeError, e:
+            lisputils.message(str(traceback.format_exc()))
             if isinstance(e, input_exceptions):
-                lisputils.message('%s: %s' % (e.__class__.__name__, str(e)))
-            else:
-                raise e
+                lisputils.message(_exception_message(e))
     newfunc.__name__ = func.__name__
     newfunc.__doc__ = func.__doc__
     return newfunc
+
+def _exception_message(e):
+    return '%s: %s' % (e.__class__.__name__, str(e))
 
 def rope_hook(hook):
     def decorator(func):
