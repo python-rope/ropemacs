@@ -263,8 +263,8 @@ class Ropemacs(object):
         if action == 'search':
             unsure = values.get('unsure') == 'yes'
             hier = values.get('in_hierarchy') == 'yes'
-            resources = ropemacs.refactor._resources(self.project,
-                                                     values.get('resources'))
+            resources = refactor._resources(self.project,
+                                            values.get('resources'))
             def calculate(handle):
                 return codeassist.find_occurrences(
                     self.project, resource, offset, unsure=unsure,
