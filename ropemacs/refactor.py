@@ -361,7 +361,8 @@ class _GenerateElement(Refactoring):
         return self.generator.get_changes()
 
     def _done(self):
-        self.interface._goto_location(self.generator.get_location())
+        resource, lineno = self.generator.get_location()
+        self.interface._goto_location(resource, lineno)
 
 
 class GenerateVariable(_GenerateElement):
