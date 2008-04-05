@@ -2,6 +2,12 @@
  Done
 ======
 
+> Public Release 0.5 : April 5, 2008
+
+- better input error reporting : March 27, 2008
+- added ropemacs-completing-read-function variable : March 17, 2008
+- added rope-jump-to-global : March 17, 2008
+
 > Public Release 0.5c6 : March 15, 2008
 
 - added rope-analyze-module command : March 15, 2008

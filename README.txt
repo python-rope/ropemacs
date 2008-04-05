@@ -13,6 +13,25 @@ and pymacs_ before using ropemacs.
 New Features
 ============
 
+Changes since 0.5c6:
+
+* added rope-jump-to-global
+* added ropemacs-completing-read-function variable
+* better error reporting
+
+Some of the changes since 0.4:
+
+* added ropemacs menu
+* added ropemacs minor mode
+* filtering refactoring resources
+* added introduce method object refactoring
+* added auto-import support
+* added support for introduce factory refactoring
+* added use function refactoring
+* added rope-jump-to-global command
+* added rope-show-call-doc command
+* added rope-find-file-other-window command
+
 
 Setting Up
 ==========
