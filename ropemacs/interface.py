@@ -420,10 +420,18 @@ class Ropemacs(object):
 
     @decorators.global_command()
     def analyze_module(self):
-        """Perform static object inference analysis on this module"""
+        """Perform static object analysis on this module"""
         self._check_project()
         resource = self._get_resource()
         self.project.pycore.analyze_module(resource)
+
+    @decorators.global_command()
+    def analyze_modules(self):
+        """Perform static object analysis on all project modules"""
+        self._check_project()
+        def _analyze_modules(handle):
+            libutils.analyze_modules(self.project, task_handle=handle)
+        lisputils.runtask(_analyze_modules, 'Analyze project modules')
 
     def _create(self, name, callback, parentname='source'):
         self._check_project()
