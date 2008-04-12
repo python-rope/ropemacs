@@ -418,7 +418,7 @@ class Ropemacs(object):
             parent.create_folder(name)
         self._create('directory', callback, 'parent')
 
-    @decorators.global_command()
+    @decorators.local_command()
     def analyze_module(self):
         """Perform static object analysis on this module"""
         self._check_project()
