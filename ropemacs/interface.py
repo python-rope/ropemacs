@@ -208,27 +208,24 @@ class Ropemacs(object):
     @decorators.local_command('a d', 'P', 'C-c d')
     def show_doc(self, prefix):
         self._check_project()
-        self._base_show_doc(prefix)
+        self._base_show_doc(prefix, codeassist.get_doc)
 
     @decorators.local_command('a c', 'P')
+    def show_calltip(self, prefix):
+        self._check_project()
+        self._base_show_doc(prefix, codeassist.get_calltip)
+
+    @decorators.local_command()
     def show_call_doc(self, prefix):
         self._check_project()
-        offset = self._get_offset()
-        text = self._get_text()
-        try:
-            offset = text.rindex('(', 0, offset) - 1
-            self._base_show_doc(prefix, text, offset)
-        except ValueError:
-            lisputils.message('Not inside a function')
+        lisputils.message('ropemacs: use `rope-show-calltip\' instead!')
 
-    def _base_show_doc(self, prefix, text=None, offset=None):
+    def _base_show_doc(self, prefix, get_doc):
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
-        if text is None:
-            text = self._get_text()
-        if offset is None:
-            offset = self._get_offset()
-        docs = codeassist.get_doc(self.project, text, offset,
-                                  self._get_resource(), maxfixes)
+        text = self._get_text()
+        offset = self._get_offset()
+        docs = get_doc(self.project, text, offset,
+                       self._get_resource(), maxfixes)
 
         use_minibuffer = not prefix
         if lisp['ropemacs-separate-doc-buffer'].value():
