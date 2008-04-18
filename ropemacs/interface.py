@@ -213,7 +213,10 @@ class Ropemacs(object):
     @decorators.local_command('a c', 'P')
     def show_calltip(self, prefix):
         self._check_project()
-        self._base_show_doc(prefix, codeassist.get_calltip)
+        def _get_doc(project, text, offset, *args, **kwds):
+            offset = text.rindex('(', 0, offset)
+            return codeassist.get_calltip(project, text, offset, *args, **kwds)
+        self._base_show_doc(prefix, _get_doc)
 
     @decorators.local_command()
     def show_call_doc(self, prefix):
