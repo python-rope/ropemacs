@@ -214,7 +214,10 @@ class Ropemacs(object):
     def show_calltip(self, prefix):
         self._check_project()
         def _get_doc(project, text, offset, *args, **kwds):
-            offset = text.rindex('(', 0, offset)
+            try:
+                offset = text.rindex('(', 0, offset) - 1
+            except ValueError:
+                return None
             return codeassist.get_calltip(project, text, offset, *args, **kwds)
         self._base_show_doc(prefix, _get_doc)
 
