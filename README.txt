@@ -168,8 +168,8 @@ Dialog ``batchset`` Command
 ---------------------------
 
 When you use rope dialogs there is a command called ``batchset``.  It
-can be used to set many configs at the same time.  After selecting
-this command from dialog base prompt, you are asked to enter a string.
+can set many options at the same time.  After selecting this command
+from dialog base prompt, you are asked to enter a string.
 
 ``batchset`` strings can set the value of configs in two ways.  The
 single line form is like this::
@@ -226,8 +226,8 @@ Enabling Autoimport
 -------------------
 
 Rope can propose and automatically import global names in other
-modules.  But this feature disabled by default.  Before using it, you
-should add::
+modules.  But this feature is disabled by default.  Before using it,
+you should add::
 
   (setq ropemacs-enable-autoimport 't)
 
@@ -311,8 +311,8 @@ Keybinding
 ----------
 
 Uses almost the same keybinding as ropeide.  Note that global commands
-have a ``C-x p`` prefix and commands have a ``C-c r`` prefix.  You can
-change that (see variables_ section).
+have a ``C-x p`` prefix and local commands have a ``C-c r`` prefix.
+You can change that (see variables_ section).
 
 ================  ============================
 Key               Command
