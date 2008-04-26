@@ -1,7 +1,7 @@
 import rope.base.change
 from Pymacs import lisp
 from rope.base import libutils
-from rope.contrib import codeassist, generate, autoimport
+from rope.contrib import codeassist, generate, autoimport, findit
 
 from ropemacs import refactor, lisputils, decorators, dialog
 
@@ -269,7 +269,7 @@ class Ropemacs(object):
             resources = refactor._resources(self.project,
                                             values.get('resources'))
             def calculate(handle):
-                return codeassist.find_occurrences(
+                return findit.find_occurrences(
                     self.project, resource, offset, unsure=unsure,
                     resources=resources, in_hierarchy=hier, task_handle=handle)
             result = lisputils.runtask(calculate, 'Find Occurrences')
