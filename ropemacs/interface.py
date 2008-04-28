@@ -248,30 +248,16 @@ class Ropemacs(object):
         if docs is None:
             lisputils.message('No docs avilable!')
 
-    @decorators.local_command('a f', shortcut='C-c f')
-    def find_occurrences(self):
+    def _base_findit(self, optionals, do_find):
         self._check_project()
         self._save_buffers()
         resource, offset = self._get_location()
 
-        optionals = {
-            'unsure': dialog.Data('Find uncertain occurrences: ',
-                                           default='no', values=['yes', 'no']),
-            'resources': dialog.Data('Files to search: '),
-            'in_hierarchy': dialog.Data(
-                    'Rename methods in class hierarchy: ',
-                    default='no', values=['yes', 'no'])}
         action, values = dialog.show_dialog(
             lisputils.askdata, ['search', 'cancel'], optionals=optionals)
         if action == 'search':
-            unsure = values.get('unsure') == 'yes'
-            hier = values.get('in_hierarchy') == 'yes'
-            resources = refactor._resources(self.project,
-                                            values.get('resources'))
             def calculate(handle):
-                return findit.find_occurrences(
-                    self.project, resource, offset, unsure=unsure,
-                    resources=resources, in_hierarchy=hier, task_handle=handle)
+                return do_find(resource, offset, values, handle)
             result = lisputils.runtask(calculate, 'Find Occurrences')
             text = []
             for occurrence in result:
@@ -286,6 +272,35 @@ class Ropemacs(object):
             lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
             lisp.local_set_key('q', lisp.rope_occurrences_quit)
 
+    @decorators.local_command('a f', shortcut='C-c f')
+    def find_occurrences(self):
+        optionals = {
+            'unsure': dialog.Data('Find uncertain occurrences: ',
+                                           default='no', values=['yes', 'no']),
+            'resources': dialog.Data('Files to search: '),
+            'in_hierarchy': dialog.Data(
+                    'Rename methods in class hierarchy: ',
+                    default='no', values=['yes', 'no'])}
+        def do_find(resource, offset, values, handle):
+            unsure = values.get('unsure') == 'yes'
+            hier = values.get('in_hierarchy') == 'yes'
+            resources = refactor._resources(self.project,
+                                            values.get('resources'))
+            return findit.find_occurrences(
+                self.project, resource, offset, unsure=unsure,
+                resources=resources, in_hierarchy=hier, task_handle=handle)
+        self._base_findit(optionals, do_find)
+
+    @decorators.local_command('a i')
+    def find_implementations(self):
+        optionals = {'resources': dialog.Data('Files to search: ')}
+        def do_find(resource, offset, values, handle):
+            resources = refactor._resources(self.project,
+                                            values.get('resources'))
+            return findit.find_implementations(
+                self.project, resource, offset,
+                resources=resources, task_handle=handle)
+        self._base_findit(optionals, do_find)
 
     @decorators.interactive
     def occurrences_goto_occurrence(self):
