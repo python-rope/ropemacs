@@ -121,7 +121,9 @@ class Ropemacs(object):
         progress = lisputils.create_progress('Opening "%s" project' % root)
         self.project = rope.base.project.Project(root)
         if lisp['ropemacs-enable-autoimport'].value():
-            self.autoimport = autoimport.AutoImport(self.project)
+            underlined = lisp['ropemacs-autoimport-underlineds']
+            self.autoimport = autoimport.AutoImport(self.project,
+                                                    underlined=underlined)
         progress.done()
 
     @decorators.global_command('k')
@@ -712,6 +714,8 @@ How many errors to fix, at most, when proposing code completions.")
 
 The `rope-generate-autoimport-cache' reads this list and fills its
 cache.")
+(defcustom ropemacs-autoimport-underlineds 'nil
+  "If set, autoimport will cache names starting with underline, too.")
 
 (defcustom ropemacs-completing-read-function (if (and (boundp 'ido-mode)
                                                       ido-mode)
