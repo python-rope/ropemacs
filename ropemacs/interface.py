@@ -121,7 +121,7 @@ class Ropemacs(object):
         progress = lisputils.create_progress('Opening "%s" project' % root)
         self.project = rope.base.project.Project(root)
         if lisp['ropemacs-enable-autoimport'].value():
-            underlined = lisp['ropemacs-autoimport-underlineds']
+            underlined = lisp['ropemacs-autoimport-underlineds'].value()
             self.autoimport = autoimport.AutoImport(self.project,
                                                     underlined=underlined)
         progress.done()
