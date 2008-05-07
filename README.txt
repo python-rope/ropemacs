@@ -305,6 +305,8 @@ Variables
 * ``ropemacs-autoimport-modules``: The name of modules whose global
   names should be cached.  `rope-generate-autoimport-cache' reads
   this list and fills its cache.
+* ``ropemacs-autoimport-underlineds``: If set, autoimport will cache
+  names starting with underlines, too.
 
 
 Keybinding

@@ -715,7 +715,7 @@ How many errors to fix, at most, when proposing code completions.")
 The `rope-generate-autoimport-cache' reads this list and fills its
 cache.")
 (defcustom ropemacs-autoimport-underlineds 'nil
-  "If set, autoimport will cache names starting with underline, too.")
+  "If set, autoimport will cache names starting with underlines, too.")
 
 (defcustom ropemacs-completing-read-function (if (and (boundp 'ido-mode)
                                                       ido-mode)
