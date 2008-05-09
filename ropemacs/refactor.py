@@ -385,7 +385,7 @@ class ChangeSignature(Refactoring):
                 olds.insert(index, arg)
             order.append(olds.index(arg))
         changers.append(rope.refactor.change_signature.
-                        ArgumentReorderer(order))
+                        ArgumentReorderer(order, autodef='None'))
 
         resources = _resources(self.project, values.get('resources'))
         return self.changer.get_changes(changers, resources=resources,
