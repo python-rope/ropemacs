@@ -186,23 +186,20 @@ class Restructure(Refactoring):
 
 class UseFunction(Refactoring):
     key = 'u'
-    optionals = {
-        'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
         self.user = rope.refactor.usefunction.UseFunction(
             self.project, self.resource, self.offset)
 
     def _calculate_changes(self, values, task_handle):
-        resources = _resources(self.project, values.get('resources', None))
-        return self.user.get_changes(resources=resources,
-                                     task_handle=task_handle)
+        return self.user.get_changes(task_handle=task_handle, **values)
+
+    def _get_optionals(self):
+        return {'resources': self.resources_option}
 
 
 class Move(Refactoring):
     key = 'v'
-    optionals = {
-        'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
         self.mover = rope.refactor.move.create_move(self.project,
@@ -211,7 +208,7 @@ class Move(Refactoring):
 
     def _calculate_changes(self, values, task_handle):
         destination = values['destination']
-        resources = _resources(self.project, values.get('resources', None))
+        resources = values.get('resources', None)
         if isinstance(self.mover, rope.refactor.move.MoveGlobal):
             return self._move_global(destination, resources, task_handle)
         if isinstance(self.mover, rope.refactor.move.MoveModule):
@@ -243,6 +240,9 @@ class Move(Refactoring):
             prompt = 'Destination attribute: '
         return {'destination': dialog.Data(prompt)}
 
+    def _get_optionals(self):
+        return {'resources': self.resources_option}
+
 
 class MoveCurrentModule(Move):
     key = '1 v'
@@ -263,24 +263,21 @@ class ModuleToPackage(Refactoring):
 
 class Inline(Refactoring):
     key = 'i'
-    optionals = {
-        'remove': dialog.Data('Remove the definition: ',
-                              values=['yes', 'no'], default='yes'),
-        'only_current': dialog.Data('Inline this occurrence only: ',
-                                    values=['yes', 'no'], default='no'),
-        'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
         self.inliner = rope.refactor.inline.create_inline(
             self.project, self.resource, self.offset)
 
     def _calculate_changes(self, values, task_handle):
-        remove = values.get('remove', 'yes') == 'yes'
-        only_current = values.get('only_current', 'no') == 'yes'
-        resources = _resources(self.project, values.get('resources'))
-        return self.inliner.get_changes(
-            remove=remove, only_current=only_current,
-            resources=resources, task_handle=task_handle)
+        return self.inliner.get_changes(task_handle=task_handle, **values)
+
+    def _get_optionals(self):
+        opts = {'resources': self.resources_option}
+        if self.inliner.get_kind() != 'parameter':
+            opts['remove'] = dialog.Boolean('Remove the definition: ', True)
+            opts['only_current'] = dialog.Boolean('Inline this '
+                                                  'occurrence only: ')
+        return opts
 
 
 class _Extract(Refactoring):
