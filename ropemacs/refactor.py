@@ -101,6 +101,11 @@ class Refactoring(object):
     def _get_optionals(self):
         return self.optionals
 
+    @property
+    def resources_option(self):
+        return dialog.Data('Files to apply this refactoring on: ',
+                           decode=self._decode_resources)
+
     def _decode_resources(self, value):
         return _resources(self.project, value)
 
@@ -126,8 +131,7 @@ class Rename(Refactoring):
         if self.renamer.is_method():
             opts['in_hierarchy'] = dialog.Boolean('Rename methods in '
                                                   'class hierarchy: ')
-        opts['resources'] = dialog.Data('Files to apply this refactoring on: ',
-                                        decode=self._decode_resources)
+        opts['resources'] = self.resources_option
         opts['unsure'] = dialog.Data('Unsure occurrences: ',
                                      decode=self._decode_unsure,
                                      values=['ignore', 'match'],
@@ -152,25 +156,32 @@ class Restructure(Refactoring):
     key = 'x'
     confs = {'pattern': dialog.Data('Restructuring pattern: '),
              'goal': dialog.Data('Restructuring goal: ')}
-    optionals = {
-        'args': dialog.Data('Arguments: '),
-        'imports': dialog.Data('Imports: '),
-        'resources': dialog.Data('Files to apply this restructuring: ')}
 
     def _calculate_changes(self, values, task_handle):
-        args = {}
-        for raw_check in values.get('args', '').split('\n'):
-            if raw_check:
-                key, value = raw_check.split(':', 1)
-                args[key.strip()] = value.strip()
-        imports = [line.strip()
-                   for line in values.get('imports', '').split('\n')]
-        resources = _resources(self.project, values.get('resources', None))
         restructuring = rope.refactor.restructure.Restructure(
             self.project, values['pattern'], values['goal'],
-            args=args, imports=imports)
-        return restructuring.get_changes(resources=resources,
+            args=values['args'], imports=values['imports'])
+        return restructuring.get_changes(resources=values['resources'],
                                          task_handle=task_handle)
+
+    def _get_optionals(self):
+        return {
+            'args': dialog.Data('Arguments: ', decode=self._decode_args),
+            'imports': dialog.Data('Imports: ', decode=self._decode_imports),
+            'resources': self.resources_option}
+
+    def _decode_args(self, value):
+        if value:
+            args = {}
+            for raw_check in value.split('\n'):
+                if raw_check:
+                    key, value = raw_check.split(':', 1)
+                    args[key.strip()] = value.strip()
+            return args
+
+    def _decode_imports(self, value):
+        if value:
+            return [line.strip() for line in value.split('\n')]
 
 
 class UseFunction(Refactoring):
