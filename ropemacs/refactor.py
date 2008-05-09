@@ -1,5 +1,8 @@
+import re
+
 import rope.base.change
 import rope.contrib.generate
+import rope.refactor.change_signature
 import rope.refactor.extract
 import rope.refactor.inline
 import rope.refactor.introduce_factory
@@ -348,6 +351,43 @@ class IntroduceFactory(Refactoring):
     def _get_confs(self):
         default = 'create_%s' % self.factory.old_name.lower()
         return {'factory_name': dialog.Data('Factory name: ', default)}
+
+
+class ChangeSignature(Refactoring):
+    saveall = True
+    key = 's'
+    optionals = {
+        'resources': dialog.Data('Files to apply this refactoring on: ')}
+
+    def _create_refactoring(self):
+        self.changer = rope.refactor.change_signature.ChangeSignature(
+            self.project, self.resource, self.offset)
+
+    def _calculate_changes(self, values, task_handle):
+        signature = values.get('signature')
+        info = self.changer.get_definition_info()
+        args = re.sub(r'[\s\(\)]+', '', signature).split(',')
+        olds = [arg[0] for arg in info.args_with_defaults]
+        print 'arguments are: ', args, olds
+
+        changers = []
+        new_order = []
+        for arg in args:
+            new_order.append(olds.index(arg))
+        changers.append(rope.refactor.change_signature.ArgumentReorderer(new_order))
+
+        resources = _resources(self.project, values.get('resources'))
+        return self.changer.get_changes(changers, resources=resources,
+                                        task_handle=task_handle)
+
+    def _get_confs(self):
+        info = self.changer.get_definition_info()
+        args = []
+        for arg, default in info.args_with_defaults:
+            args.append(arg)
+        signature = '(' + ', '.join(args) + ')'
+        return {'signature': dialog.Data('Change the signature: ',
+                                         default=signature)}
 
 
 class _GenerateElement(Refactoring):
