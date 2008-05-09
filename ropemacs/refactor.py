@@ -368,13 +368,24 @@ class ChangeSignature(Refactoring):
         info = self.changer.get_definition_info()
         args = re.sub(r'[\s\(\)]+', '', signature).split(',')
         olds = [arg[0] for arg in info.args_with_defaults]
-        print 'arguments are: ', args, olds
 
         changers = []
-        new_order = []
-        for arg in args:
-            new_order.append(olds.index(arg))
-        changers.append(rope.refactor.change_signature.ArgumentReorderer(new_order))
+        for arg in list(olds):
+            if arg in args:
+                continue
+            changers.append(rope.refactor.change_signature.
+                            ArgumentRemover(olds.index(arg)))
+            olds.remove(arg)
+
+        order = []
+        for index, arg in enumerate(args):
+            if arg not in olds:
+                changers.append(rope.refactor.change_signature.
+                                ArgumentAdder(index, arg))
+                olds.insert(index, arg)
+            order.append(olds.index(arg))
+        changers.append(rope.refactor.change_signature.
+                        ArgumentReorderer(order))
 
         resources = _resources(self.project, values.get('resources'))
         return self.changer.get_changes(changers, resources=resources,
