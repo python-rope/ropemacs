@@ -282,10 +282,8 @@ class Inline(Refactoring):
 
 class _Extract(Refactoring):
     saveall = False
-    optionals = {'similar': dialog.Data('Extract similar pieces: ',
-                                        values=['yes', 'no'], default='yes'),
-                 'global_': dialog.Data('Make global: ',
-                                        values=['yes', 'no'], default='no')}
+    optionals = {'similar': dialog.Boolean('Extract similar pieces: ', True),
+                 'global_': dialog.Boolean('Make global: ')}
     kind = None
     constructor = None
 
@@ -295,8 +293,8 @@ class _Extract(Refactoring):
                                           self.resource, start, end)
 
     def _calculate_changes(self, values, task_handle):
-        similar = values.get('similar', 'yes') == 'yes'
-        global_ = values.get('global_', 'no') == 'yes'
+        similar = values.get('similar')
+        global_ = values.get('global_')
         return self.extractor.get_changes(values['name'], similar=similar,
                                           global_=global_)
 
@@ -344,32 +342,26 @@ class MethodObject(Refactoring):
 class IntroduceFactory(Refactoring):
     saveall = True
     key = 'f'
-    optionals = {'global_factory': dialog.Data(
-            'Make global: ', values=['yes', 'no'], default='yes'),
-                 'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
         self.factory = rope.refactor.introduce_factory.IntroduceFactory(
             self.project, self.resource, self.offset)
 
     def _calculate_changes(self, values, task_handle):
-        name = values.get('factory_name')
-        global_ = values.get('global_factory', 'yes') == 'yes'
-        resources = _resources(self.project, values.get('resources'))
-        return self.factory.get_changes(name, global_factory=global_,
-                                        resources=resources,
-                                        task_handle=task_handle)
+        return self.factory.get_changes(task_handle=task_handle, **values)
 
     def _get_confs(self):
         default = 'create_%s' % self.factory.old_name.lower()
         return {'factory_name': dialog.Data('Factory name: ', default)}
 
+    def _get_optionals(self):
+        return {'global_factory': dialog.Boolean('Make global: ', True),
+                'resources': self.resources_option}
+
 
 class ChangeSignature(Refactoring):
     saveall = True
     key = 's'
-    optionals = {
-        'resources': dialog.Data('Files to apply this refactoring on: ')}
 
     def _create_refactoring(self):
         self.changer = rope.refactor.change_signature.ChangeSignature(
@@ -411,6 +403,9 @@ class ChangeSignature(Refactoring):
         signature = '(' + ', '.join(args) + ')'
         return {'signature': dialog.Data('Change the signature: ',
                                          default=signature)}
+
+    def _get_optionals(self):
+        return {'resources': self.resources_option}
 
 
 class _GenerateElement(Refactoring):
