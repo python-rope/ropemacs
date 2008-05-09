@@ -101,17 +101,13 @@ class Refactoring(object):
     def _get_optionals(self):
         return self.optionals
 
+    def _decode_resources(self, value):
+        return _resources(self.project, value)
+
 
 class Rename(Refactoring):
     key = 'r'
-    optionals = {
-        'docs': dialog.Data('Rename occurrences in comments and docs: ',
-                            values=['yes', 'no'], default='yes'),
-        'in_hierarchy': dialog.Data('Rename methods in class hierarchy: ',
-                                    values=['yes', 'no'], default='no'),
-        'resources': dialog.Data('Files to apply this refactoring on: '),
-        'unsure': dialog.Data('Unsure occurrences: ',
-                              values=['ignore', 'match'], default='ignore')}
+
     saveall = True
 
     def __init__(self, interface):
@@ -122,21 +118,29 @@ class Rename(Refactoring):
             self.project, self.resource, self.offset)
 
     def _calculate_changes(self, values, task_handle):
-        newname = values['newname']
-        unsure = values.get('unsure', 'ignore') == 'match'
-        resources = _resources(self.project, values.get('resources', None))
-        kwds = {
-            'docs': values.get('docs', 'yes') == 'yes',
-            'unsure': (lambda occurrence: unsure),
-            'resources': resources}
+        return self.renamer.get_changes(task_handle=task_handle, **values)
+
+    def _get_optionals(self):
+        opts = {}
+        opts['docs'] = dialog.Boolean('Search comments and docs: ', True)
         if self.renamer.is_method():
-            kwds['in_hierarchy'] = values.get('in_hierarchy', 'no') == 'yes'
-        return self.renamer.get_changes(newname,
-                                        task_handle=task_handle, **kwds)
+            opts['in_hierarchy'] = dialog.Boolean('Rename methods in '
+                                                  'class hierarchy: ')
+        opts['resources'] = dialog.Data('Files to apply this refactoring on: ',
+                                        decode=self._decode_resources)
+        opts['unsure'] = dialog.Data('Unsure occurrences: ',
+                                     decode=self._decode_unsure,
+                                     values=['ignore', 'match'],
+                                     default='ignore')
+        return opts
 
     def _get_confs(self):
         oldname = str(self.renamer.get_old_name())
-        return {'newname': dialog.Data('New name: ', default=oldname)}
+        return {'new_name': dialog.Data('New name: ', default=oldname)}
+
+    def _decode_unsure(self, value):
+        unsure = value == 'match'
+        return lambda occurrence: unsure
 
 
 class RenameCurrentModule(Rename):
