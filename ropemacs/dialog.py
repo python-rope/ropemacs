@@ -1,10 +1,34 @@
 class Data(object):
 
-    def __init__(self, prompt=None, default=None, values=None, kind=None):
+    def __init__(self, prompt=None, default=None, values=None,
+                 kind=None, decode=None):
         self.prompt = prompt
         self.default = default
         self.values = values
         self.kind = kind
+        self._decode = decode
+
+    def decode(self, value):
+        if self._decode:
+            return self._decode(value)
+        return value
+
+
+class Boolean(Data):
+
+    def __init__(self, prompt=None, default=False):
+        Data.__init__(self, prompt, self._encode(default),
+                      [self._encode(True), self._encode(False)])
+
+    def _encode(self, value):
+        if value:
+            return 'yes'
+        return 'no'
+
+    def decode(self, value):
+        if value.lower() in ('yes', '1', 'true'):
+            return True
+        return False
 
 
 def show_dialog(askdata, actions, confs={}, optionals={}, initial_asking=True):
@@ -28,7 +52,9 @@ def show_dialog(askdata, actions, confs={}, optionals={}, initial_asking=True):
             for key, value in _parse_batchset(sets).items():
                 if key.endswith(':'):
                     key = key[:-1]
-                result[key] = value
+                if key in names:
+                    conf = confs.get(key, optionals.get(key))
+                    result[key] = value
         elif response in actions:
             break
         else:
@@ -38,7 +64,16 @@ def show_dialog(askdata, actions, confs={}, optionals={}, initial_asking=True):
                 conf = optionals[response]
             oldvalue = result.get(response, None)
             result[response] = askdata(conf, starting=oldvalue)
-    return response, result
+    decoded = {}
+    all_confs = dict(confs)
+    all_confs.update(optionals)
+    for key in all_confs:
+        conf = all_confs.get(key)
+        if key in result:
+            decoded[key] = conf.decode(result[key])
+        else:
+            decoded[key] = conf.decode(conf.default)
+    return response, decoded
 
 
 def _parse_batchset(sets):
