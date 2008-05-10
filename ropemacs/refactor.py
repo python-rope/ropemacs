@@ -273,7 +273,10 @@ class Inline(Refactoring):
 
     def _get_optionals(self):
         opts = {'resources': self.resources_option}
-        if self.inliner.get_kind() != 'parameter':
+        if self.inliner.get_kind() == 'parameter':
+            opts['in_hierarchy'] = dialog.Boolean(
+                'Apply on all matching methods in class hierarchy: ', False)
+        else:
             opts['remove'] = dialog.Boolean('Remove the definition: ', True)
             opts['only_current'] = dialog.Boolean('Inline this '
                                                   'occurrence only: ')
