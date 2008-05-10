@@ -20,8 +20,9 @@ Features
   * Rename
   * Extract method/local variable
   * Move class/function/module/package/method
-  * Inline method/local variable
+  * Inline method/local variable/parameter
   * Restructuring
+  * Change signature
   * ...
 
 * Other refactoring-related features
