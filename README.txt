@@ -6,12 +6,43 @@ Ropemacs is an emacs mode that uses rope_ library to provide features
 like refactorings and code-assists.  You should install rope_ library
 and pymacs_ before using ropemacs.
 
-.. _`rope`: http://rope.sf.net/
+.. _rope: http://rope.sf.net/
 .. _pymacs: http://pymacs.progiciels-bpi.ca/pymacs.html
 
 
 New Features
 ============
+
+* supporing change signature; ``C-c r s``
+* supporting inline parameters
+* added rope-find-implementations; ``C-c r a i``
+* added rope-show-calltip; ``C-c r a c``
+* added rope-analyze-modules
+* added ropemacs-autoimport-underlineds variable
+
+Finally I've added change signature support in ropemacs.  It takes the
+new signature as a ``,`` separated list of parameters.  Based on this
+new list it adds, removes or reorders parameters.
+
+Also performing inline refactoring on a parameter, tells rope to
+passes the default value of the parameter wherever its function is
+called without passing it.
+
+This list will help you decide which refactoring to use when changing
+function parameters:
+
+* renaming a parameter: use rename
+* adding, removing and reordering parameters: use change signature
+* using the default value of a parameter: use inline
+
+``rope-show-calltip`` shows the signature of the function you are
+after its open parenthesis.
+
+``rope-find-implementations`` can be used to find the places in which
+a method is overridden.
+
+``rope-analyze-modules`` analyzes all python files in the project for
+collecting more object information.
 
 
 Setting Up
@@ -337,6 +368,7 @@ C-c r v           rope-move
 C-c r x           rope-restructure
 C-c r u           rope-use-function
 C-c r f           rope-introduce-factory
+C-c r s           rope-change-signature
 C-c r 1 r         rope-rename-current-module
 C-c r 1 v         rope-move-current-module
 C-c r 1 p         rope-module-to-package
