@@ -391,9 +391,9 @@ class ChangeSignature(Refactoring):
         changers.append(rope.refactor.change_signature.
                         ArgumentReorderer(order, autodef='None'))
 
-        resources = _resources(self.project, values.get('resources'))
-        return self.changer.get_changes(changers, resources=resources,
-                                        task_handle=task_handle)
+        del values['signature']
+        return self.changer.get_changes(changers, task_handle=task_handle,
+                                        **values)
 
     def _get_confs(self):
         info = self.changer.get_definition_info()
@@ -405,7 +405,11 @@ class ChangeSignature(Refactoring):
                                          default=signature)}
 
     def _get_optionals(self):
-        return {'resources': self.resources_option}
+        opts = {'resources': self.resources_option}
+        if self.changer.is_method():
+            opts['in_hierarchy'] = dialog.Boolean('Rename methods in '
+                                                  'class hierarchy: ')
+        return opts
 
 
 class _GenerateElement(Refactoring):
