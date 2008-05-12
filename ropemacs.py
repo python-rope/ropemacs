@@ -240,8 +240,11 @@ class LispUtils(object):
         self._set_interaction(callback, prefix)
         if self.local_prefix and key:
             key = self._key_sequence(self.local_prefix + ' ' + key)
-            lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
-                 (self._key_sequence(key), _lisp_name(name)))
+            self._bind_local(_lisp_name(name), key)
+
+    def _bind_local(self, name, key):
+        lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
+             (self._key_sequence(key), name))
 
     def global_command(self, name, callback, key=None, prefix=False):
         globals()[name] = callback
@@ -489,9 +492,20 @@ MINOR_MODE = """\
 )
 """
 
+shortcuts = [('M-/', 'rope-code-assist'),
+             ('M-?', 'rope-lucky-assist'),
+             ('C-c g', 'rope-goto-definition'),
+             ('C-c d', 'rope-show-doc'),
+             ('C-c f', 'rope-find-occurrences')]
+
+
 ropecommon.decorators.logger.message = lisp.message
 lisp(DEFVARS)
 _interface = ropecommon.interface.RopeCommon(env=LispUtils())
 _interface.init()
 lisp(MINOR_MODE)
+
+for key, command in shortcuts:
+    LispUtils()._bind_local(command, key)
+
 lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
