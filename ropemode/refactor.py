@@ -45,13 +45,10 @@ class Refactoring(object):
         if action == 'preview':
             if changes is not None:
                 diffs = str(changes.get_description())
-                self.env.make_buffer('*rope-preview*', diffs, switch=True,
-                                      modes=['diff'], window='current')
-                if self.env.yes_or_no('Do the changes? '):
+                if self.env.preview_changes(diffs):
                     self._perform(changes)
                 else:
                     self.env.message('Thrown away!')
-                self.env.hide_buffer('*rope-preview*', delete=False)
             else:
                 self.env.message('No changes!')
 

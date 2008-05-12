@@ -153,8 +153,8 @@ class LispUtils(object):
         else:
             lisp.find_file(filename)
 
-    def make_buffer(self, name, contents, empty_goto=True, switch=False,
-                    window='other', modes=[], fit_lines=None):
+    def _make_buffer(self, name, contents, empty_goto=True, switch=False,
+                     window='other', modes=[], fit_lines=None):
         """Make an emacs buffer
 
         `window` can be one of `None`, 'current' or 'other'.
@@ -183,7 +183,7 @@ class LispUtils(object):
                     lisp.bury_buffer(new_buffer)
         return new_buffer
 
-    def hide_buffer(self, name, delete=True):
+    def _hide_buffer(self, name, delete=True):
         buffer = lisp.get_buffer(name)
         if buffer is not None:
             window = lisp.get_buffer_window(buffer)
@@ -223,17 +223,24 @@ class LispUtils(object):
             line = '%s : %s %s' % (filename, offset, note)
             text.append(line)
         text = '\n'.join(text) + '\n'
-        buffer = self.make_buffer('*rope-occurrences*', text, switch=True)
+        buffer = self._make_buffer('*rope-occurrences*', text, switch=True)
         lisp.set_buffer(buffer)
         lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
         lisp.local_set_key('q', lisp.delete_window)
 
     def show_doc(self, docs):
         fit_lines = self.get('ropemacs-max-doc-buffer-height')
-        buffer = self.make_buffer('*rope-pydoc*', docs,
-                                  empty_goto=False, fit_lines=fit_lines)
+        buffer = self._make_buffer('*rope-pydoc*', docs,
+                                   empty_goto=False, fit_lines=fit_lines)
         lisp.local_set_key('q', lisp.bury_buffer)
 
+    def preview_changes(self, diffs):
+        self._make_buffer('*rope-preview*', diffs, switch=True,
+                          modes=['diff'], window='current')
+        try:
+            return self.yes_or_no('Do the changes? ')
+        finally:
+            self._hide_buffer('*rope-preview*', delete=False)
 
     def local_command(self, name, callback, key=None, prefix=False):
         globals()[name] = callback
