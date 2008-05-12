@@ -15,9 +15,9 @@ class LispUtils(object):
         return lisp.yes_or_no_p(prompt)
 
     def get_region(self):
-        offset1 = self._get_offset()
+        offset1 = self.get_offset()
         lisp.exchange_point_and_mark()
-        offset2 = self._get_offset()
+        offset2 = self.get_offset()
         lisp.exchange_point_and_mark()
         return min(offset1, offset2), max(offset1, offset2)
 
@@ -25,8 +25,6 @@ class LispUtils(object):
         return lisp.point() - 1
 
     def get_text(self):
-        if not lisp.buffer_modified_p():
-            return self._get_resource().read()
         end = lisp.buffer_size() + 1
         old_min = lisp.point_min()
         old_max = lisp.point_max()
@@ -202,6 +200,144 @@ def _register_functions(interface):
             globals()[attrname] = attr
 
 
+DEFVARS = """\
+(defgroup ropemacs nil
+  "ropemacs, an emacs plugin for rope."
+  :link '(url-link "http://rope.sourceforge.net/ropemacs.html")
+  :prefix "rope-")
+
+(defcustom ropemacs-confirm-saving t
+  "Shows whether to confirm saving modified buffers before refactorings.
+
+If non-nil, you have to confirm saving all modified
+python files before refactorings; otherwise they are
+saved automatically.")
+
+(defcustom ropemacs-codeassist-maxfixes 1
+  "The number of errors to fix before code-assist.
+
+How many errors to fix, at most, when proposing code completions.")
+
+(defcustom ropemacs-separate-doc-buffer t
+  "Should `rope-show-doc' use a separate buffer or the minibuffer.")
+(defcustom ropemacs-max-doc-buffer-height 22
+  "The maximum buffer height for `rope-show-doc'.")
+
+(defcustom ropemacs-enable-autoimport 'nil
+  "Specifies whether autoimport should be enabled.")
+(defcustom ropemacs-autoimport-modules nil
+  "The name of modules whose global names should be cached.
+
+The `rope-generate-autoimport-cache' reads this list and fills its
+cache.")
+(defcustom ropemacs-autoimport-underlineds 'nil
+  "If set, autoimport will cache names starting with underlines, too.")
+
+(defcustom ropemacs-completing-read-function (if (and (boundp 'ido-mode)
+                                                      ido-mode)
+                                                 'ido-completing-read
+                                               'completing-read)
+  "Function to call when prompting user to choose between a list of options.
+This should take the same arguments as `completing-read'.
+Possible values are `completing-read' and `ido-completing-read'.
+Note that you must set `ido-mode' if using`ido-completing-read'."
+  :type 'function)
+
+(make-obsolete-variable
+  'rope-confirm-saving 'ropemacs-confirm-saving)
+(make-obsolete-variable
+  'rope-code-assist-max-fixes 'ropemacs-codeassist-maxfixes)
+
+(defcustom ropemacs-local-prefix "C-c r"
+  "The prefix for ropemacs refactorings.
+
+Use nil to prevent binding keys.")
+
+(defcustom ropemacs-global-prefix "C-x p"
+  "The prefix for ropemacs project commands.
+
+Use nil to prevent binding keys.")
+
+(defcustom ropemacs-enable-shortcuts 't
+  "Shows whether to bind ropemacs shortcuts keys.
+
+If non-nil it binds:
+
+================  ============================
+Key               Command
+================  ============================
+M-/               rope-code-assist
+C-c g             rope-goto-definition
+C-c d             rope-show-doc
+C-c f             rope-find-occurrences
+M-?               rope-lucky-assist
+================  ============================
+")
+
+(defvar ropemacs-local-keymap (make-sparse-keymap))
+
+(easy-menu-define ropemacs-mode-menu ropemacs-local-keymap
+"`ropemacs' menu"
+                  '("Rope"
+                    ["Code assist" rope-code-assist t]
+                    ["Lucky assist" rope-lucky-assist t]
+                    ["Goto definition" rope-goto-definition t]
+                    ["Jump to global" rope-jump-to-global t]
+                    ["Show documentation" rope-show-doc t]
+                    ["Find Occurrences" rope-find-occurrences t]
+                    ["Analyze module" rope-analyze-module t]
+                    ("Refactor"
+                      ["Inline" rope-inline t]
+                      ["Extract Variable" rope-extract-variable t]
+                      ["Extract Method" rope-extract-method t]
+                      ["Organize Imports" rope-organize-imports t]
+                      ["Rename" rope-rename t]
+                      ["Move" rope-move t]
+                      ["Restructure" rope-restructure t]
+                      ["Use Function" rope-use-function t]
+                      ["Introduce Factory" rope-introduce-factory t]
+                      ("Generate"
+                        ["Class" rope-generate-class t]
+                        ["Function" rope-generate-function t]
+                        ["Module" rope-generate-module t]
+                        ["Package" rope-generate-package t]
+                        ["Variable" rope-generate-variable t]
+                      )
+                      ("Module"
+                        ["Module to Package" rope-module-to-package t]
+                        ["Rename Module" rope-rename-current-module t]
+                        ["Move Module" rope-move-current-module t]
+                      )
+                      "--"
+                      ["Undo" rope-undo t]
+                      ["Redo" rope-redo t]
+                    )
+                    ("Project"
+                      ["Open project" rope-open-project t]
+                      ["Close project" rope-close-project t]
+                      ["Find file" rope-find-file t]
+                      ["Open project config" rope-project-config t]
+                    )
+                    ("Create"
+                      ["Module" rope-create-module t]
+                      ["Package" rope-create-package t]
+                      ["File" rope-create-file t]
+                      ["Directory" rope-create-directory t]
+                    )
+                    ))
+
+(provide 'ropemacs)
+"""
+
+MINOR_MODE = """\
+(define-minor-mode ropemacs-mode
+ "ropemacs, rope in emacs!" nil " Rope" ropemacs-local-keymap
+  :global nil)
+)
+"""
+
+lisp(DEFVARS)
 _interface = ropecommon.interface.Ropemacs(env=LispUtils())
 _register_functions(_interface)
 _interface.init()
+lisp(MINOR_MODE)
