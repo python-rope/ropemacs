@@ -65,11 +65,11 @@ class Refactoring(object):
 
     @property
     def offset(self):
-        return self.interface._get_offset()
+        return self.env.get_offset()
 
     @property
     def region(self):
-        return self.interface._get_region()
+        return self.env.get_region()
 
     @property
     def name(self):

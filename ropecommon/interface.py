@@ -170,38 +170,13 @@ class Ropemacs(object):
                     self._reload_buffers(changes)
             self.env.runtask(redo, 'Redo refactoring', interrupts=False)
 
-    def _get_region(self):
-        offset1 = self._get_offset()
-        lisp.exchange_point_and_mark()
-        offset2 = self._get_offset()
-        lisp.exchange_point_and_mark()
-        return min(offset1, offset2), max(offset1, offset2)
-
-    def _get_offset(self):
-        return lisp.point() - 1
-
-    def _get_text(self):
-        if not lisp.buffer_modified_p():
-            return self._get_resource().read()
-        end = lisp.buffer_size() + 1
-        old_min = lisp.point_min()
-        old_max = lisp.point_max()
-        narrowed = (old_min != 1 or old_max != end)
-        if narrowed:
-            lisp.narrow_to_region(1, lisp.buffer_size() + 1)
-        try:
-            return lisp.buffer_string()
-        finally:
-            if narrowed:
-                lisp.narrow_to_region(old_min, old_max)
-
     @decorators.local_command('a g', shortcut='C-c g')
     def goto_definition(self):
         self._check_project()
         resource, offset = self._get_location()
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
         definition = codeassist.get_definition_location(
-            self.project, self._get_text(), offset, resource, maxfixes)
+            self.project, self.env.get_text(), offset, resource, maxfixes)
         if tuple(definition) != (None, None):
             lisp.push_mark()
             self._goto_location(definition[0], definition[1])
@@ -231,8 +206,8 @@ class Ropemacs(object):
 
     def _base_show_doc(self, prefix, get_doc):
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
-        text = self._get_text()
-        offset = self._get_offset()
+        text = self.env.get_text()
+        offset = self.env.get_offset()
         docs = get_doc(self.project, text, offset,
                        self._get_resource(), maxfixes)
 
@@ -476,7 +451,7 @@ class Ropemacs(object):
 
     def _get_location(self):
         resource = self._get_resource()
-        offset = self._get_offset()
+        offset = self.env.get_offset()
         return resource, offset
 
     def _get_resource(self, filename=None):

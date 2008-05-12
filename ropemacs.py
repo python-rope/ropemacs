@@ -11,6 +11,31 @@ class LispUtils(object):
     def yes_or_no(self, prompt):
         return lisp.yes_or_no_p(prompt)
 
+    def get_region(self):
+        offset1 = self._get_offset()
+        lisp.exchange_point_and_mark()
+        offset2 = self._get_offset()
+        lisp.exchange_point_and_mark()
+        return min(offset1, offset2), max(offset1, offset2)
+
+    def get_offset(self):
+        return lisp.point() - 1
+
+    def get_text(self):
+        if not lisp.buffer_modified_p():
+            return self._get_resource().read()
+        end = lisp.buffer_size() + 1
+        old_min = lisp.point_min()
+        old_max = lisp.point_max()
+        narrowed = (old_min != 1 or old_max != end)
+        if narrowed:
+            lisp.narrow_to_region(1, lisp.buffer_size() + 1)
+        try:
+            return lisp.buffer_string()
+        finally:
+            if narrowed:
+                lisp.narrow_to_region(old_min, old_max)
+
     def make_buffer(self, name, contents, empty_goto=True, switch=False,
                     window='other', modes=[], fit_lines=None):
         """Make an emacs buffer
