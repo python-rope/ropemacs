@@ -235,6 +235,9 @@ class LispUtils(object):
     def push_mark(self):
         lisp.push_mark()
 
+    def prefix_value(self, prefix):
+        return lisp.prefix_numeric_value(prefix)
+
 
 class _LispProgress(object):
 

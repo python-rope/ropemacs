@@ -502,7 +502,7 @@ class _CodeAssist(object):
     def code_assist(self, prefix):
         names = self._calculate_proposals()
         if prefix is not None:
-            arg = lisp.prefix_numeric_value(prefix)
+            arg = self.env.prefix_value(prefix)
             if arg == 0:
                 arg = len(names)
             common_start = self._calculate_prefix(names[:arg])
@@ -518,7 +518,7 @@ class _CodeAssist(object):
         names = self._calculate_proposals()
         selected = 0
         if prefix is not None:
-            selected = lisp.prefix_numeric_value(prefix)
+            selected = self.env.prefix_value(prefix)
         if 0 <= selected < len(names):
             result = names[selected]
         else:
