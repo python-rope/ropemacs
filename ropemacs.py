@@ -1,6 +1,6 @@
 """ropemacs, an emacs mode for using rope refactoring library"""
 from Pymacs import lisp
-from rope.base import taskhandle
+from rope.base import taskhandle, utils
 
 import ropecommon.dialog
 import ropecommon.interface
@@ -9,8 +9,52 @@ import ropecommon.decorators
 
 class LispUtils(object):
 
-    def get(self, name):
-        return lisp[name].value()
+    def askdata(self, data, starting=None):
+        """`data` is a `ropecommon.dialog.Data` object"""
+        ask_func = self.ask
+        ask_args = {'prompt': data.prompt, 'starting': starting,
+                    'default': data.default}
+        if data.values:
+            ask_func = self.ask_values
+            ask_args['values'] = data.values
+        elif data.kind == 'directory':
+            ask_func = self.ask_directory
+        return ask_func(**ask_args)
+
+    def ask_values(self, prompt, values, default=None, starting=None, exact=True):
+        if self._emacs_version() < 22:
+            values = [[value, value] for value in values]
+        if exact and default is not None:
+            prompt = prompt + ('[%s] ' % default)
+        reader = lisp['ropemacs-completing-read-function'].value()
+        result = reader(prompt, values, None, exact, starting)
+        if result == '' and exact:
+            return default
+        return result
+
+
+    def ask(self, prompt, default=None, starting=None):
+        if default is not None:
+            prompt = prompt + ('[%s] ' % default)
+        result = lisp.read_from_minibuffer(prompt, starting, None, None,
+                                           None, default, None)
+        if result == '' and default is not None:
+            return default
+        return result
+
+    def ask_directory(self, prompt, default=None, starting=None):
+        if default is not None:
+            prompt = prompt + ('[%s] ' % default)
+        if lisp.fboundp(lisp['read-directory-name']):
+            result = lisp.read_directory_name(prompt, starting, default)
+        else:
+            result = lisp.read_file_name(prompt, starting, default)
+        if result == '' and default is not None:
+            return default
+        return result
+
+    def message(self, message):
+        lisp.message(message)
 
     def yes_or_no(self, prompt):
         return lisp.yes_or_no_p(prompt)
@@ -18,12 +62,8 @@ class LispUtils(object):
     def y_or_n(self, prompt):
         return lisp.y_or_n_p(prompt)
 
-    def get_region(self):
-        offset1 = self.get_offset()
-        lisp.exchange_point_and_mark()
-        offset2 = self.get_offset()
-        lisp.exchange_point_and_mark()
-        return min(offset1, offset2), max(offset1, offset2)
+    def get(self, name):
+        return lisp[name].value()
 
     def get_offset(self):
         return lisp.point() - 1
@@ -40,6 +80,13 @@ class LispUtils(object):
         finally:
             if narrowed:
                 lisp.narrow_to_region(old_min, old_max)
+
+    def get_region(self):
+        offset1 = self.get_offset()
+        lisp.exchange_point_and_mark()
+        offset2 = self.get_offset()
+        lisp.exchange_point_and_mark()
+        return min(offset1, offset2), max(offset1, offset2)
 
     def filename(self):
         return lisp.buffer_file_name()
@@ -136,7 +183,6 @@ class LispUtils(object):
                     lisp.bury_buffer(new_buffer)
         return new_buffer
 
-
     def hide_buffer(self, name, delete=True):
         buffer = lisp.get_buffer(name)
         if buffer is not None:
@@ -148,56 +194,6 @@ class LispUtils(object):
                 else:
                     if lisp.buffer_name(lisp.current_buffer()) == name:
                         lisp.switch_to_buffer(None)
-
-
-    def message(self, message):
-        lisp.message(message)
-
-
-    def askdata(self, data, starting=None):
-        """`data` is a `ropecommon.dialog.Data` object"""
-        ask_func = self.ask
-        ask_args = {'prompt': data.prompt, 'starting': starting,
-                    'default': data.default}
-        if data.values:
-            ask_func = self.ask_values
-            ask_args['values'] = data.values
-        elif data.kind == 'directory':
-            ask_func = self.ask_directory
-        return ask_func(**ask_args)
-
-
-    def ask_values(self, prompt, values, default=None, starting=None, exact=True):
-        if self._emacs_version() < 22:
-            values = [[value, value] for value in values]
-        if exact and default is not None:
-            prompt = prompt + ('[%s] ' % default)
-        reader = lisp['ropemacs-completing-read-function'].value()
-        result = reader(prompt, values, None, exact, starting)
-        if result == '' and exact:
-            return default
-        return result
-
-
-    def ask(self, prompt, default=None, starting=None):
-        if default is not None:
-            prompt = prompt + ('[%s] ' % default)
-        result = lisp.read_from_minibuffer(prompt, starting, None, None,
-                                           None, default, None)
-        if result == '' and default is not None:
-            return default
-        return result
-
-    def ask_directory(self, prompt, default=None, starting=None):
-        if default is not None:
-            prompt = prompt + ('[%s] ' % default)
-        if lisp.fboundp(lisp['read-directory-name']):
-            result = lisp.read_directory_name(prompt, starting, default)
-        else:
-            result = lisp.read_file_name(prompt, starting, default)
-        if result == '' and default is not None:
-            return default
-        return result
 
     def _emacs_version(self):
         return int(lisp['emacs-version'].value().split('.')[0])
@@ -211,6 +207,15 @@ class LispUtils(object):
         else:
             progress = _OldProgress(name)
         return progress
+
+    def current_word(self):
+        return lisp.current_word()
+
+    def push_mark(self):
+        lisp.push_mark()
+
+    def prefix_value(self, prefix):
+        return lisp.prefix_numeric_value(prefix)
 
     def show_occurrences(self, locations):
         text = []
@@ -229,15 +234,60 @@ class LispUtils(object):
                                   empty_goto=False, fit_lines=fit_lines)
         lisp.local_set_key('q', lisp.bury_buffer)
 
-    def current_word(self):
-        return lisp.current_word()
 
-    def push_mark(self):
-        lisp.push_mark()
+    def local_command(self, name, callback, key=None, prefix=False):
+        globals()[name] = callback
+        self._set_interaction(callback, prefix)
+        if self.local_prefix and key:
+            key = self._key_sequence(self.local_prefix + ' ' + key)
+            lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
+                 (self._key_sequence(key), _lisp_name(name)))
 
-    def prefix_value(self, prefix):
-        return lisp.prefix_numeric_value(prefix)
+    def global_command(self, name, callback, key=None, prefix=False):
+        globals()[name] = callback
+        self._set_interaction(callback, prefix)
+        if self.global_prefix and key:
+            key = self._key_sequence(self.global_prefix + ' ' + key)
+            lisp.global_set_key(key, lisp[_lisp_name(name)])
 
+    def _key_sequence(self, sequence):
+        result = []
+        for key in sequence.split():
+            if key.startswith('C-'):
+                number = ord(key[-1].upper()) - ord('A') + 1
+                result.append(chr(number))
+            elif key.startswith('M-'):
+                number = ord(key[-1].upper()) + 0x80
+                result.append(chr(number))
+            else:
+                result.append(key)
+        return ''.join(result)
+
+    def _set_interaction(self, callback, prefix):
+        if hasattr(callback, 'im_func'):
+            callback = callback.im_func
+        if prefix:
+            callback.interaction = 'P'
+        else:
+            callback.interaction = ''
+
+    def add_hook(self, name, callback, hook):
+        globals()[name] = callback
+        lisp.add_hook(lisp[hook], lisp[_lisp_name(name)])
+
+    @property
+    @utils.cacheit
+    def global_prefix(self):
+        return self.get('ropemacs-global-prefix')
+
+    @property
+    @utils.cacheit
+    def local_prefix(self):
+        return self.get('ropemacs-local-prefix')
+
+
+def _lisp_name(name):
+    return 'rope-' + name.replace('_', '-')
 
 class _LispProgress(object):
 
@@ -301,13 +351,6 @@ def occurrences_goto_occurrence():
         lisp.goto_char(offset + 1)
         lisp.switch_to_buffer_other_window('*rope-occurrences*')
 occurrences_goto_occurrence.interaction = ''
-
-
-def _register_functions(interface):
-    for attrname in dir(interface):
-        attr = getattr(interface, attrname)
-        if hasattr(attr, 'interaction') or hasattr(attr, 'lisp'):
-            globals()[attrname] = attr
 
 
 DEFVARS = """\
@@ -448,8 +491,7 @@ MINOR_MODE = """\
 
 ropecommon.decorators.logger.message = lisp.message
 lisp(DEFVARS)
-_interface = ropecommon.interface.Ropemacs(env=LispUtils())
-_register_functions(_interface)
+_interface = ropecommon.interface.RopeCommon(env=LispUtils())
 _interface.init()
 lisp(MINOR_MODE)
 lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])

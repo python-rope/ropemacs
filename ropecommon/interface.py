@@ -6,7 +6,7 @@ from rope.contrib import codeassist, generate, autoimport, findit
 from ropecommon import refactor, decorators, dialog
 
 
-class Ropemacs(object):
+class RopeCommon(object):
 
     def __init__(self, env):
         self.project = None
@@ -21,31 +21,22 @@ class Ropemacs(object):
         """Initialize rope mode"""
 
     def _init_ropemacs(self):
-        global_prefix = self.env.get('ropemacs-global-prefix')
-        local_prefix = self.env.get('ropemacs-local-prefix')
-        enable_shortcuts = self.env.get('ropemacs-enable-shortcuts')
         for attrname in dir(self):
             attr = getattr(self, attrname)
             if not callable(attr):
                 continue
             kind = getattr(attr, 'kind', None)
-            name = attr.__name__
             if kind == 'local':
-                local_key = getattr(attr, 'local_key', None)
-                shortcut_key = getattr(attr, 'shortcut_key', None)
-                if local_prefix is not None and local_key:
-                    self._bind_local_key(attr.name,
-                                         local_prefix + ' ' + local_key)
-                if enable_shortcuts and shortcut_key:
-                    self._bind_local_key(attr.name, shortcut_key)
+                key = getattr(attr, 'local_key', None)
+                prefix = getattr(attr, 'prefix', None)
+                self.env.local_command(attrname, attr, key, prefix)
             if kind == 'global':
-                global_key = getattr(attr, 'global_key', None)
-                if global_key:
-                    key = self._key_sequence(global_prefix + ' ' + global_key)
-                    lisp.global_set_key(key, lisp[_lisp_name(attr.name)])
+                key = getattr(attr, 'global_key', None)
+                prefix = getattr(attr, 'prefix', None)
+                self.env.global_command(attrname, attr, key, prefix)
             if kind == 'hook':
                 hook = getattr(attr, 'hook', None)
-                lisp.add_hook(lisp[hook], lisp[_lisp_name(attr.name)])
+                self.env.add_hook(attrname, attr, hook)
 
     def _prepare_refactorings(self):
         for name in dir(refactor):
@@ -62,19 +53,6 @@ class Ropemacs(object):
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
-
-    def _key_sequence(self, sequence):
-        result = []
-        for key in sequence.split():
-            if key.startswith('C-'):
-                number = ord(key[-1].upper()) - ord('A') + 1
-                result.append(chr(number))
-            elif key.startswith('M-'):
-                number = ord(key[-1].upper()) + 0x80
-                result.append(chr(number))
-            else:
-                result.append(key)
-        return ''.join(result)
 
     @decorators.rope_hook('before-save-hook')
     def before_save_actions(self):
@@ -94,20 +72,10 @@ class Ropemacs(object):
                                    self.old_content)
             self.old_content = None
 
-    def _bind_local_key(self, callback, key):
-        lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
-             (self._key_sequence(key), _lisp_name(callback)))
-
     @decorators.rope_hook('kill-emacs-hook')
     def exiting_actions(self):
         if self.project is not None:
             self.close_project()
-
-    @decorators.lispfunction
-    def unload_hook(self):
-        """Unload registered hooks"""
-        for hook, function in hooks:
-            lisp.remove_hook(lisp[hook], lisp[function])
 
     @decorators.global_command('o')
     def open_project(self, root=None):
@@ -481,9 +449,6 @@ class Ropemacs(object):
                 resource.project == self.project and
                 self.project.pycore.is_python_file(resource))
 
-
-def _lisp_name(name):
-    return 'rope-' + name.replace('_', '-')
 
 
 class _CodeAssist(object):

@@ -30,11 +30,6 @@ def lisphook(func):
     return newfunc
 
 
-def interactive(func):
-    func.interaction = ''
-    return func
-
-
 def lispfunction(func):
     func.lisp = None
     return func
@@ -69,12 +64,11 @@ def rope_hook(hook):
     return decorator
 
 
-def local_command(key=None, interaction='', shortcut=None, name=None):
+def local_command(key=None, prefix=False, shortcut=None, name=None):
     def decorator(func, name=name):
         func = _exception_handler(func)
         func.kind = 'local'
-        if interaction is not None:
-            func.interaction = interaction
+        func.prefix = prefix
         func.local_key = key
         func.shortcut_key = shortcut
         if name is None:
@@ -84,12 +78,11 @@ def local_command(key=None, interaction='', shortcut=None, name=None):
     return decorator
 
 
-def global_command(key=None, interaction=''):
+def global_command(key=None, prefix=False):
     def decorator(func):
         func = _exception_handler(func)
         func.kind = 'global'
-        if interaction is not None:
-            func.interaction = interaction
+        func.prefix = prefix
         func.global_key = key
         func.name = func.__name__
         return func
