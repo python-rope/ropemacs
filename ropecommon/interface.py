@@ -221,7 +221,7 @@ class Ropemacs(object):
             self.env.message('No docs avilable!')
 
     def _get_text(self):
-        if not lisp.buffer_modified_p():
+        if not self.env.is_modified():
             return self._get_resource().read()
         return self.env.get_text()
 
@@ -422,7 +422,7 @@ class Ropemacs(object):
             self.env.find_file(str(resource.real_path),
                                resource.project == self.project)
         if lineno:
-            lisp.goto_line(lineno)
+            self.env.goto_line(lineno)
 
     def _get_location(self):
         resource = self._get_resource()
@@ -503,7 +503,7 @@ class _CodeAssist(object):
             if arg == 0:
                 arg = len(names)
             common_start = self._calculate_prefix(names[:arg])
-            lisp.insert(common_start[self.offset - self.starting_offset:])
+            self.env.insert(common_start[self.offset - self.starting_offset:])
             self._starting = common_start
             self._offset = self.starting_offset + len(common_start)
         prompt = 'Completion for %s: ' % self.expression
@@ -542,11 +542,11 @@ class _CodeAssist(object):
         if ' : ' in assist:
             name, module = assist.rsplit(' : ', 1)
             lisp.delete_region(self.starting_offset + 1, self.offset + 1)
-            lisp.insert(name)
+            self.env.insert(name)
             self._insert_import(name, module)
         else:
             lisp.delete_region(self.starting_offset + 1, self.offset + 1)
-            lisp.insert(assist)
+            self.env.insert(assist)
 
     def _calculate_proposals(self):
         self.interface._check_project()
@@ -565,11 +565,8 @@ class _CodeAssist(object):
 
     def _insert_import(self, name, module):
         lineno = self.autoimport.find_insertion_line(self.source)
-        current = lisp.point()
-        lisp.goto_line(lineno)
-        newimport = 'from %s import %s\n' % (module, name)
-        lisp.insert(newimport)
-        lisp.goto_char(current + len(newimport))
+        line = 'from %s import %s' % (module, name)
+        self.env.insert_line(line, lineno)
 
     def _calculate_prefix(self, names):
         if not names:

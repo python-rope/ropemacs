@@ -43,6 +43,21 @@ class LispUtils(object):
     def filename(self):
         return lisp.buffer_file_name()
 
+    def is_modified(self):
+        return lisp.buffer_modified_p()
+
+    def goto_line(self, lineno):
+        lisp.goto_line(lineno)
+
+    def insert_line(self, line, lineno):
+        current = lisp.point()
+        lisp.goto_line(lineno)
+        lisp.insert(line + '\n')
+        lisp.goto_char(current + len(line) + 1)
+
+    def insert(self, text):
+        lisp.insert(text)
+
     def filenames(self):
         result = []
         for buffer in lisp.buffer_list():
