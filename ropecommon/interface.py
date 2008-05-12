@@ -29,23 +29,23 @@ class Ropemacs(object):
             if not callable(attr):
                 continue
             kind = getattr(attr, 'kind', None)
-            name = decorators._lisp_name(attr)
+            name = attr.__name__
             if kind == 'local':
                 local_key = getattr(attr, 'local_key', None)
                 shortcut_key = getattr(attr, 'shortcut_key', None)
                 if local_prefix is not None and local_key:
-                    self._bind_local_key(attr.lisp_name,
+                    self._bind_local_key(attr.name,
                                          local_prefix + ' ' + local_key)
                 if enable_shortcuts and shortcut_key:
-                    self._bind_local_key(attr.lisp_name, shortcut_key)
+                    self._bind_local_key(attr.name, shortcut_key)
             if kind == 'global':
                 global_key = getattr(attr, 'global_key', None)
                 if global_key:
                     key = self._key_sequence(global_prefix + ' ' + global_key)
-                    lisp.global_set_key(key, lisp[attr.lisp_name])
+                    lisp.global_set_key(key, lisp[_lisp_name(attr.name)])
             if kind == 'hook':
                 hook = getattr(attr, 'hook', None)
-                lisp.add_hook(lisp[hook], lisp[attr.lisp_name])
+                lisp.add_hook(lisp[hook], lisp[_lisp_name(attr.name)])
         lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
 
     def _prepare_refactorings(self):
@@ -54,13 +54,12 @@ class Ropemacs(object):
                 attr = getattr(refactor, name)
                 if isinstance(attr, type) and \
                    issubclass(attr, refactor.Refactoring):
-                    ref_name = self._refactoring_name(attr)
-                    lisp_name = 'rope-' + ref_name.replace('_', '-')
-                    @decorators.local_command(attr.key, 'P', None, lisp_name)
+                    refname = self._refactoring_name(attr)
+                    @decorators.local_command(attr.key, 'P', None, refname)
                     def do_refactor(prefix, self=self, refactoring=attr):
                         initial_asking = prefix is None
                         refactoring(self, self.env).show(initial_asking=initial_asking)
-                    setattr(self, ref_name, do_refactor)
+                    setattr(self, refname, do_refactor)
 
     def _refactoring_name(self, refactoring):
         return refactor.refactoring_name(refactoring)
@@ -98,7 +97,7 @@ class Ropemacs(object):
 
     def _bind_local_key(self, callback, key):
         lisp('(define-key ropemacs-local-keymap "%s" \'%s)' %
-             (self._key_sequence(key), callback))
+             (self._key_sequence(key), _lisp_name(callback)))
 
     @decorators.rope_hook('kill-emacs-hook')
     def exiting_actions(self):
@@ -482,6 +481,10 @@ class Ropemacs(object):
         return (resource is not None and
                 resource.project == self.project and
                 self.project.pycore.is_python_file(resource))
+
+
+def _lisp_name(name):
+    return 'rope-' + name.replace('_', '-')
 
 
 class _CodeAssist(object):

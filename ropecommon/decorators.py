@@ -44,9 +44,6 @@ input_exceptions = (exceptions.RefactoringError,
                     exceptions.ModuleSyntaxError,
                     exceptions.BadIdentifierError)
 
-def _lisp_name(func):
-    return 'rope-' + func.__name__.replace('_', '-')
-
 def _exception_handler(func):
     def newfunc(*args, **kwds):
         try:
@@ -65,7 +62,7 @@ def _exception_message(e):
 def rope_hook(hook):
     def decorator(func):
         func = lisphook(func)
-        func.lisp_name = _lisp_name(func)
+        func.name = func.__name__
         func.kind = 'hook'
         func.hook = hook
         return func
@@ -81,8 +78,8 @@ def local_command(key=None, interaction='', shortcut=None, name=None):
         func.local_key = key
         func.shortcut_key = shortcut
         if name is None:
-            name = _lisp_name(func)
-        func.lisp_name = name
+            name = func.__name__
+        func.name = name
         return func
     return decorator
 
@@ -94,6 +91,6 @@ def global_command(key=None, interaction=''):
         if interaction is not None:
             func.interaction = interaction
         func.global_key = key
-        func.lisp_name = _lisp_name(func)
+        func.name = func.__name__
         return func
     return decorator
