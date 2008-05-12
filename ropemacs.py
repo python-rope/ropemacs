@@ -228,6 +228,12 @@ class LispUtils(object):
                                   empty_goto=False, fit_lines=fit_lines)
         lisp.local_set_key('q', lisp.bury_buffer)
 
+    def current_word(self):
+        return lisp.current_word()
+
+    def push_mark(self):
+        lisp.push_mark()
+
 
 class _LispProgress(object):
 

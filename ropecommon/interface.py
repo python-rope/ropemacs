@@ -176,7 +176,7 @@ class Ropemacs(object):
         definition = codeassist.get_definition_location(
             self.project, self._get_text(), offset, resource, maxfixes)
         if tuple(definition) != (None, None):
-            lisp.push_mark()
+            self.env.push_mark()
             self._goto_location(definition[0], definition[1])
         else:
             self.env.message('Cannot find the definition!')
@@ -526,7 +526,7 @@ class _CodeAssist(object):
     def auto_import(self):
         if not self.interface._check_autoimport():
             return
-        name = lisp.current_word()
+        name = self.env.current_word()
         modules = self.autoimport.get_modules(name)
         if modules:
             if len(modules) == 1:
