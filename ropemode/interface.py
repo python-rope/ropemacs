@@ -14,12 +14,12 @@ class RopeMode(object):
 
         self._prepare_refactorings()
         self.autoimport = None
-        self._init_ropemacs()
+        self._init_mode()
 
     def init(self):
         """Initialize rope mode"""
 
-    def _init_ropemacs(self):
+    def _init_mode(self):
         for attrname in dir(self):
             attr = getattr(self, attrname)
             if not callable(attr):
@@ -84,8 +84,8 @@ class RopeMode(object):
             self.close_project()
         progress = self.env.create_progress('Opening [%s] project' % root)
         self.project = rope.base.project.Project(root)
-        if self.env.get('ropemacs-enable-autoimport'):
-            underlined = self.env.get('ropemacs-autoimport-underlineds')
+        if self.env.get('enable_autoimport'):
+            underlined = self.env.get('autoimport_underlineds')
             self.autoimport = autoimport.AutoImport(self.project,
                                                     underlined=underlined)
         progress.done()
@@ -139,7 +139,7 @@ class RopeMode(object):
     def goto_definition(self):
         self._check_project()
         resource, offset = self._get_location()
-        maxfixes = self.env.get('ropemacs-codeassist-maxfixes')
+        maxfixes = self.env.get('codeassist_maxfixes')
         definition = codeassist.get_definition_location(
             self.project, self._get_text(), offset, resource, maxfixes)
         if tuple(definition) != (None, None):
@@ -167,17 +167,17 @@ class RopeMode(object):
     @decorators.local_command()
     def show_call_doc(self, prefix):
         self._check_project()
-        self.env.message('ropemacs: use `rope-show-calltip\' instead!')
+        self.env.message('ropemode: use `show_calltip\' instead!')
 
     def _base_show_doc(self, prefix, get_doc):
-        maxfixes = self.env.get('ropemacs-codeassist-maxfixes')
+        maxfixes = self.env.get('codeassist_maxfixes')
         text = self._get_text()
         offset = self.env.get_offset()
         docs = get_doc(self.project, text, offset,
                        self._get_resource(), maxfixes)
 
         use_minibuffer = not prefix
-        if self.env.get('ropemacs-separate-doc-buffer'):
+        if self.env.get('separate_doc_buffer'):
             use_minibuffer = not use_minibuffer
         if use_minibuffer and docs:
             docs = '\n'.join(docs.split('\n')[:7])
@@ -253,7 +253,7 @@ class RopeMode(object):
         self._check_project()
         if self.autoimport is None:
             self.env.message('autoimport is disabled; '
-                             'see `ropemacs-enable-autoimport\' variable')
+                             'see `enable_autoimport\' variable')
             return False
         return True
 
@@ -261,7 +261,7 @@ class RopeMode(object):
     def generate_autoimport_cache(self):
         if not self._check_autoimport():
             return
-        modules = self.env.get('ropemacs-autoimport-modules')
+        modules = self.env.get('autoimport_modules')
         modnames = []
         if modules:
             for i in range(len(modules)):
@@ -433,7 +433,7 @@ class RopeMode(object):
         return result
 
     def _save_buffers(self, only_current=False):
-        ask = self.env.get('ropemacs-confirm-saving')
+        ask = self.env.get('confirm_saving')
         if only_current:
             filenames = self.env.filename()
         else:
@@ -519,7 +519,7 @@ class _CodeAssist(object):
     def _calculate_proposals(self):
         self.interface._check_project()
         resource = self.interface._get_resource()
-        maxfixes = self.env.get('ropemacs-codeassist-maxfixes')
+        maxfixes = self.env.get('codeassist_maxfixes')
         proposals = codeassist.code_assist(
             self.interface.project, self.source, self.offset,
             resource, maxfixes=maxfixes)

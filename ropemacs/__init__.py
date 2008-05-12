@@ -63,7 +63,7 @@ class LispUtils(object):
         return lisp.y_or_n_p(prompt)
 
     def get(self, name):
-        return lisp[name].value()
+        return lisp['ropemacs-' + name.replace('_', '-')].value()
 
     def get_offset(self):
         return lisp.point() - 1
@@ -226,7 +226,7 @@ class LispUtils(object):
         lisp.local_set_key('q', lisp.delete_window)
 
     def show_doc(self, docs):
-        fit_lines = self.get('ropemacs-max-doc-buffer-height')
+        fit_lines = self.get('max_doc_buffer_height')
         buffer = self._make_buffer('*rope-pydoc*', docs,
                                    empty_goto=False, fit_lines=fit_lines)
         lisp.local_set_key('q', lisp.bury_buffer)
@@ -285,12 +285,12 @@ class LispUtils(object):
     @property
     @utils.cacheit
     def global_prefix(self):
-        return self.get('ropemacs-global-prefix')
+        return self.get('global_prefix')
 
     @property
     @utils.cacheit
     def local_prefix(self):
-        return self.get('ropemacs-local-prefix')
+        return self.get('local_prefix')
 
 
 def _lisp_name(name):
