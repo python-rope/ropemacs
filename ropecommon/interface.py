@@ -149,7 +149,7 @@ class Ropemacs(object):
         if change is None:
             self.env.message('Nothing to undo!')
             return
-        if lisp.y_or_n_p('Undo <%s>? ' % str(change)):
+        if self.env.y_or_n('Undo <%s>? ' % str(change)):
             def undo(handle):
                 for changes in self.project.history.undo(task_handle=handle):
                     self._reload_buffers(changes, undo=True)
@@ -162,7 +162,7 @@ class Ropemacs(object):
         if change is None:
             self.env.message('Nothing to redo!')
             return
-        if lisp.y_or_n_p('Redo <%s>? ' % str(change)):
+        if self.env.y_or_n('Redo <%s>? ' % str(change)):
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
                     self._reload_buffers(changes)

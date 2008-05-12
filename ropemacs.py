@@ -14,6 +14,9 @@ class LispUtils(object):
     def yes_or_no(self, prompt):
         return lisp.yes_or_no_p(prompt)
 
+    def y_or_n(self, prompt):
+        return lisp.y_or_n_p(prompt)
+
     def get_region(self):
         offset1 = self.get_offset()
         lisp.exchange_point_and_mark()
