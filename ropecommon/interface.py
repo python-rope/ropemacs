@@ -216,11 +216,7 @@ class Ropemacs(object):
             docs = '\n'.join(docs.split('\n')[:7])
             self.env.message(docs)
         else:
-            fit_lines = self.env.get('ropemacs-max-doc-buffer-height')
-            buffer = self.env.make_buffer('*rope-pydoc*', docs,
-                                          empty_goto=False,
-                                           fit_lines=fit_lines)
-            lisp.local_set_key('q', lisp.bury_buffer)
+            self.env.show_doc(docs)
         if docs is None:
             self.env.message('No docs avilable!')
 

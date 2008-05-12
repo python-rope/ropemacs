@@ -204,6 +204,12 @@ class LispUtils(object):
         lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
         lisp.local_set_key('q', lisp.delete_window)
 
+    def show_doc(self, docs):
+        fit_lines = self.get('ropemacs-max-doc-buffer-height')
+        buffer = self.make_buffer('*rope-pydoc*', docs,
+                                  empty_goto=False, fit_lines=fit_lines)
+        lisp.local_set_key('q', lisp.bury_buffer)
+
 
 class _LispProgress(object):
 
