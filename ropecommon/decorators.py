@@ -2,7 +2,18 @@ import traceback
 
 from rope.base import exceptions
 
-from Pymacs import lisp
+
+class Logger(object):
+
+    message = None
+
+    def __call__(self, message):
+        if message is None:
+            print message
+        else:
+            self.message(message)
+
+logger = Logger()
 
 
 def lisphook(func):
@@ -11,8 +22,8 @@ def lisphook(func):
             func(*args, **kwds)
         except Exception, e:
             trace = str(traceback.format_exc())
-            lisp.message('%s\nIgnored an exception in ropemacs hook: %s' %
-                         (trace, _exception_message(e)))
+            logger('%s\nIgnored an exception in ropemacs hook: %s' %
+                   (trace, _exception_message(e)))
     newfunc.lisp = None
     newfunc.__name__ = func.__name__
     newfunc.__doc__ = func.__doc__
@@ -41,9 +52,9 @@ def _exception_handler(func):
         try:
             func(*args, **kwds)
         except exceptions.RopeError, e:
-            lisp.message(str(traceback.format_exc()))
+            logger(str(traceback.format_exc()))
             if isinstance(e, input_exceptions):
-                lisp.message(_exception_message(e))
+                logger(_exception_message(e))
     newfunc.__name__ = func.__name__
     newfunc.__doc__ = func.__doc__
     return newfunc

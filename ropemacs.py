@@ -4,6 +4,7 @@ from rope.base import taskhandle
 
 import ropecommon.dialog
 import ropecommon.interface
+import ropecommon.decorators
 
 
 class LispUtils(object):
@@ -442,6 +443,7 @@ MINOR_MODE = """\
 )
 """
 
+ropecommon.decorators.logger.message = lisp.message
 lisp(DEFVARS)
 _interface = ropecommon.interface.Ropemacs(env=LispUtils())
 _register_functions(_interface)
