@@ -81,7 +81,7 @@ class Ropemacs(object):
     @decorators.rope_hook('before-save-hook')
     def before_save_actions(self):
         if self.project is not None:
-            if not self._is_python_file(lisp.buffer_file_name()):
+            if not self._is_python_file(self.env.filename()):
                 return
             resource = self._get_resource()
             if resource.exists():
@@ -92,7 +92,7 @@ class Ropemacs(object):
     @decorators.rope_hook('after-save-hook')
     def after_save_actions(self):
         if self.project is not None and self.old_content is not None:
-            libutils.report_change(self.project, lisp.buffer_file_name(),
+            libutils.report_change(self.project, self.env.filename(),
                                    self.old_content)
             self.old_content = None
 
@@ -459,7 +459,7 @@ class Ropemacs(object):
 
     def _get_resource(self, filename=None):
         if filename is None:
-            filename = lisp.buffer_file_name()
+            filename = self.env.filename()
         if filename is None:
             return
         resource = libutils.path_to_resource(self.project, filename, 'file')
@@ -508,21 +508,15 @@ class Ropemacs(object):
 
     def _save_buffers(self, only_current=False):
         ask = self.env.get('ropemacs-confirm-saving')
-        initial = lisp.current_buffer()
-        current_buffer = lisp.current_buffer()
         if only_current:
-            buffers = [current_buffer]
+            filenames = self.env.filename()
         else:
-            buffers = lisp.buffer_list()
-        for buffer in buffers:
-            filename = lisp.buffer_file_name(buffer)
-            if filename:
-                if self._is_python_file(filename) and \
-                   lisp.buffer_modified_p(buffer):
-                    if not ask or lisp.y_or_n_p('Save %s buffer?' % filename):
-                        lisp.set_buffer(buffer)
-                        lisp.save_buffer()
-        lisp.set_buffer(initial)
+            filenames = self.env.filenames()
+        pythons = []
+        for filename in filenames:
+            if self._is_python_file(filename):
+                pythons.append(filename)
+        self.env.save_files(pythons, ask)
 
     def _is_python_file(self, path):
         resource = self._get_resource(path)

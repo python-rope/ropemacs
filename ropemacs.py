@@ -37,6 +37,28 @@ class LispUtils(object):
             if narrowed:
                 lisp.narrow_to_region(old_min, old_max)
 
+    def filename(self):
+        return lisp.buffer_file_name()
+
+    def filenames(self):
+        result = []
+        for buffer in lisp.buffer_list():
+            filename = lisp.buffer_file_name(buffer)
+            if filename:
+                result.append(filename)
+        return result
+
+    def save_files(self, filenames, ask=False):
+        initial = lisp.current_buffer()
+        for filename in filenames:
+            buffer = lisp.find_buffer_visiting(filename)
+            if buffer:
+                if lisp.buffer_modified_p(buffer):
+                    if not ask or lisp.y_or_n_p('Save %s buffer?' % filename):
+                        lisp.set_buffer(buffer)
+                        lisp.save_buffer()
+        lisp.set_buffer(initial)
+
     def make_buffer(self, name, contents, empty_goto=True, switch=False,
                     window='other', modes=[], fit_lines=None):
         """Make an emacs buffer
