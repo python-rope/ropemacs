@@ -46,7 +46,6 @@ class Ropemacs(object):
             if kind == 'hook':
                 hook = getattr(attr, 'hook', None)
                 lisp.add_hook(lisp[hook], lisp[_lisp_name(attr.name)])
-        lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
 
     def _prepare_refactorings(self):
         for name in dir(refactor):
