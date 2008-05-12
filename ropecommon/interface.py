@@ -476,24 +476,11 @@ class Ropemacs(object):
             changes.get_changed_resources(),
             self._get_moved_resources(changes, undo))
 
-    def _reload_buffers_for_changes(self, changed_resources,
-                                    moved_resources={}):
-        if self._get_resource() in moved_resources:
-            initial = None
-        else:
-            initial = lisp.current_buffer()
-        for resource in changed_resources:
-            buffer = lisp.find_buffer_visiting(str(resource.real_path))
-            if buffer:
-                if resource.exists():
-                    lisp.set_buffer(buffer)
-                    lisp.revert_buffer(False, True)
-                elif resource in moved_resources:
-                    new_resource = moved_resources[resource]
-                    lisp.kill_buffer(buffer)
-                    lisp.find_file(new_resource.real_path)
-        if initial is not None:
-            lisp.set_buffer(initial)
+    def _reload_buffers_for_changes(self, changed, moved={}):
+        filenames = [resource.real_path for resource in changed]
+        moved = dict([(resource.real_path, moved[resource].real_path)
+                      for resource in moved])
+        self.env.reload_files(filenames, moved)
 
     def _get_moved_resources(self, changes, undo=False):
         result = {}

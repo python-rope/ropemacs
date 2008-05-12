@@ -62,6 +62,23 @@ class LispUtils(object):
                         lisp.save_buffer()
         lisp.set_buffer(initial)
 
+    def reload_files(self, filenames, moves={}):
+        if self.filename() in moves:
+            initial = None
+        else:
+            initial = lisp.current_buffer()
+        for filename in filenames:
+            buffer = lisp.find_buffer_visiting(filename)
+            if buffer:
+                if filename in moves:
+                    lisp.kill_buffer(buffer)
+                    lisp.find_file(moves[filename])
+                else:
+                    lisp.set_buffer(buffer)
+                    lisp.revert_buffer(False, True)
+        if initial is not None:
+            lisp.set_buffer(initial)
+
     def make_buffer(self, name, contents, empty_goto=True, switch=False,
                     window='other', modes=[], fit_lines=None):
         """Make an emacs buffer
