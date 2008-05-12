@@ -288,7 +288,7 @@ class Ropemacs(object):
         if tokens:
             resource = self.project.get_resource(tokens[0])
             offset = int(tokens[2])
-            lisp.find_file_other_window(resource.real_path)
+            self.env.find_file(resource.real_path, other=True)
             lisp.goto_char(offset + 1)
             lisp.switch_to_buffer_other_window('*rope-occurrences*')
 
@@ -337,13 +337,13 @@ class Ropemacs(object):
     def find_file(self, prefix):
         file = self._base_find_file(prefix)
         if file is not None:
-            lisp.find_file(file.real_path)
+            self.env.find_file(file.real_path)
 
     @decorators.global_command('4 f', 'P')
     def find_file_other_window(self, prefix):
         file = self._base_find_file(prefix)
         if file is not None:
-            lisp.find_file_other_window(file.real_path)
+            self.env.find_file(file.real_path, other=True)
 
     def _base_find_file(self, prefix):
         self._check_project()
@@ -383,7 +383,7 @@ class Ropemacs(object):
         self._check_project()
         if self.project.ropefolder is not None:
             config = self.project.ropefolder.get_child('config.py')
-            lisp.find_file(config.real_path)
+            self.env.find_file(config.real_path)
         else:
             self.env.message('No rope project folder found')
 
@@ -441,14 +441,12 @@ class Ropemacs(object):
                 self.project, values.get(parentname, self.project.address))
             resource = callback(parent, values['name'])
             if resource:
-                lisp.find_file(resource.real_path)
+                self.env.find_file(resource.real_path)
 
     def _goto_location(self, resource, lineno):
         if resource:
-            if resource.project == self.project:
-                lisp.find_file(str(resource.real_path))
-            else:
-                lisp.find_file_read_only(str(resource.real_path))
+            self.env.find_file(str(resource.real_path),
+                               resource.project == self.project)
         if lineno:
             lisp.goto_line(lineno)
 

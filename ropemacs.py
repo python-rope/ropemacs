@@ -79,6 +79,14 @@ class LispUtils(object):
         if initial is not None:
             lisp.set_buffer(initial)
 
+    def find_file(self, filename, readonly=False, other=False):
+        if other:
+            self.find_file_other_window(filename)
+        elif not readonly:
+            lisp.find_file(filename)
+        else:
+            lisp.find_file_read_only(filename)
+
     def make_buffer(self, name, contents, empty_goto=True, switch=False,
                     window='other', modes=[], fit_lines=None):
         """Make an emacs buffer
