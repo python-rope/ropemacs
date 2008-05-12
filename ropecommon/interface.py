@@ -3,14 +3,15 @@ from Pymacs import lisp
 from rope.base import libutils
 from rope.contrib import codeassist, generate, autoimport, findit
 
-from ropecommon import refactor, lisputils, decorators, dialog
+from ropecommon import refactor, decorators, dialog
 
 
 class Ropemacs(object):
 
-    def __init__(self):
+    def __init__(self, env):
         self.project = None
         self.old_content = None
+        self.env = env
         lisp(DEFVARS)
 
         self._prepare_refactorings()
@@ -60,7 +61,7 @@ class Ropemacs(object):
                     @decorators.local_command(attr.key, 'P', None, lisp_name)
                     def do_refactor(prefix, self=self, refactoring=attr):
                         initial_asking = prefix is None
-                        refactoring(self).show(initial_asking=initial_asking)
+                        refactoring(self, self.env).show(initial_asking=initial_asking)
                     setattr(self, ref_name, do_refactor)
 
     def _refactoring_name(self, refactoring):
@@ -115,10 +116,10 @@ class Ropemacs(object):
     @decorators.global_command('o')
     def open_project(self, root=None):
         if not root:
-            root = lisputils.ask_directory('Rope project root folder: ')
+            root = self.env.ask_directory('Rope project root folder: ')
         if self.project is not None:
             self.close_project()
-        progress = lisputils.create_progress('Opening "%s" project' % root)
+        progress = self.env.create_progress('Opening "%s" project' % root)
         self.project = rope.base.project.Project(root)
         if lisp['ropemacs-enable-autoimport'].value():
             underlined = lisp['ropemacs-autoimport-underlineds'].value()
@@ -129,8 +130,8 @@ class Ropemacs(object):
     @decorators.global_command('k')
     def close_project(self):
         if self.project is not None:
-            progress = lisputils.create_progress('Closing "%s" project' %
-                                                 self.project.address)
+            progress = self.env.create_progress('Closing "%s" project' %
+                                                self.project.address)
             self.project.close()
             self.project = None
             progress.done()
@@ -138,7 +139,7 @@ class Ropemacs(object):
     @decorators.global_command()
     def write_project(self):
         if self.project is not None:
-            progress = lisputils.create_progress(
+            progress = self.env.create_progress(
                 'Writing "%s" project data to disk' % self.project.address)
             self.project.sync()
             progress.done()
@@ -148,26 +149,26 @@ class Ropemacs(object):
         self._check_project()
         change = self.project.history.tobe_undone
         if change is None:
-            lisputils.message('Nothing to undo!')
+            self.env.message('Nothing to undo!')
             return
         if lisp.y_or_n_p('Undo <%s>? ' % str(change)):
             def undo(handle):
                 for changes in self.project.history.undo(task_handle=handle):
                     self._reload_buffers(changes, undo=True)
-            lisputils.runtask(undo, 'Undo refactoring', interrupts=False)
+            self.env.runtask(undo, 'Undo refactoring', interrupts=False)
 
     @decorators.global_command('r')
     def redo(self):
         self._check_project()
         change = self.project.history.tobe_redone
         if change is None:
-            lisputils.message('Nothing to redo!')
+            self.env.message('Nothing to redo!')
             return
         if lisp.y_or_n_p('Redo <%s>? ' % str(change)):
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
                     self._reload_buffers(changes)
-            lisputils.runtask(redo, 'Redo refactoring', interrupts=False)
+            self.env.runtask(redo, 'Redo refactoring', interrupts=False)
 
     def _get_region(self):
         offset1 = self._get_offset()
@@ -205,7 +206,7 @@ class Ropemacs(object):
             lisp.push_mark()
             self._goto_location(definition[0], definition[1])
         else:
-            lisputils.message('Cannot find the definition!')
+            self.env.message('Cannot find the definition!')
 
     @decorators.local_command('a d', 'P', 'C-c d')
     def show_doc(self, prefix):
@@ -226,7 +227,7 @@ class Ropemacs(object):
     @decorators.local_command()
     def show_call_doc(self, prefix):
         self._check_project()
-        lisputils.message('ropemacs: use `rope-show-calltip\' instead!')
+        self.env.message('ropemacs: use `rope-show-calltip\' instead!')
 
     def _base_show_doc(self, prefix, get_doc):
         maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
@@ -240,15 +241,15 @@ class Ropemacs(object):
             use_minibuffer = not use_minibuffer
         if use_minibuffer and docs:
             docs = '\n'.join(docs.split('\n')[:7])
-            lisputils.message(docs)
+            self.env.message(docs)
         else:
             fit_lines = lisp["ropemacs-max-doc-buffer-height"].value()
-            buffer = lisputils.make_buffer('*rope-pydoc*', docs,
-                                           empty_goto=False,
+            buffer = self.env.make_buffer('*rope-pydoc*', docs,
+                                          empty_goto=False,
                                            fit_lines=fit_lines)
             lisp.local_set_key('q', lisp.bury_buffer)
         if docs is None:
-            lisputils.message('No docs avilable!')
+            self.env.message('No docs avilable!')
 
     def _base_findit(self, do_find, optionals, get_kwds):
         self._check_project()
@@ -256,7 +257,7 @@ class Ropemacs(object):
         resource, offset = self._get_location()
 
         action, values = dialog.show_dialog(
-            lisputils.askdata, ['search', 'cancel'], optionals=optionals)
+            self.env.askdata, ['search', 'cancel'], optionals=optionals)
         if action == 'search':
             kwds = get_kwds(values)
             def calculate(handle):
@@ -264,7 +265,7 @@ class Ropemacs(object):
                                                 values.get('resources'))
                 return do_find(self.project, resource, offset,
                                resources=resources, task_handle=handle, **kwds)
-            result = lisputils.runtask(calculate, 'Find Occurrences')
+            result = self.env.runtask(calculate, 'Find Occurrences')
             text = []
             for occurrence in result:
                 line = '%s : %s' % (occurrence.resource.path, occurrence.offset)
@@ -272,8 +273,8 @@ class Ropemacs(object):
                     line += ' ?'
                 text.append(line)
             text = '\n'.join(text) + '\n'
-            buffer = lisputils.make_buffer('*rope-occurrences*',
-                                           text, switch=True)
+            buffer = self.env.make_buffer('*rope-occurrences*',
+                                          text, switch=True)
             lisp.set_buffer(buffer)
             lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
             lisp.local_set_key('q', lisp.rope_occurrences_quit)
@@ -315,7 +316,7 @@ class Ropemacs(object):
 
     @decorators.interactive
     def occurrences_quit(self):
-        lisputils.hide_buffer('*rope-occurrences*')
+        self.env.hide_buffer('*rope-occurrences*')
 
     @decorators.local_command('a /', 'P', 'M-/')
     def code_assist(self, prefix):
@@ -332,8 +333,8 @@ class Ropemacs(object):
     def _check_autoimport(self):
         self._check_project()
         if self.autoimport is None:
-            lisputils.message('autoimport is disabled; '
-                              'see `ropemacs-enable-autoimport\' variable')
+            self.env.message('autoimport is disabled; '
+                             'see `ropemacs-enable-autoimport\' variable')
             return False
         return True
 
@@ -352,7 +353,7 @@ class Ropemacs(object):
         def generate(handle):
             self.autoimport.generate_cache(task_handle=handle)
             self.autoimport.generate_modules_cache(modules, task_handle=handle)
-        lisputils.runtask(generate, 'Generate autoimport cache')
+        self.env.runtask(generate, 'Generate autoimport cache')
 
     @decorators.global_command('f', 'P')
     def find_file(self, prefix):
@@ -378,19 +379,19 @@ class Ropemacs(object):
         names = []
         for file in files:
             names.append('<'.join(reversed(file.path.split('/'))))
-        result = lisputils.ask_values('Rope Find File: ', names, exact=True)
+        result = self.env.ask_values('Rope Find File: ', names, exact=True)
         if result is not None:
             path = '/'.join(reversed(result.split('<')))
             file = self.project.get_file(path)
             return file
-        lisputils.message('No file selected')
+        self.env.message('No file selected')
 
     @decorators.local_command('a j')
     def jump_to_global(self):
         if not self._check_autoimport():
             return
         all_names = list(self.autoimport.get_all_names())
-        name = lisputils.ask_values('Global name: ', all_names)
+        name = self.env.ask_values('Global name: ', all_names)
         result = dict(self.autoimport.get_name_locations(name))
         if len(result) == 1:
             resource = list(result.keys())[0]
@@ -406,7 +407,7 @@ class Ropemacs(object):
             config = self.project.ropefolder.get_child('config.py')
             lisp.find_file(config.real_path)
         else:
-            lisputils.message('No rope project folder found')
+            self.env.message('No rope project folder found')
 
     @decorators.global_command('n m')
     def create_module(self):
@@ -446,7 +447,7 @@ class Ropemacs(object):
         self._check_project()
         def _analyze_modules(handle):
             libutils.analyze_modules(self.project, task_handle=handle)
-        lisputils.runtask(_analyze_modules, 'Analyze project modules')
+        self.env.runtask(_analyze_modules, 'Analyze project modules')
 
     def _create(self, name, callback, parentname='source'):
         self._check_project()
@@ -456,7 +457,7 @@ class Ropemacs(object):
                 parentname.title() + ' Folder: ',
                 default=self.project.address, kind='directory')}
         action, values = dialog.show_dialog(
-            lisputils.askdata, ['perform', 'cancel'], confs, optionals)
+            self.env.askdata, ['perform', 'cancel'], confs, optionals)
         if action == 'perform':
             parent = libutils.path_to_resource(
                 self.project, values.get(parentname, self.project.address))
@@ -574,8 +575,8 @@ class _CodeAssist(object):
             self._starting = common_start
             self._offset = self.starting_offset + len(common_start)
         prompt = 'Completion for %s: ' % self.expression
-        result = lisputils.ask_values(prompt, names,
-                                      starting=self.starting, exact=None)
+        result = self.env.ask_values(prompt, names,
+                                     starting=self.starting, exact=None)
         self._apply_assist(result)
 
     def lucky_assist(self, prefix):
@@ -586,7 +587,7 @@ class _CodeAssist(object):
         if 0 <= selected < len(names):
             result = names[selected]
         else:
-            lisputils.message('Not enough proposals!')
+            self.env.message('Not enough proposals!')
             return
         self._apply_assist(result)
 
@@ -599,11 +600,11 @@ class _CodeAssist(object):
             if len(modules) == 1:
                 module = modules[0]
             else:
-                module = lisputils.ask_values(
+                module = self.env.ask_values(
                     'Which module to import: ', modules)
             self._insert_import(name, module)
         else:
-            lisputils.message('Global name %s not found!' % name)
+            self.env.message('Global name %s not found!' % name)
 
     def _apply_assist(self, assist):
         if ' : ' in assist:

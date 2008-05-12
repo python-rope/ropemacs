@@ -12,7 +12,7 @@ import rope.refactor.rename
 import rope.refactor.restructure
 import rope.refactor.usefunction
 
-from ropecommon import dialog, lisputils, filter
+from ropecommon import dialog, filter
 
 
 class Refactoring(object):
@@ -21,38 +21,39 @@ class Refactoring(object):
     optionals = {}
     saveall = True
 
-    def __init__(self, interface):
+    def __init__(self, interface, env):
         self.interface = interface
+        self.env = env
 
     def show(self, initial_asking=True):
         self.interface._check_project()
         self.interface._save_buffers(only_current=not self.saveall)
         self._create_refactoring()
         action, result = dialog.show_dialog(
-            lisputils.askdata, ['perform', 'preview', 'cancel'],
+            self.env.askdata, ['perform', 'preview', 'cancel'],
             self._get_confs(), self._get_optionals(),
             initial_asking=initial_asking)
         if action == 'cancel':
-            lisputils.message('Cancelled!')
+            self.env.message('Cancelled!')
             return
         def calculate(handle):
             return self._calculate_changes(result, handle)
         name = 'Calculating %s changes' % self.name
-        changes = lisputils.runtask(calculate, name=name)
+        changes = self.env.runtask(calculate, name=name)
         if action == 'perform':
             self._perform(changes)
         if action == 'preview':
             if changes is not None:
                 diffs = str(changes.get_description())
-                lisputils.make_buffer('*rope-preview*', diffs, switch=True,
+                self.env.make_buffer('*rope-preview*', diffs, switch=True,
                                       modes=['diff'], window='current')
-                if lisputils.yes_or_no('Do the changes? '):
+                if self.env.yes_or_no('Do the changes? '):
                     self._perform(changes)
                 else:
-                    lisputils.message('Thrown away!')
-                lisputils.hide_buffer('*rope-preview*', delete=False)
+                    self.env.message('Thrown away!')
+                self.env.hide_buffer('*rope-preview*', delete=False)
             else:
-                lisputils.message('No changes!')
+                self.env.message('No changes!')
 
     @property
     def project(self):
@@ -85,15 +86,15 @@ class Refactoring(object):
 
     def _perform(self, changes):
         if changes is None:
-            lisputils.message('No changes!')
+            self.env.message('No changes!')
             return
         def perform(handle, self=self, changes=changes):
             self.project.do(changes, task_handle=handle)
             self.interface._reload_buffers(changes)
             self._done()
-        lisputils.runtask(perform, 'Making %s changes' % self.name,
+        self.env.runtask(perform, 'Making %s changes' % self.name,
                           interrupts=False)
-        lisputils.message(str(changes.description) + ' finished')
+        self.env.message(str(changes.description) + ' finished')
 
     def _get_confs(self):
         return self.confs
@@ -114,9 +115,6 @@ class Rename(Refactoring):
     key = 'r'
 
     saveall = True
-
-    def __init__(self, interface):
-        self.interface = interface
 
     def _create_refactoring(self):
         self.renamer = rope.refactor.rename.Rename(
