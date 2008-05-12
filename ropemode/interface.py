@@ -82,7 +82,7 @@ class RopeMode(object):
             root = self.env.ask_directory('Rope project root folder: ')
         if self.project is not None:
             self.close_project()
-        progress = self.env.create_progress('Opening "%s" project' % root)
+        progress = self.env.create_progress('Opening [%s] project' % root)
         self.project = rope.base.project.Project(root)
         if self.env.get('ropemacs-enable-autoimport'):
             underlined = self.env.get('ropemacs-autoimport-underlineds')
@@ -93,7 +93,7 @@ class RopeMode(object):
     @decorators.global_command('k')
     def close_project(self):
         if self.project is not None:
-            progress = self.env.create_progress('Closing "%s" project' %
+            progress = self.env.create_progress('Closing [%s] project' %
                                                 self.project.address)
             self.project.close()
             self.project = None
@@ -103,7 +103,7 @@ class RopeMode(object):
     def write_project(self):
         if self.project is not None:
             progress = self.env.create_progress(
-                'Writing "%s" project data to disk' % self.project.address)
+                'Writing [%s] project data to disk' % self.project.address)
             self.project.sync()
             progress.done()
 
@@ -114,7 +114,7 @@ class RopeMode(object):
         if change is None:
             self.env.message('Nothing to undo!')
             return
-        if self.env.y_or_n('Undo <%s>? ' % str(change)):
+        if self.env.y_or_n('Undo [%s]? ' % str(change)):
             def undo(handle):
                 for changes in self.project.history.undo(task_handle=handle):
                     self._reload_buffers(changes, undo=True)
@@ -128,7 +128,7 @@ class RopeMode(object):
         if change is None:
             self.env.message('Nothing to redo!')
             return
-        if self.env.y_or_n('Redo <%s>? ' % str(change)):
+        if self.env.y_or_n('Redo [%s]? ' % str(change)):
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
                     self._reload_buffers(changes)
