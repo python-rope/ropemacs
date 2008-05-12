@@ -244,18 +244,14 @@ class Ropemacs(object):
                 return do_find(self.project, resource, offset,
                                resources=resources, task_handle=handle, **kwds)
             result = self.env.runtask(calculate, 'Find Occurrences')
-            text = []
+            locations = []
             for occurrence in result:
-                line = '%s : %s' % (occurrence.resource.path, occurrence.offset)
+                note = ''
                 if occurrence.unsure:
-                    line += ' ?'
-                text.append(line)
-            text = '\n'.join(text) + '\n'
-            buffer = self.env.make_buffer('*rope-occurrences*',
-                                          text, switch=True)
-            lisp.set_buffer(buffer)
-            lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
-            lisp.local_set_key('q', lisp.rope_occurrences_quit)
+                    note = '?'
+                locations.append((occurrence.resource.path,
+                                  occurrence.offset, note))
+            self.env.show_occurrences(locations)
 
     @decorators.local_command('a f', shortcut='C-c f')
     def find_occurrences(self):
@@ -277,24 +273,6 @@ class Ropemacs(object):
         def get_kwds(values):
             return {}
         self._base_findit(findit.find_implementations, optionals, get_kwds)
-
-    @decorators.interactive
-    def occurrences_goto_occurrence(self):
-        self._check_project()
-        start = lisp.line_beginning_position()
-        end = lisp.line_end_position()
-        line = lisp.buffer_substring_no_properties(start, end)
-        tokens = line.split()
-        if tokens:
-            resource = self.project.get_resource(tokens[0])
-            offset = int(tokens[2])
-            self.env.find_file(resource.real_path, other=True)
-            lisp.goto_char(offset + 1)
-            lisp.switch_to_buffer_other_window('*rope-occurrences*')
-
-    @decorators.interactive
-    def occurrences_quit(self):
-        self.env.hide_buffer('*rope-occurrences*')
 
     @decorators.local_command('a /', 'P', 'M-/')
     def code_assist(self, prefix):

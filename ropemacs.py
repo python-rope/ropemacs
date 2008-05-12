@@ -81,7 +81,7 @@ class LispUtils(object):
 
     def find_file(self, filename, readonly=False, other=False):
         if other:
-            self.find_file_other_window(filename)
+            lisp.find_file_other_window(filename)
         elif not readonly:
             lisp.find_file(filename)
         else:
@@ -193,6 +193,17 @@ class LispUtils(object):
             progress = _OldProgress(name)
         return progress
 
+    def show_occurrences(self, locations):
+        text = []
+        for filename, offset, note in locations:
+            line = '%s : %s %s' % (filename, offset, note)
+            text.append(line)
+        text = '\n'.join(text) + '\n'
+        buffer = self.make_buffer('*rope-occurrences*', text, switch=True)
+        lisp.set_buffer(buffer)
+        lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
+        lisp.local_set_key('q', lisp.delete_window)
+
 
 class _LispProgress(object):
 
@@ -241,6 +252,21 @@ class RunTask(object):
         result = self.task(handle)
         progress.done()
         return result
+
+
+def occurrences_goto_occurrence():
+    start = lisp.line_beginning_position()
+    end = lisp.line_end_position()
+    line = lisp.buffer_substring_no_properties(start, end)
+    tokens = line.split()
+    if tokens:
+        filename = tokens[0]
+        offset = int(tokens[2])
+        resource = _interface._get_resource(filename)
+        LispUtils().find_file(resource.real_path, other=True)
+        lisp.goto_char(offset + 1)
+        lisp.switch_to_buffer_other_window('*rope-occurrences*')
+occurrences_goto_occurrence.interaction = ''
 
 
 def _register_functions(interface):
