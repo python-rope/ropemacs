@@ -541,11 +541,11 @@ class _CodeAssist(object):
     def _apply_assist(self, assist):
         if ' : ' in assist:
             name, module = assist.rsplit(' : ', 1)
-            lisp.delete_region(self.starting_offset + 1, self.offset + 1)
+            self.env.delete(self.starting_offset + 1, self.offset + 1)
             self.env.insert(name)
             self._insert_import(name, module)
         else:
-            lisp.delete_region(self.starting_offset + 1, self.offset + 1)
+            self.env.delete(self.starting_offset + 1, self.offset + 1)
             self.env.insert(assist)
 
     def _calculate_proposals(self):

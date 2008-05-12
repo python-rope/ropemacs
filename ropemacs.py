@@ -58,6 +58,9 @@ class LispUtils(object):
     def insert(self, text):
         lisp.insert(text)
 
+    def delete(self, start, end):
+        lisp.delete_region(start, end)
+
     def filenames(self):
         result = []
         for buffer in lisp.buffer_list():
@@ -97,10 +100,10 @@ class LispUtils(object):
     def find_file(self, filename, readonly=False, other=False):
         if other:
             lisp.find_file_other_window(filename)
-        elif not readonly:
-            lisp.find_file(filename)
-        else:
+        elif readonly:
             lisp.find_file_read_only(filename)
+        else:
+            lisp.find_file(filename)
 
     def make_buffer(self, name, contents, empty_goto=True, switch=False,
                     window='other', modes=[], fit_lines=None):
