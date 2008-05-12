@@ -5,7 +5,7 @@ from rope.contrib import codeassist, generate, autoimport, findit
 from ropemode import refactor, decorators, dialog
 
 
-class RopeCommon(object):
+class RopeMode(object):
 
     def __init__(self, env):
         self.project = None

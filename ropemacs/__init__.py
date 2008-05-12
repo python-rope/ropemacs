@@ -508,7 +508,7 @@ shortcuts = [('M-/', 'rope-code-assist'),
 
 ropemode.decorators.logger.message = lisp.message
 lisp(DEFVARS)
-_interface = ropemode.interface.RopeCommon(env=LispUtils())
+_interface = ropemode.interface.RopeMode(env=LispUtils())
 _interface.init()
 lisp(MINOR_MODE)
 
