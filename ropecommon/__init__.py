@@ -1,4 +1,4 @@
-"""ropecommon, an emacs mode for using rope refactoring library"""
+"""ropecommon, a helper for using rope refactoring library in IDEs"""
 
 COPYRIGHT = """\
 Copyright (C) 2007-2008 Ali Gholami Rudi
