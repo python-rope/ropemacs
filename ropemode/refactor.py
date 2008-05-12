@@ -11,6 +11,7 @@ import rope.refactor.move
 import rope.refactor.rename
 import rope.refactor.restructure
 import rope.refactor.usefunction
+from rope.base import taskhandle
 
 from ropemode import dialog, filter
 
@@ -39,7 +40,7 @@ class Refactoring(object):
         def calculate(handle):
             return self._calculate_changes(result, handle)
         name = 'Calculating %s changes' % self.name
-        changes = self.env.runtask(calculate, name=name)
+        changes = runtask(self.env, calculate, name=name)
         if action == 'perform':
             self._perform(changes)
         if action == 'preview':
@@ -89,8 +90,8 @@ class Refactoring(object):
             self.project.do(changes, task_handle=handle)
             self.interface._reload_buffers(changes)
             self._done()
-        self.env.runtask(perform, 'Making %s changes' % self.name,
-                          interrupts=False)
+        runtask(self.env, perform, 'Making %s changes' % self.name,
+                interrupts=False)
         self.env.message(str(changes.description) + ' finished')
 
     def _get_confs(self):
@@ -459,3 +460,29 @@ def _resources(project, text):
     if text is None or text.strip() == '':
         return None
     return filter.resources(project, text)
+
+
+def runtask(env, command, name, interrupts=True):
+    return RunTask(env, command, name, interrupts)()
+
+class RunTask(object):
+
+    def __init__(self, env, task, name, interrupts=True):
+        self.env = env
+        self.task = task
+        self.name = name
+        self.interrupts = interrupts
+
+    def __call__(self):
+        handle = taskhandle.TaskHandle(name=self.name)
+        progress = self.env.create_progress(self.name)
+        def update_progress():
+            jobset = handle.current_jobset()
+            if jobset:
+                percent = jobset.get_percent_done()
+                if percent is not None:
+                    progress.update(percent)
+        handle.add_observer(update_progress)
+        result = self.task(handle)
+        progress.done()
+        return result

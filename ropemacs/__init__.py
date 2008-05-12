@@ -1,10 +1,10 @@
 """ropemacs, an emacs mode for using rope refactoring library"""
 from Pymacs import lisp
-from rope.base import taskhandle, utils
+from rope.base import utils
 
+import ropemode.decorators
 import ropemode.dialog
 import ropemode.interface
-import ropemode.decorators
 
 
 class LispUtils(object):
@@ -198,9 +198,6 @@ class LispUtils(object):
     def _emacs_version(self):
         return int(lisp['emacs-version'].value().split('.')[0])
 
-    def runtask(self, command, name, interrupts=True):
-        return RunTask(command, name, interrupts)()
-
     def create_progress(self, name):
         if lisp.fboundp(lisp['make-progress-reporter']):
             progress = _LispProgress(name)
@@ -324,28 +321,6 @@ class _OldProgress(object):
 
     def done(self):
         message('%s ... done' % self.name)
-
-
-class RunTask(object):
-
-    def __init__(self, task, name, interrupts=True):
-        self.task = task
-        self.name = name
-        self.interrupts = interrupts
-
-    def __call__(self):
-        handle = taskhandle.TaskHandle(name=self.name)
-        progress = LispUtils().create_progress(self.name)
-        def update_progress():
-            jobset = handle.current_jobset()
-            if jobset:
-                percent = jobset.get_percent_done()
-                if percent is not None:
-                    progress.update(percent)
-        handle.add_observer(update_progress)
-        result = self.task(handle)
-        progress.done()
-        return result
 
 
 def occurrences_goto_occurrence():

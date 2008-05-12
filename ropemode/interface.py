@@ -118,7 +118,8 @@ class RopeMode(object):
             def undo(handle):
                 for changes in self.project.history.undo(task_handle=handle):
                     self._reload_buffers(changes, undo=True)
-            self.env.runtask(undo, 'Undo refactoring', interrupts=False)
+            refactor.runtask(self.env, undo, 'Undo refactoring',
+                             interrupts=False)
 
     @decorators.global_command('r')
     def redo(self):
@@ -131,7 +132,8 @@ class RopeMode(object):
             def redo(handle):
                 for changes in self.project.history.redo(task_handle=handle):
                     self._reload_buffers(changes)
-            self.env.runtask(redo, 'Redo refactoring', interrupts=False)
+            refactor.runtask(self.env, redo, 'Redo refactoring',
+                             interrupts=False)
 
     @decorators.local_command('a g', shortcut='C-c g')
     def goto_definition(self):
@@ -204,7 +206,7 @@ class RopeMode(object):
                                                 values.get('resources'))
                 return do_find(self.project, resource, offset,
                                resources=resources, task_handle=handle, **kwds)
-            result = self.env.runtask(calculate, 'Find Occurrences')
+            result = refactor.runtask(self.env, calculate, 'Find Occurrences')
             locations = []
             for occurrence in result:
                 note = ''
@@ -270,7 +272,7 @@ class RopeMode(object):
         def generate(handle):
             self.autoimport.generate_cache(task_handle=handle)
             self.autoimport.generate_modules_cache(modules, task_handle=handle)
-        self.env.runtask(generate, 'Generate autoimport cache')
+        refactor.runtask(self.env, generate, 'Generate autoimport cache')
 
     @decorators.global_command('f', 'P')
     def find_file(self, prefix):
@@ -364,7 +366,7 @@ class RopeMode(object):
         self._check_project()
         def _analyze_modules(handle):
             libutils.analyze_modules(self.project, task_handle=handle)
-        self.env.runtask(_analyze_modules, 'Analyze project modules')
+        refactor.runtask(self.env, _analyze_modules, 'Analyze project modules')
 
     def _create(self, name, callback, parentname='source'):
         self._check_project()
