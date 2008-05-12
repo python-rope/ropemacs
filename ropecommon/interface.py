@@ -23,9 +23,9 @@ class Ropemacs(object):
         """Initialize rope mode"""
 
     def _init_ropemacs(self):
-        global_prefix = lisp.ropemacs_global_prefix.value()
-        local_prefix = lisp.ropemacs_local_prefix.value()
-        enable_shortcuts = lisp['ropemacs-enable-shortcuts'].value()
+        global_prefix = self.env.get('ropemacs-global-prefix')
+        local_prefix = self.env.get('ropemacs-local-prefix')
+        enable_shortcuts = self.env.get('ropemacs-enable-shortcuts')
         for attrname in dir(self):
             attr = getattr(self, attrname)
             if not callable(attr):
@@ -121,8 +121,8 @@ class Ropemacs(object):
             self.close_project()
         progress = self.env.create_progress('Opening "%s" project' % root)
         self.project = rope.base.project.Project(root)
-        if lisp['ropemacs-enable-autoimport'].value():
-            underlined = lisp['ropemacs-autoimport-underlineds'].value()
+        if self.env.get('ropemacs-enable-autoimport'):
+            underlined = self.env.get('ropemacs-autoimport-underlineds')
             self.autoimport = autoimport.AutoImport(self.project,
                                                     underlined=underlined)
         progress.done()
@@ -174,7 +174,7 @@ class Ropemacs(object):
     def goto_definition(self):
         self._check_project()
         resource, offset = self._get_location()
-        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
+        maxfixes = self.env.get('ropemacs-codeassist-maxfixes')
         definition = codeassist.get_definition_location(
             self.project, self.env.get_text(), offset, resource, maxfixes)
         if tuple(definition) != (None, None):
@@ -205,20 +205,20 @@ class Ropemacs(object):
         self.env.message('ropemacs: use `rope-show-calltip\' instead!')
 
     def _base_show_doc(self, prefix, get_doc):
-        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
+        maxfixes = self.env.get('ropemacs-codeassist-maxfixes')
         text = self.env.get_text()
         offset = self.env.get_offset()
         docs = get_doc(self.project, text, offset,
                        self._get_resource(), maxfixes)
 
         use_minibuffer = not prefix
-        if lisp['ropemacs-separate-doc-buffer'].value():
+        if self.env.get('ropemacs-separate-doc-buffer'):
             use_minibuffer = not use_minibuffer
         if use_minibuffer and docs:
             docs = '\n'.join(docs.split('\n')[:7])
             self.env.message(docs)
         else:
-            fit_lines = lisp["ropemacs-max-doc-buffer-height"].value()
+            fit_lines = self.env.get('ropemacs-max-doc-buffer-height')
             buffer = self.env.make_buffer('*rope-pydoc*', docs,
                                           empty_goto=False,
                                            fit_lines=fit_lines)
@@ -317,7 +317,7 @@ class Ropemacs(object):
     def generate_autoimport_cache(self):
         if not self._check_autoimport():
             return
-        modules = lisp['ropemacs-autoimport-modules'].value()
+        modules = self.env.get('ropemacs-autoimport-modules')
         modnames = []
         if modules:
             for i in range(len(modules)):
@@ -504,7 +504,7 @@ class Ropemacs(object):
         return result
 
     def _save_buffers(self, only_current=False):
-        ask = lisp['ropemacs-confirm-saving'].value()
+        ask = self.env.get('ropemacs-confirm-saving')
         initial = lisp.current_buffer()
         current_buffer = lisp.current_buffer()
         if only_current:
@@ -594,7 +594,7 @@ class _CodeAssist(object):
     def _calculate_proposals(self):
         self.interface._check_project()
         resource = self.interface._get_resource()
-        maxfixes = lisp['ropemacs-codeassist-maxfixes'].value()
+        maxfixes = self.env.get('ropemacs-codeassist-maxfixes')
         proposals = codeassist.code_assist(
             self.interface.project, self.source, self.offset,
             resource, maxfixes=maxfixes)

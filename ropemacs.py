@@ -8,6 +8,9 @@ import ropecommon.interface
 
 class LispUtils(object):
 
+    def get(self, name):
+        return lisp[name].value()
+
     def yes_or_no(self, prompt):
         return lisp.yes_or_no_p(prompt)
 
