@@ -1,4 +1,4 @@
-include README.txt COPYING setup.py MANIFEST.in
+include README.txt COPYING setup.py MANIFEST.in CONTRIBUTORS
 recursive-include ropemacs *.py
+recursive-include ropecommon *.py
 recursive-include docs *.txt
-include docs/pymacs_python25.patch
