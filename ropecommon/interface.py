@@ -3,7 +3,7 @@ from Pymacs import lisp
 from rope.base import libutils
 from rope.contrib import codeassist, generate, autoimport, findit
 
-from ropemacs import refactor, lisputils, decorators, dialog
+from ropecommon import refactor, lisputils, decorators, dialog
 
 
 class Ropemacs(object):

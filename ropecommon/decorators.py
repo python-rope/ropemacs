@@ -2,7 +2,7 @@ import traceback
 
 from rope.base import exceptions
 
-from ropemacs import lisputils
+from ropecommon import lisputils
 
 
 def lisphook(func):

@@ -1,6 +1,6 @@
 import unittest
 
-from ropemacs import dialog
+from ropecommon import dialog
 
 
 class ConfigTest(unittest.TestCase):
