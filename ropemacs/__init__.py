@@ -2,15 +2,15 @@
 from Pymacs import lisp
 from rope.base import taskhandle, utils
 
-import ropecommon.dialog
-import ropecommon.interface
-import ropecommon.decorators
+import ropemode.dialog
+import ropemode.interface
+import ropemode.decorators
 
 
 class LispUtils(object):
 
     def askdata(self, data, starting=None):
-        """`data` is a `ropecommon.dialog.Data` object"""
+        """`data` is a `ropemode.dialog.Data` object"""
         ask_func = self.ask
         ask_args = {'prompt': data.prompt, 'starting': starting,
                     'default': data.default}
@@ -499,9 +499,9 @@ shortcuts = [('M-/', 'rope-code-assist'),
              ('C-c f', 'rope-find-occurrences')]
 
 
-ropecommon.decorators.logger.message = lisp.message
+ropemode.decorators.logger.message = lisp.message
 lisp(DEFVARS)
-_interface = ropecommon.interface.RopeCommon(env=LispUtils())
+_interface = ropemode.interface.RopeCommon(env=LispUtils())
 _interface.init()
 lisp(MINOR_MODE)
 

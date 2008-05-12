@@ -12,7 +12,7 @@ import rope.refactor.rename
 import rope.refactor.restructure
 import rope.refactor.usefunction
 
-from ropecommon import dialog, filter
+from ropemode import dialog, filter
 
 
 class Refactoring(object):

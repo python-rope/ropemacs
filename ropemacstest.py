@@ -1,6 +1,6 @@
 import unittest
 
-from ropecommon import dialog
+from ropemode import dialog
 
 
 class ConfigTest(unittest.TestCase):

@@ -1,9 +1,8 @@
 import rope.base.change
-from Pymacs import lisp
 from rope.base import libutils
 from rope.contrib import codeassist, generate, autoimport, findit
 
-from ropecommon import refactor, decorators, dialog
+from ropemode import refactor, decorators, dialog
 
 
 class RopeCommon(object):
