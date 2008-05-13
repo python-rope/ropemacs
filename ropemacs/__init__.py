@@ -279,8 +279,11 @@ class LispUtils(object):
             callback.interaction = ''
 
     def add_hook(self, name, callback, hook):
+        mapping = {'before_save': 'before-save-hook',
+                   'after_save': 'after-save-hook',
+                   'exit': 'kill-emacs-hook'}
         globals()[name] = callback
-        lisp.add_hook(lisp[hook], lisp[_lisp_name(name)])
+        lisp.add_hook(lisp[mapping[hook]], lisp[_lisp_name(name)])
 
     @property
     @utils.cacheit
