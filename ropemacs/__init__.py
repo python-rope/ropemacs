@@ -117,7 +117,8 @@ class LispUtils(object):
                 result.append(filename)
         return result
 
-    def save_files(self, filenames, ask=False):
+    def save_files(self, filenames):
+        ask = self.get('confirm_saving')
         initial = lisp.current_buffer()
         for filename in filenames:
             buffer = lisp.find_buffer_visiting(filename)
