@@ -225,11 +225,19 @@ class LispUtils(object):
         lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
         lisp.local_set_key('q', lisp.delete_window)
 
-    def show_doc(self, docs):
-        fit_lines = self.get('max_doc_buffer_height')
-        buffer = self._make_buffer('*rope-pydoc*', docs,
-                                   empty_goto=False, fit_lines=fit_lines)
-        lisp.local_set_key('q', lisp.bury_buffer)
+    def show_doc(self, docs, altview=False):
+        use_minibuffer = not altview
+        if self.get('separate_doc_buffer'):
+            use_minibuffer = not use_minibuffer
+        if not use_minibuffer:
+            fit_lines = self.get('max_doc_buffer_height')
+            buffer = self._make_buffer('*rope-pydoc*', docs,
+                                       empty_goto=False,
+                                       fit_lines=fit_lines)
+            lisp.local_set_key('q', lisp.bury_buffer)
+        elif docs:
+            docs = '\n'.join(docs.split('\n')[:7])
+            self.message(docs)
 
     def preview_changes(self, diffs):
         self._make_buffer('*rope-preview*', diffs, switch=True,
