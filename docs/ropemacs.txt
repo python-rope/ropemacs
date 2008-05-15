@@ -44,10 +44,20 @@ Features
 Source Repository
 =================
 
+The repository version needs ropemode (which was once part of
+ropemacs); in order to use the repository version of ropemacs you need
+to put ropemode in your ``PYTHONPATH``.  Note that ropemode is
+included in released packages.
+
 Ropemacs:
 
 * repo url: http://rope.sf.net/hg/ropemacs
 * snapshot: http://rope.sf.net/hg/ropemacs/archive/tip.tar.gz
+
+Ropemode:
+
+* repo url: http://rope.sf.net/hg/ropemode
+* snapshot: http://rope.sf.net/hg/ropemode/archive/tip.tar.gz
 
 
 Feedback
