@@ -9,18 +9,6 @@ import ropemode.interface
 
 class LispUtils(object):
 
-    def askdata(self, data, starting=None):
-        """`data` is a `ropemode.dialog.Data` object"""
-        ask_func = self.ask
-        ask_args = {'prompt': data.prompt, 'starting': starting,
-                    'default': data.default}
-        if data.values:
-            ask_func = self.ask_values
-            ask_args['values'] = data.values
-        elif data.kind == 'directory':
-            ask_func = self.ask_directory
-        return ask_func(**ask_args)
-
     def ask_values(self, prompt, values, default=None, starting=None, exact=True):
         if self._emacs_version() < 22:
             values = [[value, value] for value in values]
@@ -31,7 +19,6 @@ class LispUtils(object):
         if result == '' and exact:
             return default
         return result
-
 
     def ask(self, prompt, default=None, starting=None):
         if default is not None:
