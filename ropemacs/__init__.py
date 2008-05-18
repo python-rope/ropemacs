@@ -8,6 +8,15 @@ from rope.base import utils
 
 class LispUtils(ropemode.environment.Environment):
 
+    def ask(self, prompt, default=None, starting=None):
+        if default is not None:
+            prompt = prompt + ('[%s] ' % default)
+        result = lisp.read_from_minibuffer(prompt, starting, None, None,
+                                           None, default, None)
+        if result == '' and default is not None:
+            return default
+        return result
+
     def ask_values(self, prompt, values, default=None, starting=None, exact=True):
         if self._emacs_version() < 22:
             values = [[value, value] for value in values]
@@ -19,14 +28,8 @@ class LispUtils(ropemode.environment.Environment):
             return default
         return result
 
-    def ask(self, prompt, default=None, starting=None):
-        if default is not None:
-            prompt = prompt + ('[%s] ' % default)
-        result = lisp.read_from_minibuffer(prompt, starting, None, None,
-                                           None, default, None)
-        if result == '' and default is not None:
-            return default
-        return result
+    def ask_completion(self, prompt, values, starting=None):
+        return self.ask_values(prompt, values, starting=starting, exact=None)
 
     def ask_directory(self, prompt, default=None, starting=None):
         if default is not None:
