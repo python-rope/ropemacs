@@ -1,13 +1,12 @@
 """ropemacs, an emacs mode for using rope refactoring library"""
+import ropemode.decorators
+import ropemode.environment
+import ropemode.interface
 from Pymacs import lisp
 from rope.base import utils
 
-import ropemode.decorators
-import ropemode.dialog
-import ropemode.interface
 
-
-class LispUtils(ropemode.interface.Environment):
+class LispUtils(ropemode.environment.Environment):
 
     def ask_values(self, prompt, values, default=None, starting=None, exact=True):
         if self._emacs_version() < 22:
