@@ -7,7 +7,7 @@ import ropemode.dialog
 import ropemode.interface
 
 
-class LispUtils(object):
+class LispUtils(ropemode.interface.Environment):
 
     def ask_values(self, prompt, values, default=None, starting=None, exact=True):
         if self._emacs_version() < 22:
