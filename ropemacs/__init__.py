@@ -206,8 +206,9 @@ class LispUtils(ropemode.environment.Environment):
 
     def show_occurrences(self, locations):
         text = []
-        for filename, offset, note in locations:
-            line = '%s : %s %s' % (filename, offset, note)
+        for location in locations:
+            line = '%s : %s   %s %s' % (location.filename, location.lineno,
+                                        location.note, location.offset)
             text.append(line)
         text = '\n'.join(text) + '\n'
         buffer = self._make_buffer('*rope-occurrences*', text, switch=True)
@@ -331,7 +332,7 @@ def occurrences_goto_occurrence():
     tokens = line.split()
     if tokens:
         filename = tokens[0]
-        offset = int(tokens[2])
+        offset = int(tokens[-1])
         resource = _interface._get_resource(filename)
         LispUtils().find_file(resource.real_path, other=True)
         lisp.goto_char(offset + 1)
