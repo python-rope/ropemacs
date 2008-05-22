@@ -5,8 +5,8 @@
 Ropemacs is a plugin for performing python refactorings in emacs.  It
 uses rope_ library and pymacs_.
 
-You should install `rope`_ library before using ropemacs.  You can
-download ropemacs from `project download page`_.
+You should install `rope`_ library and pymacs_ before using ropemacs.
+You can download ropemacs from `project download page`_.
 
 .. _rope: http://rope.sf.net/
 
