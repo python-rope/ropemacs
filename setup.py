@@ -22,7 +22,7 @@ def get_long_description():
 
 setup(name='ropemacs',
       version='0.6c2',
-      description='An emacs mode for using rope refactoring library',
+      description='An emacs mode for using rope python refactoring library',
       long_description=get_long_description(),
       packages=['ropemode', 'ropemacs'],
       author='Ali Gholami Rudi',
