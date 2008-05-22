@@ -3,8 +3,8 @@
 =========================
 
 Ropemacs is an emacs mode that uses rope_ library to provide features
-like refactorings and code-assists.  You should install rope_ library
-and pymacs_ before using ropemacs.
+like python refactorings and code-assists.  You should install rope_
+library and pymacs_ before using ropemacs.
 
 .. _rope: http://rope.sf.net/
 .. _pymacs: http://pymacs.progiciels-bpi.ca/pymacs.html
@@ -70,8 +70,8 @@ to force pymacs to use Python2.5.
 Ropemacs Minor Mode
 -------------------
 
-Rope registers its local keys when ``ropemacs-mode`` is enabled.  By
-default it is enabled using ``python-mode`` hook (this hook is
+Ropemacs registers its local keys when ``ropemacs-mode`` is enabled.
+By default it is enabled using ``python-mode`` hook (this hook is
 available if you are using Emacs' ``python.el`` or XEmacs'
 ``python-mode.el``).  If you want to enable it in other major modes
 either execute ``ropemacs-mode`` manually or call it in some other
@@ -84,7 +84,7 @@ Getting Started
 Refactoring Dialog
 ------------------
 
-Rope refactorings use a special kind of dialog.  When you start a
+Ropemacs refactorings use a special kind of dialog.  When you start a
 refactoring, you'll be asked to confirm saving modified python
 buffers; you can change it by using ``ropemacs-confirm-saving``
 variable.  Adding ``(setq ropemacs-confirm-saving 'nil)`` to your
@@ -123,8 +123,8 @@ Code-Assist
 ``rope-code-assist`` command (``M-/`` by default) will let you select
 from a list of completions.  If prefixed (``C-u M-/``), ropemacs
 inserts the common prefix, automatically.  If a numeric argument is
-given, rope will insert the common prefix for that many of the first
-proposals.
+given, ropemacs will insert the common prefix for that many of the
+first proposals.
 
 ``rope-lucky-assist`` command (``M-?``) does not ask anything;
 instead, it inserts the first proposal.  By prefixing it, you can
@@ -167,9 +167,9 @@ indicated with a ``?`` mark in the end.
 Dialog ``batchset`` Command
 ---------------------------
 
-When you use rope dialogs there is a command called ``batchset``.  It
-can set many options at the same time.  After selecting this command
-from dialog base prompt, you are asked to enter a string.
+When you use ropemacs dialogs there is a command called ``batchset``.
+It can set many options at the same time.  After selecting this
+command from dialog base prompt, you are asked to enter a string.
 
 ``batchset`` strings can set the value of configs in two ways.  The
 single line form is like this::
@@ -225,7 +225,7 @@ restructuring can be::
 Enabling Autoimport
 -------------------
 
-Rope can propose and automatically import global names in other
+Ropemacs can propose and automatically import global names in other
 modules.  But this feature is disabled by default.  Before using it,
 you should add::
 
@@ -367,8 +367,8 @@ code-assist group.  You can define your own shortcuts like this::
 
   (define-key ropemacs-local-keymap "\C-cg" 'rope-goto-definition)
 
-Rope itself comes with a few shortcuts.  These shortcuts will be used
-only when ropemacs-enable-shortcuts is non-nil.
+Ropemacs itself comes with a few shortcuts.  These shortcuts will be
+used only when ropemacs-enable-shortcuts is non-nil.
 
 ================  ============================
 Key               Command
