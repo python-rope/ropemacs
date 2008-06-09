@@ -32,14 +32,16 @@ class LispUtils(ropemode.environment.Environment):
         return self.ask_values(prompt, values, starting=starting, exact=None)
 
     def ask_directory(self, prompt, default=None, starting=None):
-        if default is not None:
-            prompt = prompt + ('[%s] ' % default)
+        location = starting or default
+        if location is not None:
+            prompt = prompt + ('[%s] ' % location)
         if lisp.fboundp(lisp['read-directory-name']):
-            result = lisp.read_directory_name(prompt, starting, default)
+            # returns default when starting is entered
+            result = lisp.read_directory_name(prompt, location, location)
         else:
-            result = lisp.read_file_name(prompt, starting, default)
-        if result == '' and default is not None:
-            return default
+            result = lisp.read_file_name(prompt, location, location)
+        if result == '' and location is not None:
+            return location
         return result
 
     def message(self, message):
