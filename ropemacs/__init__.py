@@ -45,7 +45,7 @@ class LispUtils(ropemode.environment.Environment):
         return result
 
     def message(self, message):
-        lisp.message(message)
+        message(message)
 
     def yes_or_no(self, prompt):
         return lisp.yes_or_no_p(prompt)
@@ -327,6 +327,9 @@ class _OldProgress(object):
         message('%s ... done' % self.name)
 
 
+def message(message):
+    lisp.message(message.replace('%', '%%'))
+
 def occurrences_goto_occurrence():
     start = lisp.line_beginning_position()
     end = lisp.line_end_position()
@@ -485,7 +488,7 @@ shortcuts = [('M-/', 'rope-code-assist'),
              ('C-c f', 'rope-find-occurrences')]
 
 
-ropemode.decorators.logger.message = lisp.message
+ropemode.decorators.logger.message = message
 lisp(DEFVARS)
 _interface = ropemode.interface.RopeMode(env=LispUtils())
 _interface.init()
