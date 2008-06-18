@@ -44,8 +44,8 @@ class LispUtils(ropemode.environment.Environment):
             return location
         return result
 
-    def message(self, message):
-        message(message)
+    def message(self, msg):
+        message(msg)
 
     def yes_or_no(self, prompt):
         return lisp.yes_or_no_p(prompt)
