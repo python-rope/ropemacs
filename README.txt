@@ -292,6 +292,9 @@ Variables
   to fix for code assists.  The default value is ``1``.
 * ``ropemacs-separate-doc-buffer``: Should ``rope-show-doc`` use a
   separate buffer or the minibuffer.  Defaults to ``t``.
+* ``ropemacs-guess-project``: If non-nil, ropemacs tries to guess and
+  open the project that contains the file on which a rope command is
+  performed when no project is already opened.
 
 * ``ropemacs-local-prefix``: The prefix for ropemacs refactorings.
   Defaults to ``C-c r``.

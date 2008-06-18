@@ -471,6 +471,13 @@ M-?               rope-lucky-assist
                     )
                     ))
 
+(defcustom ropemacs-guess-project 'nil
+  "Try to guess the project when needed.
+
+If non-nil, ropemacs tries to guess and open the project that contains
+a file on which the rope command is performed when no project is
+already opened.")
+
 (provide 'ropemacs)
 """
 
