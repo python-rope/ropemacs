@@ -334,8 +334,10 @@ def message(message):
     lisp.message(message.replace('%', '%%'))
 
 def occurrences_goto_occurrence():
-    start = lisp.line_beginning_position()
-    end = lisp.line_end_position()
+    lisp.end_of_line()
+    end = lisp.point()
+    lisp.beginning_of_line()
+    start = lisp.point()
     line = lisp.buffer_substring_no_properties(start, end)
     tokens = line.split()
     if tokens:
