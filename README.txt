@@ -13,13 +13,6 @@ library and pymacs_ before using ropemacs.
 New Features
 ============
 
-* added ``ropemacs-guess-project`` variable
-* added ``rope-run-module`` command
-* showing line-number in occurrences buffer
-* fixed go to occurrence in xemacs
-* fixed error messages that contain percent sign
-* fixed ask directory and entering default directory
-
 
 Setting Up
 ==========
