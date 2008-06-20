@@ -2,6 +2,15 @@
  Done
 ======
 
+> Public Release 0.6c2 : June 20, 2008
+
+- fixed go to occurrence in xemacs : June 20, 2008
+- added ropemacs-guess-project variable : June 18, 2008
+- fixed error messages that contain percent sign : June 18, 2008
+- fixed ask directory and entering default directory : June 9, 2008
+- added rope-run-module command : May 24, 2008
+- showing line-number in occurrences buffer : May 19, 2008
+
 > Public Release 0.6c1 : May 10, 2008
 
 - supporting inlining parameters : May 10, 2008
