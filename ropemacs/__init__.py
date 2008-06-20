@@ -53,10 +53,11 @@ class LispUtils(ropemode.environment.Environment):
     def y_or_n(self, prompt):
         return lisp.y_or_n_p(prompt)
 
-    def get(self, name):
+    def get(self, name, default=None):
         lispname = 'ropemacs-' + name.replace('_', '-')
         if lisp.boundp(lisp[lispname]):
             return lisp[lispname].value()
+        return default
 
     def get_offset(self):
         return lisp.point() - 1
