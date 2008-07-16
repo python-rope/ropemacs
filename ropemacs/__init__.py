@@ -335,7 +335,7 @@ class _OldProgress(object):
 def message(message):
     lisp.message(message.replace('%', '%%'))
 
-def occurrences_goto(other=True):
+def occurrences_goto():
     if lisp.line_number_at_pos() < 3:
         lisp.forward_line(3 - lisp.line_number_at_pos())
     lisp.end_of_line()
@@ -347,20 +347,19 @@ def occurrences_goto(other=True):
         filename = tokens[0]
         offset = int(tokens[-1])
         resource = _interface._get_resource(filename)
-        LispUtils().find_file(resource.real_path, other=other)
+        LispUtils().find_file(resource.real_path, other=True)
         lisp.goto_char(offset + 1)
 occurrences_goto.interaction = ''
 
 def occurrences_next(arg, reset):
-    lisp.display_buffer('*rope-occurrences*')
-    lisp.set_buffer('*rope-occurrences*')
+    lisp.switch_to_buffer_other_window('*rope-occurrences*')
     if reset:
         lisp.goto_char(lisp.point_min())
     lisp.forward_line(arg)
     if lisp.eobp():
         lisp.message("Cycling rope occurences")
         lisp.goto_char(lisp.point_min())
-    occurrences_goto(other=False)
+    occurrences_goto()
 occurrences_next.interaction = ''
 
 
