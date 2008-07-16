@@ -220,7 +220,7 @@ class LispUtils(ropemode.environment.Environment):
         lisp.set_buffer(buffer)
         lisp.toggle_read_only(1)
         lisp.set(lisp["next-error-function"], lisp.rope_occurrences_next)
-        lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
+        lisp.local_set_key('\r', lisp.rope_occurrences_goto)
         lisp.local_set_key('q', lisp.delete_window)
 
     def show_doc(self, docs, altview=False):
@@ -335,14 +335,13 @@ class _OldProgress(object):
 def message(message):
     lisp.message(message.replace('%', '%%'))
 
-def occurrences_goto_occurrence(other=True):
+def occurrences_goto(other=True):
     if lisp.line_number_at_pos() < 3:
         lisp.forward_line(3 - lisp.line_number_at_pos())
     lisp.end_of_line()
     end = lisp.point()
     lisp.beginning_of_line()
-    start = lisp.point()
-    line = lisp.buffer_substring_no_properties(start, end)
+    line = lisp.buffer_substring_no_properties(lisp.point(), end)
     tokens = line.split()
     if tokens:
         filename = tokens[0]
@@ -350,7 +349,7 @@ def occurrences_goto_occurrence(other=True):
         resource = _interface._get_resource(filename)
         LispUtils().find_file(resource.real_path, other=other)
         lisp.goto_char(offset + 1)
-occurrences_goto_occurrence.interaction = ''
+occurrences_goto.interaction = ''
 
 def occurrences_next(arg, reset):
     lisp.display_buffer('*rope-occurrences*')
@@ -361,7 +360,7 @@ def occurrences_next(arg, reset):
     if lisp.eobp():
         lisp.message("Cycling rope occurences")
         lisp.goto_char(lisp.point_min())
-    occurrences_goto_occurrence(other=False)
+    occurrences_goto(other=False)
 occurrences_next.interaction = ''
 
 
