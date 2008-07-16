@@ -210,7 +210,7 @@ class LispUtils(ropemode.environment.Environment):
         return lisp.prefix_numeric_value(prefix)
 
     def show_occurrences(self, locations):
-        text = []
+        text = ['List of occurrences:', '']
         for location in locations:
             line = '%s : %s   %s %s' % (location.filename, location.lineno,
                                         location.note, location.offset)
@@ -336,6 +336,8 @@ def message(message):
     lisp.message(message.replace('%', '%%'))
 
 def occurrences_goto_occurrence(other=True):
+    if lisp.line_number_at_pos() < 3:
+        lisp.forward_line(3 - lisp.line_number_at_pos())
     lisp.end_of_line()
     end = lisp.point()
     lisp.beginning_of_line()
