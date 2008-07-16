@@ -218,6 +218,8 @@ class LispUtils(ropemode.environment.Environment):
         text = '\n'.join(text) + '\n'
         buffer = self._make_buffer('*rope-occurrences*', text, switch=True)
         lisp.set_buffer(buffer)
+        lisp.toggle_read_only(1)
+        lisp.set(lisp["next-error-function"], lisp.rope_occurrences_next)
         lisp.local_set_key('\r', lisp.rope_occurrences_goto_occurrence)
         lisp.local_set_key('q', lisp.delete_window)
 
@@ -346,8 +348,18 @@ def occurrences_goto_occurrence():
         resource = _interface._get_resource(filename)
         LispUtils().find_file(resource.real_path, other=True)
         lisp.goto_char(offset + 1)
-        lisp.switch_to_buffer_other_window('*rope-occurrences*')
 occurrences_goto_occurrence.interaction = ''
+
+def occurrences_next(arg, reset):
+    lisp.switch_to_buffer_other_window('*rope-occurrences*')
+    if reset:
+        lisp.goto_char(lisp.point_min())
+    lisp.forward_line(arg)
+    if lisp.eobp():
+        lisp.message("Cycling rope occurences")
+        lisp.goto_char(lisp.point_min())
+    occurrences_goto_occurrence()
+occurrences_next.interaction = ''
 
 
 DEFVARS = """\
