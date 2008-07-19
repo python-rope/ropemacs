@@ -292,12 +292,12 @@ class LispUtils(ropemode.environment.Environment):
         lisp.add_hook(lisp[mapping[hook]], lisp[_lisp_name(name)])
 
     @property
-    @utils.cacheit
+    @utils.saveit
     def global_prefix(self):
         return self.get('global_prefix')
 
     @property
-    @utils.cacheit
+    @utils.saveit
     def local_prefix(self):
         return self.get('local_prefix')
 

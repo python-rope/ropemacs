@@ -7,4 +7,3 @@ TODO
 
 * saving the old values of refactoring configs
 * showing proposal type in code-assist
-* something like grep mode for find occurrences
