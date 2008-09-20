@@ -51,13 +51,13 @@ included in released packages.
 
 Ropemacs:
 
-* repo url: http://rope.sf.net/hg/ropemacs
-* snapshot: http://rope.sf.net/hg/ropemacs/archive/tip.tar.gz
+* repo url: http://bitbucket.org/agr/ropemacs
+* snapshot: http://bitbucket.org/agr/ropemacs/get/tip.gz
 
 Ropemode:
 
-* repo url: http://rope.sf.net/hg/ropemode
-* snapshot: http://rope.sf.net/hg/ropemode/archive/tip.tar.gz
+* repo url: http://bitbucket.org/agr/ropemode
+* snapshot: http://bitbucket.org/agr/ropemode/get/tip.gz
 
 
 Feedback
