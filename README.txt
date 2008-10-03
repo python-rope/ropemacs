@@ -17,6 +17,11 @@ New Features
 compilation mode keys like ``C-x \``` work for occurrences buffer,
 too.
 
+Also there is a bug in pymacs 23 and 24-beta1 that makes python reach
+maximum recursion after interrupting a pymacs command; a patch is
+included in the docs folder.
+
+
 Setting Up
 ==========
 
@@ -309,7 +314,7 @@ Variables
 * ``ropemacs-enable-autoimport``: Shows whether to enable autoimport.
   Defaults to ``nil``.
 * ``ropemacs-autoimport-modules``: The name of modules whose global
-  names should be cached.  `rope-generate-autoimport-cache' reads
+  names should be cached.  ``rope-generate-autoimport-cache`` reads
   this list and fills its cache.
 * ``ropemacs-autoimport-underlineds``: If set, autoimport will cache
   names starting with underlines, too.
