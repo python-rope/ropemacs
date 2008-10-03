@@ -2,3 +2,4 @@ include README.txt COPYING setup.py MANIFEST.in CONTRIBUTORS
 recursive-include ropemacs *.py
 recursive-include ropemode *.py
 recursive-include docs *.txt
+recursive-include docs *.patch
