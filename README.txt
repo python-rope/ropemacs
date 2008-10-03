@@ -13,6 +13,9 @@ library and pymacs_ before using ropemacs.
 New Features
 ============
 
+``rope-find-occurrences`` sets ``next-error-function``.  That means
+compilation mode keys like ``C-x \``` work for occurrences buffer,
+too.
 
 Setting Up
 ==========
