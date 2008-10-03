@@ -20,7 +20,7 @@ def get_long_description():
     return '\n' + '\n'.join(lines[:end]) + '\n'
 
 setup(name='ropemacs',
-      version='0.6c3',
+      version='0.6',
       description='An emacs mode for using rope python refactoring library',
       long_description=get_long_description(),
       packages=['ropemode', 'ropemacs'],
