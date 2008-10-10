@@ -1,4 +1,6 @@
 """ropemacs, an emacs mode for using rope refactoring library"""
+import sys
+
 import ropemode.decorators
 import ropemode.environment
 import ropemode.interface
@@ -513,13 +515,27 @@ shortcuts = [('M-/', 'rope-code-assist'),
              ('C-c f', 'rope-find-occurrences')]
 
 
-ropemode.decorators.logger.message = message
-lisp(DEFVARS)
-_interface = ropemode.interface.RopeMode(env=LispUtils())
-_interface.init()
-lisp(MINOR_MODE)
+def _load_ropemacs():
+    ropemode.decorators.logger.message = message
+    lisp(DEFVARS)
+    _interface = ropemode.interface.RopeMode(env=LispUtils())
+    _interface.init()
+    lisp(MINOR_MODE)
 
-for key, command in shortcuts:
-    LispUtils()._bind_local(command, key)
+    for key, command in shortcuts:
+        LispUtils()._bind_local(command, key)
 
-lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
+    lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
+
+def _started_from_pymacs():
+    import inspect
+    frame = sys._getframe()
+    while frame:
+        # checking frame.f_code.co_name == 'pymacs_load_helper' might
+        # be very fragile.
+        if inspect.getfile(frame).rstrip('c').endswith('pymacs.py'):
+            return True
+        frame = frame.f_back
+
+if _started_from_pymacs():
+    _load_ropemacs()
