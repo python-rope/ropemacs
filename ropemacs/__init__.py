@@ -515,7 +515,10 @@ shortcuts = [('M-/', 'rope-code-assist'),
              ('C-c f', 'rope-find-occurrences')]
 
 
+_interface = None
+
 def _load_ropemacs():
+    global _interface
     ropemode.decorators.logger.message = message
     lisp(DEFVARS)
     _interface = ropemode.interface.RopeMode(env=LispUtils())
