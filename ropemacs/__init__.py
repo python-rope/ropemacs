@@ -525,8 +525,9 @@ def _load_ropemacs():
     _interface.init()
     lisp(MINOR_MODE)
 
-    for key, command in shortcuts:
-        LispUtils()._bind_local(command, key)
+    if _interface.get('enable_shortcuts'):
+        for key, command in shortcuts:
+            LispUtils()._bind_local(command, key)
 
     lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
 
