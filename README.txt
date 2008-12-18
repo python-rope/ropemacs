@@ -162,6 +162,9 @@ C-u 1 M-/     xab
 C-u 3 M-/     xbb
 ============  ==========  =======================
 
+You can use ``rope-completions`` lisp function to get the list of
+completions.
+
 
 Finding Occurrences
 -------------------
