@@ -308,13 +308,6 @@ Variables
   open the project that contains the file on which a rope command is
   performed when no project is already opened.
 
-* ``ropemacs-local-prefix``: The prefix for ropemacs refactorings.
-  Defaults to ``C-c r``.
-* ``ropemacs-global-prefix``: The prefix for ropemacs project commands
-  Defaults to ``C-x p``.
-* ``ropemacs-enable-shortcuts``: Shows whether to bind ropemacs
-  shortcuts keys.  Defaults to ``t``.
-
 * ``ropemacs-enable-autoimport``: Shows whether to enable autoimport.
   Defaults to ``nil``.
 * ``ropemacs-autoimport-modules``: The name of modules whose global
@@ -322,6 +315,16 @@ Variables
   this list and fills its cache.
 * ``ropemacs-autoimport-underlineds``: If set, autoimport will cache
   names starting with underlines, too.
+
+These variables change the keybinding.  They should be set before
+loading ropemacs.
+
+* ``ropemacs-local-prefix``: The prefix for ropemacs refactorings.
+  Defaults to ``C-c r``.
+* ``ropemacs-global-prefix``: The prefix for ropemacs project commands
+  Defaults to ``C-x p``.
+* ``ropemacs-enable-shortcuts``: Shows whether to bind ropemacs
+  shortcuts keys.  Defaults to ``t``.
 
 
 Keybinding
@@ -382,8 +385,7 @@ code-assist group.  You can define your own shortcuts like this::
 
   (define-key ropemacs-local-keymap "\C-cg" 'rope-goto-definition)
 
-Ropemacs itself comes with a few shortcuts.  These shortcuts will be
-used only when ropemacs-enable-shortcuts is non-nil.
+Ropemacs itself comes with a few shortcuts:
 
 ================  ============================
 Key               Command
@@ -394,6 +396,13 @@ C-c g             rope-goto-definition
 C-c d             rope-show-doc
 C-c f             rope-find-occurrences
 ================  ============================
+
+These shortcuts will be used only when ropemacs-enable-shortcuts is
+non-nil (it is enabled by default).  Note that in order to disable these
+shortcuts, the value of ropemacs-enable-shortcuts should be set *before*
+loading ropemacs::
+
+  (setq ropemacs-enable-shortcuts 'nil)
 
 
 Contributing
