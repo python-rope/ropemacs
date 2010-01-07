@@ -33,6 +33,15 @@ After installing pymacs, add these lines to your ``~/.emacs`` file::
 Note that rope and ropemacs should be in your ``PYTHONPATH`` for this
 to work.
 
+Also note that ropemacs may redefine some standard Emacs and your custom key
+bindings.  To prevent this, put the following example lines to your
+``~/.emacs`` *before* the lines presented above:
+
+  (setq ropemacs-enable-shortcuts nil)
+  (setq ropemacs-local-prefix "C-c C-p")
+
+See keybinding_ and variables_ sections for more details.
+
 Loading Lazily
 --------------
 
