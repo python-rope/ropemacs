@@ -175,6 +175,7 @@ class LispUtils(ropemode.environment.Environment):
             elif window == 'other':
                 if self.get("use_pop_to_buffer"):
                     lisp.pop_to_buffer(new_buffer)
+                    lisp.goto_char(lisp.point_min())
                 else:
                     new_window = lisp.display_buffer(new_buffer)
                     lisp.set_window_point(new_window, lisp.point_min())
