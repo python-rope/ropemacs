@@ -354,8 +354,8 @@ C-x p u           rope-undo
 C-x p r           rope-redo
 C-x p c           rope-project-config
 C-x p n [mpfd]    rope-create-(module|package|file|directory)
-                  rope-write-project
-
+\                 rope-write-project
+\
 C-c r r           rope-rename
 C-c r l           rope-extract-variable
 C-c r m           rope-extract-method
@@ -368,10 +368,10 @@ C-c r s           rope-change-signature
 C-c r 1 r         rope-rename-current-module
 C-c r 1 v         rope-move-current-module
 C-c r 1 p         rope-module-to-package
-
+\
 C-c r o           rope-organize-imports
 C-c r n [vfcmp]   rope-generate-(variable|function|class|module|package)
-
+\
 C-c r a /         rope-code-assist
 C-c r a g         rope-goto-definition
 C-c r a d         rope-show-doc
@@ -379,11 +379,11 @@ C-c r a f         rope-find-occurrences
 C-c r a ?         rope-lucky-assist
 C-c r a j         rope-jump-to-global
 C-c r a c         rope-show-calltip
-                  rope-analyze-module
-
-                  rope-auto-import
-                  rope-generate-autoimport-cache
-===============   ============================
+\                 rope-analyze-module
+\
+\                 rope-auto-import
+\                 rope-generate-autoimport-cache
+================  ============================
 
 
 Shortcuts
