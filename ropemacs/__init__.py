@@ -173,11 +173,16 @@ class LispUtils(ropemode.environment.Environment):
                     lisp.switch_to_buffer_other_window(new_buffer)
                 lisp.goto_char(lisp.point_min())
             elif window == 'other':
-                new_window = lisp.display_buffer(new_buffer)
-                lisp.set_window_point(new_window, lisp.point_min())
-                if fit_lines and lisp.fboundp(lisp['fit-window-to-buffer']):
-                    lisp.fit_window_to_buffer(new_window, fit_lines)
-                    lisp.bury_buffer(new_buffer)
+                if self.get("use_pop_to_buffer"):
+                    lisp.pop_to_buffer(new_buffer)
+                    lisp.goto_char(lisp.point_min())
+                else:
+                    new_window = lisp.display_buffer(new_buffer)
+                    lisp.set_window_point(new_window, lisp.point_min())
+                    if (fit_lines
+                        and lisp.fboundp(lisp['fit-window-to-buffer'])):
+                        lisp.fit_window_to_buffer(new_window, fit_lines)
+                        lisp.bury_buffer(new_buffer)
         return new_buffer
 
     def _hide_buffer(self, name, delete=True):
@@ -409,6 +414,11 @@ How many errors to fix, at most, when proposing code completions.")
   "Should `rope-show-doc' use a separate buffer or the minibuffer.")
 (defcustom ropemacs-max-doc-buffer-height 22
   "The maximum buffer height for `rope-show-doc'.")
+
+(defcustom ropemacs-use-pop-to-buffer nil
+  "Use native `pop-to-buffer' to show new buffer.
+
+This affect all ropemacs function including `rope-show-doc'.")
 
 (defcustom ropemacs-enable-autoimport 'nil
   "Specifies whether autoimport should be enabled.")
