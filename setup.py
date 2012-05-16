@@ -1,7 +1,7 @@
 extra_kwargs = {}
 try:
     from setuptools import setup
-    extra_kwargs['install_requires'] = ['rope >= 0.9.3', 'ropemode']
+    extra_kwargs['install_requires'] = ['rope >= 0.9.4', 'ropemode >= 0.2']
 except ImportError:
     from distutils.core import setup
 
@@ -25,7 +25,7 @@ def get_long_description():
     return '\n' + '\n'.join(lines[:end]) + '\n'
 
 setup(name='ropemacs',
-      version='0.6',
+      version='0.7',
       description='An emacs mode for using rope python refactoring library',
       long_description=get_long_description(),
       packages=['ropemacs'],
