@@ -37,6 +37,8 @@ class LispUtils(ropemode.environment.Environment):
         location = starting or default
         if location is not None:
             prompt = prompt + ('[%s] ' % location)
+        # TODO: Translate fully qualified TRAMP file path to host
+        # relative remote path.
         if lisp.fboundp(lisp['read-directory-name']):
             # returns default when starting is entered
             result = lisp.read_directory_name(prompt, location, location)
@@ -85,7 +87,15 @@ class LispUtils(ropemode.environment.Environment):
         return min(offset1, offset2), max(offset1, offset2)
 
     def filename(self):
-        return lisp.buffer_file_name()
+        import traceback
+        lisp.message(repr(traceback.format_stack()))
+        lisp.backtrace()
+        filename = lisp.buffer_file_name()
+        host_relative_remote_filename = None
+        if filename:
+            host_relative_remote_filename = lisp.file_remote_p(filename, lisp.localname)
+        lisp.message("%s: %s" % (filename, repr(host_relative_remote_filename)))
+        return host_relative_remote_filename or filename
 
     def is_modified(self):
         return lisp.buffer_modified_p()
