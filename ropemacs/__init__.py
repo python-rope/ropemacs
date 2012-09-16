@@ -45,8 +45,14 @@ class LispUtils(ropemode.environment.Environment):
         else:
             result = lisp.read_file_name(prompt, location, location)
         if result == '' and location is not None:
-            return location
-        return result
+            return self.path_on_python_host(location)
+        return self.path_on_python_host(result)
+
+    def path_on_python_host(self, path_on_lisp_host):
+        path_on_python_host = None
+        if path_on_lisp_host:
+            path_on_python_host = lisp.file_remote_p(path_on_lisp_host, lisp.localname)
+        return path_on_python_host or path_on_lisp_host
 
     def message(self, msg):
         message(msg)
@@ -87,15 +93,8 @@ class LispUtils(ropemode.environment.Environment):
         return min(offset1, offset2), max(offset1, offset2)
 
     def filename(self):
-        import traceback
-        lisp.message(repr(traceback.format_stack()))
-        lisp.backtrace()
         filename = lisp.buffer_file_name()
-        host_relative_remote_filename = None
-        if filename:
-            host_relative_remote_filename = lisp.file_remote_p(filename, lisp.localname)
-        lisp.message("%s: %s" % (filename, repr(host_relative_remote_filename)))
-        return host_relative_remote_filename or filename
+        return self.path_on_python_host(filename)
 
     def is_modified(self):
         return lisp.buffer_modified_p()
@@ -152,7 +151,11 @@ class LispUtils(ropemode.environment.Environment):
         if initial is not None:
             lisp.set_buffer(initial)
 
+    def path_on_lisp_host(self, path_on_python_host):
+        return lisp.file_remote_p(lisp['default-directory'].value()) + path_on_python_host
+
     def find_file(self, filename, readonly=False, other=False):
+        filename = self.path_on_lisp_host(filename)
         if other:
             lisp.find_file_other_window(filename)
         elif readonly:
