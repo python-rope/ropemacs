@@ -37,8 +37,6 @@ class LispUtils(ropemode.environment.Environment):
         location = starting or default
         if location is not None:
             prompt = prompt + ('[%s] ' % location)
-        # TODO: Translate fully qualified TRAMP file path to host
-        # relative remote path.
         if lisp.fboundp(lisp['read-directory-name']):
             # returns default when starting is entered
             result = lisp.read_directory_name(prompt, location, location)
