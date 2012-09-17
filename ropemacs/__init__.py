@@ -138,7 +138,7 @@ class LispUtils(ropemode.environment.Environment):
         else:
             initial = lisp.current_buffer()
         for filename in filenames:
-            buffer = lisp.find_buffer_visiting(filename)
+            buffer = lisp.find_buffer_visiting(self.path_on_lisp_host(filename))
             if buffer:
                 if filename in moves:
                     lisp.kill_buffer(buffer)
