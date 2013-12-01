@@ -410,6 +410,9 @@ saved automatically.")
 
 How many errors to fix, at most, when proposing code completions.")
 
+(defcustom ropemacs-codeassist-noerror nil
+  "Ignore errors in the code during code-assist if it is non-nil.")
+
 (defcustom ropemacs-separate-doc-buffer t
   "Should `rope-show-doc' use a separate buffer or the minibuffer.")
 (defcustom ropemacs-max-doc-buffer-height 22
