@@ -1,7 +1,15 @@
+# dependencies for python 2 or python 3
+import sys
+if sys.version < '3':
+    install_requires = ['rope >= 0.9.4', 'ropemode >= 0.2']
+else:
+    install_requires = ['rope_py3k >= 0.9.4', 'ropemode >= 0.2']
+
+
 extra_kwargs = {}
 try:
     from setuptools import setup
-    extra_kwargs['install_requires'] = ['rope >= 0.9.4', 'ropemode >= 0.2']
+    extra_kwargs['install_requires'] = install_requires
 except ImportError:
     from distutils.core import setup
 
@@ -35,4 +43,6 @@ setup(name='ropemacs',
       license='GNU GPL',
       classifiers=classifiers,
       requires=['ropemode'],
+      use_2to3=True,
+      use_2to3_fixers=['fixes'],
       **extra_kwargs)
