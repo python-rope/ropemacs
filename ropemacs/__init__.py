@@ -545,7 +545,6 @@ MINOR_MODE = """\
 (define-minor-mode ropemacs-mode
  "ropemacs, rope in emacs!" nil " Rope" ropemacs-local-keymap
   :global nil)
-)
 """
 
 shortcuts = [('M-/', 'rope-code-assist'),
