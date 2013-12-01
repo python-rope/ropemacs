@@ -391,6 +391,26 @@ def occurrences_next(arg, reset):
     occurrences_goto()
 occurrences_next.interaction = ''
 
+def turn_on():
+    """Turn on ropemacs-mode."""
+    lisp.ropemacs_mode(True)
+turn_on.interaction = ''
+
+def turn_off():
+    """Turn off ropemacs-mode."""
+    lisp.ropemacs_mode(False)
+turn_off.interaction = ''
+
+def turn_on():
+    """Turn on ropemacs-mode."""
+    lisp.ropemacs_mode(True)
+turn_on.interaction = ''
+
+def turn_off():
+    """Turn off ropemacs-mode."""
+    lisp.ropemacs_mode(False)
+turn_off.interaction = ''
+
 
 DEFVARS = """\
 (defgroup ropemacs nil
@@ -570,7 +590,7 @@ def _load_ropemacs():
         for key, command in shortcuts:
             LispUtils()._bind_local(command, key)
 
-    lisp.add_hook(lisp['python-mode-hook'], lisp['ropemacs-mode'])
+    lisp.add_hook(lisp['python-mode-hook'], lisp['rope-turn-on'])
 
 def _started_from_pymacs():
     import inspect
