@@ -1,3 +1,9 @@
+
+**Note:** *Please note that this project has been moved to* `GitHub python-rope / ropemacs`_
+
+.. _GitHub python-rope / ropemacs: https://github.com/python-rope/ropemacs
+
+
 =========================
  ropemacs, rope in emacs
 =========================
