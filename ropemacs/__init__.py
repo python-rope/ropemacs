@@ -238,19 +238,46 @@ the rope-marker-ring")
     def prefix_value(self, prefix):
         return lisp.prefix_numeric_value(prefix)
 
+    def read_line_from_file(self, filename, lineno):
+        with open(filename) as f:
+            for i, line in enumerate(f):
+                if i+1 == lineno:
+                    return line
+
+        return "" # If lineno goes beyond the end of the file
+
     def show_occurrences(self, locations):
-        text = ['List of occurrences:', '']
-        for location in locations:
-            line = '%s : %s   %s %s' % (location.filename, location.lineno,
-                                        location.note, location.offset)
-            text.append(line)
-        text = '\n'.join(text) + '\n'
-        buffer = self._make_buffer('*rope-occurrences*', text, switch=False)
+        buffer = self._make_buffer('*rope-occurrences*', "", switch=False)
         lisp.set_buffer(buffer)
+        lisp.toggle_read_only(0)
+
+        trunc_length = len(lisp.rope_get_project_root())
+
+        lisp.insert('List of occurrences:\n')
+        for location in locations:
+            code_line = self.read_line_from_file(location.filename, location.lineno).rstrip()
+            filename = location.filename[trunc_length:]
+            lineno = str(location.lineno)
+            offset = str(location.offset)
+
+            lisp.insert(filename + ":" + lineno + ":" + code_line + " " + offset)
+
+            beginning = lisp.line_beginning_position()
+            end = beginning + len(filename)
+
+            lisp.add_text_properties(beginning, end, [lisp.face, lisp.button])
+            lisp.add_text_properties(beginning, end, [lisp.mouse_face, lisp.highlight,
+                                                      lisp.help_echo, "mouse-2: visit this file in other window"])
+
+            lisp.insert("\n")
+
         lisp.toggle_read_only(1)
+
         lisp.set(lisp["next-error-function"], lisp.rope_occurrences_next)
         lisp.local_set_key('\r', lisp.rope_occurrences_goto)
+        lisp.local_set_key((lisp.mouse_1,), lisp.rope_occurrences_goto)
         lisp.local_set_key('q', lisp.delete_window)
+
 
     def show_doc(self, docs, altview=False):
         use_minibuffer = not altview
@@ -365,15 +392,27 @@ def message(message):
     lisp.message(message.replace('%', '%%'))
 
 def occurrences_goto():
-    if lisp.line_number_at_pos() < 3:
-        lisp.forward_line(3 - lisp.line_number_at_pos())
+    if lisp.line_number_at_pos() < 1:
+        lisp.forward_line(1 - lisp.line_number_at_pos())
     lisp.end_of_line()
     end = lisp.point()
     lisp.beginning_of_line()
     line = lisp.buffer_substring_no_properties(lisp.point(), end)
     tokens = line.split()
-    if tokens:
-        filename = tokens[0]
+    semicolon_tokens = line.split(":")
+
+    project_root = lisp.rope_get_project_root()
+    if tokens and semicolon_tokens:
+        # Mark this line with an arrow
+        lisp('''
+        (remove-overlays (point-min) (point-max))
+            (overlay-put (make-overlay (line-beginning-position) (line-end-position))
+            'before-string
+            (propertize "A" 'display '(left-fringe right-triangle)))
+        ''')
+
+
+        filename = project_root + "/" + semicolon_tokens[0]
         offset = int(tokens[-1])
         resource = _interface._get_resource(filename)
         LispUtils().find_file(resource.real_path, other=True)
