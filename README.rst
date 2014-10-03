@@ -143,6 +143,10 @@ files only.
 Code-Assist
 -----------
 
+Ropemacs integrates with ``completion-at-point`` (``C-M-i`` by
+default). Called once, it will insert the common prefix.  Called twice,
+it will pop up a buffer with all available completions.
+
 ``rope-code-assist`` command (``M-/`` by default) will let you select
 from a list of completions.  If prefixed (``C-u M-/``), ropemacs
 inserts the common prefix, automatically.  If a numeric argument is
