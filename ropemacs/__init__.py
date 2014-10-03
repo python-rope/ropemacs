@@ -581,9 +581,59 @@ already opened.")
 """
 
 MINOR_MODE = """\
+(require 'thingatpt)
+
 (define-minor-mode ropemacs-mode
  "ropemacs, rope in emacs!" nil " Rope" ropemacs-local-keymap
-  :global nil)
+  (if ropemacs-mode
+      (add-hook 'completion-at-point-functions 'ropemacs-completion-at-point nil t)
+    (remove-hook 'completion-at-point-functions 'ropemacs-completion-at-point t)))
+
+(defun ropemacs-completion-at-point ()
+  (unless (nth 8 (syntax-ppss))
+    (let ((bounds (or (bounds-of-thing-at-point 'symbol)
+                      (cons (point) (point)))))
+      (list (car bounds)
+            (cdr bounds)
+            'ropemacs--completion-table
+            :company-doc-buffer 'ropemacs--completion-doc-buffer
+            :company-location 'ropemacs--completion-location))))
+
+(defalias 'ropemacs--completion-table
+  (if (fboundp 'completion-table-with-cache)
+      (completion-table-with-cache #'ropemacs--completion-candidates)
+    (completion-table-dynamic #'ropemacs--completion-candidates)))
+
+(defun ropemacs--completion-candidates (prefix)
+  (mapcar (lambda (element) (concat prefix element))
+          (rope-completions)))
+
+(defun ropemacs--with-inserted (candidate fn)
+  (let ((inhibit-modification-hooks t)
+        (inhibit-point-motion-hooks t)
+        (modified-p (buffer-modified-p))
+        (beg (or (car (bounds-of-thing-at-point 'symbol)) (point)))
+        (pt (point)))
+     (insert (substring candidate (- pt beg)))
+     (unwind-protect
+         (funcall fn)
+       (delete-region pt (point))
+       (set-buffer-modified-p modified-p))))
+
+(defun ropemacs--completion-doc-buffer (candidate)
+  (let ((doc (ropemacs--with-inserted candidate #'rope-get-doc)))
+    (when doc
+      (with-current-buffer (get-buffer-create "*ropemacs-completion-doc*")
+        (erase-buffer)
+        (insert doc)
+        (goto-char (point-min))
+        (current-buffer)))))
+
+(defun ropemacs--completion-location (candidate)
+  (let ((location (ropemacs--with-inserted
+                   candidate #'rope-definition-location)))
+    (when location
+      (cons (elt location 0) (elt location 1)))))
 """
 
 shortcuts = [('M-/', 'rope-code-assist'),
