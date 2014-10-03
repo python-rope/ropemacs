@@ -33,7 +33,7 @@ Features
 
 * Code-assists
 
-  * Code-completion
+  * Code completion
   * Goto definition
   * Show pydoc
   * Find occurrences
