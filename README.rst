@@ -13,7 +13,7 @@ like python refactorings and code-assists.  You should install rope_
 library and pymacs_ before using ropemacs.
 
 .. _rope: https://github.com/python-rope/rope/
-.. _pymacs: http://pymacs.progiciels-bpi.ca/pymacs.html
+.. _pymacs: https://github.com/pinard/Pymacs
 
 
 New Features
