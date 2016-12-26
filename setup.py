@@ -1,7 +1,18 @@
+import sys
+
+if sys.version < '3':
+    rope_package = 'rope'
+else:
+    rope_package = 'rope_py3k'
+
 extra_kwargs = {}
 try:
     from setuptools import setup
-    extra_kwargs['install_requires'] = ['rope >= 0.9.4', 'ropemode >= 0.2']
+    extra_kwargs['install_requires'] = [
+        'future >= 0.11.2',
+        rope_package + ' >= 0.9.4',
+        'ropemode >= 0.3a1'
+    ]
 except ImportError:
     from distutils.core import setup
 
@@ -21,6 +32,7 @@ classifiers = [
 
 
 def get_long_description():
+    from future.builtins import open
     lines = open('README.rst').read().splitlines(False)
     end = lines.index('Setting Up')
     return '\n' + '\n'.join(lines[:end]) + '\n'
@@ -35,5 +47,5 @@ setup(name='ropemacs',
       url='http://rope.sf.net/ropemacs.html',
       license='GNU GPL',
       classifiers=classifiers,
-      requires=['ropemode'],
+      requires=['future (>= 0.11.2)', 'ropemode (>= 0.3a1)'],
       **extra_kwargs)

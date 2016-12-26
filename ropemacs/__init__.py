@@ -1,4 +1,6 @@
 """ropemacs, an emacs mode for using rope refactoring library"""
+from future.builtins import chr, int
+
 import sys
 
 import ropemode.decorators
@@ -333,8 +335,8 @@ the rope-marker-ring")
         return ''.join(result)
 
     def _set_interaction(self, callback, prefix):
-        if hasattr(callback, 'im_func'):
-            callback = callback.im_func
+        if hasattr(callback, '__func__'):
+            callback = callback.__func__
         if prefix:
             callback.interaction = 'P'
         else:
