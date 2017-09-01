@@ -425,7 +425,7 @@ def occurrences_next(arg, reset):
         lisp.goto_char(lisp.point_min())
     lisp.forward_line(arg)
     if lisp.eobp():
-        lisp.message("Cycling rope occurences")
+        lisp.message("Cycling rope occurrences")
         lisp.goto_char(lisp.point_min())
     occurrences_goto()
 occurrences_next.interaction = ''
