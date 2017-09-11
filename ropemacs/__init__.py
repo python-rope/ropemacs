@@ -336,9 +336,14 @@ the rope-marker-ring")
         if hasattr(callback, 'im_func'):
             callback = callback.im_func
         if prefix:
-            callback.interaction = 'P'
+            callback_interaction = 'P'
         else:
-            callback.interaction = ''
+            callback_interaction = ''
+
+        try:
+            callback.interaction = callback_interaction
+        except AttributeError:
+            callback.__func__.interaction = callback_interaction
 
     def add_hook(self, name, callback, hook):
         mapping = {'before_save': 'before-save-hook',
