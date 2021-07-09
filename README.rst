@@ -9,8 +9,7 @@
 =========================
 
 Ropemacs is an emacs mode that uses rope_ library to provide features
-like python refactorings and code-assists.  You should install rope_
-library and pymacs_ before using ropemacs.
+like python refactorings and code-assists.  You should install pymacs_ before using ropemacs.
 
 .. _rope: https://github.com/python-rope/rope/
 .. _pymacs: https://github.com/dgentry/Pymacs
@@ -31,17 +30,18 @@ included in the docs folder.
 Setting Up
 ==========
 
+Install latest version of ropemacs::
+
+  python -m pip install --user --editable "git+https://github.com/python-rope/ropemacs.git#egg=ropemacs"
+
 After installing pymacs, add these lines to your ``~/.emacs`` file::
 
   (require 'pymacs)
   (pymacs-load "ropemacs" "rope-")
 
-Note that rope and ropemacs should be in your ``PYTHONPATH`` for this
-to work.
-
 Also note that ropemacs may redefine some standard Emacs and your custom key
 bindings.  To prevent this, put the following example lines to your
-``~/.emacs`` *before* the lines presented above:
+``~/.emacs`` *before* the lines presented above::
 
   (setq ropemacs-enable-shortcuts nil)
   (setq ropemacs-local-prefix "C-c C-p")
