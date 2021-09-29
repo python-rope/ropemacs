@@ -1,9 +1,3 @@
-
-**Note:** *Please note that this project has been moved to* `GitHub python-rope / ropemacs`_
-
-.. _GitHub python-rope / ropemacs: https://github.com/python-rope/ropemacs
-
-
 =========================
  ropemacs, rope in emacs
 =========================
@@ -427,11 +421,11 @@ loading ropemacs::
 Contributing
 ============
 
-Send your bug reports, feature requests and patches to `rope-dev (at)
-googlegroups.com`_.
+Send your bug reports, feature requests and patches to `ropemacs Github 
+Issue Tracker`_ or `rope Github Discussions`_
 
-.. _`rope-dev (at) googlegroups.com`: http://groups.google.com/group/rope-dev
-
+.. _`ropemacs Github Issue Tracker`: https://github.com/python-rope/ropemacs/issues
+.. _`rope Github Discussions`: https://github.com/python-rope/rope/discussions
 
 License
 =======
