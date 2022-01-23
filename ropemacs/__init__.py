@@ -1,5 +1,6 @@
 """ropemacs, an emacs mode for using rope refactoring library"""
 import sys
+from os.path import join
 
 import ropemode.decorators
 import ropemode.environment
@@ -152,7 +153,7 @@ class LispUtils(ropemode.environment.Environment):
     def path_on_lisp_host(self, path_on_python_host):
         default_directory = lisp['default-directory'].value()
         path = lisp.file_remote_p(default_directory)
-        return (path or default_directory) + path_on_python_host
+        return join((path or default_directory) , path_on_python_host)
 
     def find_file(self, filename, readonly=False, other=False):
         filename = self.path_on_lisp_host(filename)
