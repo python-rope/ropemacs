@@ -499,9 +499,9 @@ Note that you must set `ido-mode' if using`ido-completing-read'."
   :type 'function)
 
 (make-obsolete-variable
-  'rope-confirm-saving 'ropemacs-confirm-saving)
+  'rope-confirm-saving 'ropemacs-confirm-saving "27.1")
 (make-obsolete-variable
-  'rope-code-assist-max-fixes 'ropemacs-codeassist-maxfixes)
+  'rope-code-assist-max-fixes 'ropemacs-codeassist-maxfixes "27.1")
 
 (defcustom ropemacs-local-prefix "C-c r"
   "The prefix for ropemacs refactorings.
