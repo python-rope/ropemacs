@@ -1,3 +1,7 @@
+
+**This project is quite definitively free for adoption. Anybody who actually cares for Emacs, please, take this over from my hands. Thank you!**
+
+
 =========================
  ropemacs, rope in emacs
 =========================
