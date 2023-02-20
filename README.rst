@@ -1,3 +1,8 @@
+.. csv-table::
+
+   "❗If you are using ropemacs, consider using `pylsp-rope`_ in Emacs."
+
+.. _pylsp-rope: https://github.com/python-rope/pylsp-rope
 
 **This project is quite definitively free for adoption. Anybody who actually cares for Emacs, please, take this over from my hands. Thank you!**
 
